@@ -1,0 +1,6 @@
+# Ignore datasets
+data/*
+!data/.gitkeep
+*.csv
+*.zip
+.ipynb_checkpoints/

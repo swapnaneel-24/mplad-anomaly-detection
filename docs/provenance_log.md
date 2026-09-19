@@ -70,7 +70,7 @@ The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will
 
 
 
-### Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
+## Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
 
 **Date:** 2026-09-19
 

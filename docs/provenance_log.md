@@ -43,3 +43,28 @@ This stream can be used to study unusual infrastructure/administrative records a
 
 **Decision:**
 Proceed to preprocessing and feature engineering. The corrected dataset resolves the earlier dataset-size problem, while the remaining methodological limitations will be addressed during Phase 2.
+
+### Stream B Expansion and Final Compatibility Decision
+
+**Date:** 2026-09-19
+
+The PMGSY-III Stream B dataset was expanded from the original Bihar, Uttar Pradesh and Madhya Pradesh population to include Rajasthan, Maharashtra and Odisha. After exact-row deduplication, the resulting six-state working population contains **9,634 unique records**.
+
+A stratified compatibility audit was performed separately for `P` and `L` records. The datasets share the substantive schema, but differences were observed in proposal-type composition, road-length distributions and temporal coverage. `CN_CODE` was found to be present and unique for `P` records but absent for `L` records; it was therefore treated as an identifier rather than a primary ML feature.
+
+Adversarial validation was used to determine whether the added states could be distinguished from the core Bihar–UP–MP population. For `P` records, CORE-vs-ADDED AUC was **0.837** using `PROPOSED_L`, `IMS_BATCH` and `IMS_YEAR`, falling to **0.708** when `IMS_YEAR` was removed. For `L` records, AUC was **0.970**, falling to **0.850** without `IMS_YEAR`.
+
+Further inspection showed that `IMS_BATCH` is strongly associated with `IMS_YEAR` and `PROPOSAL_T`, with batch composition varying substantially by state and cohort. This indicated that `IMS_BATCH` can act as a source/cohort indicator rather than a genuine infrastructure characteristic. Permutation importance supported this, particularly for `L` records, where `IMS_BATCH` was the dominant discriminator and `PROPOSED_L` provided no measurable separation.
+
+A final adversarial test using only `PROPOSED_L` produced an AUC of **0.664** for `P` records and **0.500** for `L` records. This showed that, after excluding temporal and batch variables, the remaining cross-state shift in the `P` population was substantially lower. The `L` result also confirmed that `PROPOSED_L` contains no useful variation for that population.
+
+**Final Decision:**
+- The six-state PMGSY dataset is **accepted for Stream B**.
+- `P` records will form the **primary combined ML population**.
+- `L` records will be treated separately or descriptively and will not be mixed into the primary feature space.
+- `IMS_BATCH` and raw `IMS_YEAR` will be excluded from the initial anomaly-detection feature space because they can encode temporal/cohort differences. They will remain available for EDA, stratified analysis and sensitivity testing.
+- `MRL_ID`, `STATE_ID`, `LGD_STATE`, `LGD_DISTRI`, `DISTRICT_I`, `BLOCK_ID` and `CN_CODE` will be treated as identifiers/administrative reference fields rather than direct ML features unless later feature-engineering analysis provides a defensible reason to use them.
+- No additional state will be added solely to exceed the supervisor's approximate **10,000–15,000 row** guideline.
+
+The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will be addressed during Phase 2 through EDA, feature engineering, preprocessing and feature-space validation rather than by discarding the expanded dataset.
+

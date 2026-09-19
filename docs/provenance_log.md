@@ -68,3 +68,24 @@ A final adversarial test using only `PROPOSED_L` produced an AUC of **0.664** fo
 
 The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will be addressed during Phase 2 through EDA, feature engineering, preprocessing and feature-space validation rather than by discarding the expanded dataset.
 
+
+
+### Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
+
+**Date:** 2026-09-19
+
+Phase 2 begins with **extended exploratory data analysis (EDA) before final preprocessing and feature selection** for the PMGSY-III Stream B dataset.
+
+The current six-state dataset and the earlier compatibility analysis provide a starting point, but the observations and decisions made so far are **provisional**. They may change, mature, or be revised as the structure and behaviour of the data become clearer through further EDA, investigation and analysis.
+
+A particular concern is the presence of a large number of apparent duplicate records in the CSV representation. These will **not be assumed to be erroneous and removed automatically**. Since the source data originates from geospatial records, identical tabular attributes may not necessarily represent identical underlying spatial entities. Possible explanations include export duplication, repeated project/segment records, legitimate repeated observations, or loss of distinguishing information during conversion to tabular form.
+
+Therefore, duplicate handling will be treated as an **investigative decision within Phase 2**, with possible outcomes including removal, aggregation, retention, or another justified treatment depending on the evidence.
+
+The same principle will apply to other preprocessing decisions, including missing-value treatment, categorical encoding, temporal variables and feature selection. The objective is to understand the data first and allow the final feature space and preprocessing strategy to emerge from the evidence rather than imposing fixed assumptions in advance.
+
+**Initial Phase 2 approach:**
+
+`Raw/Current Data → Extended EDA → Structural Investigation → Feature Engineering Candidates → Feature-Space Audit → Final Preprocessing → Modelling`
+
+No final preprocessing or feature-space decision is considered locked at the start of Phase 2.

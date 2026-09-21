@@ -1,6 +1,9 @@
 # Ignore datasets
-data/*
+data/**
+!data/**/
+!data/**/*.dvc
 !data/.gitkeep
+
 *.csv
 *.zip
 .ipynb_checkpoints/

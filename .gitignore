@@ -7,3 +7,5 @@ data/**
 *.csv
 *.zip
 .ipynb_checkpoints/
+results/stream a/phase 3/*.pkl
+results/stream a/phase 4/FULL_phase4_evaluation_dataset.csv

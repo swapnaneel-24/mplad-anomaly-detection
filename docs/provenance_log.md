@@ -246,3 +246,294 @@ The same principle will apply to other preprocessing decisions, including missin
 `Raw/Current Data → Extended EDA → Structural Investigation → Feature Engineering Candidates → Feature-Space Audit → Final Preprocessing → Modelling`
 
 No final preprocessing or feature-space decision is considered locked at the start of Phase 2.
+
+---
+
+# **STREAM A EXECUTION TRAIL - Phases 2 through 6 (ULB Proxy Benchmark)**
+
+*This section documents the complete execution trail for Stream A, in chronological order, with all substantive decisions, identified tensions, bug discoveries, and methodology revisions. It is written to be auditable: a reviewer reading this section should be able to reconstruct why every design choice was made and what alternatives were rejected and why.*
+
+
+## Phase 2 (Track A) - Initial Preprocessing and Scaling Decision
+
+**Date:** 2026-10-21
+
+### Initial Approach
+The first preprocessing pass applied `RobustScaler` to `Time` and `Amount`, retained `V1`-`V28` untouched, and wrote a single output file `creditcard_preprocessed.csv` containing features and the `Class` label in one CSV.
+
+### Diagnostics Driving the Scaling Choice
+Pre-scaling diagnostics on `Amount`:
+
+| Metric | Value |
+| :--- | :--- |
+| Mean | 88.35 |
+| Median | 22.00 |
+| Std | 250.12 |
+| Max | 25,691.16 |
+| Skewness | 16.98 |
+| Kurtosis | 845.09 |
+| IQR-outlier fraction (overall) | 11.20% |
+| IQR-outlier fraction (legit, Class=0) | 11.19% |
+| IQR-outlier fraction (fraud, Class=1) | 18.50% |
+
+Decision: `RobustScaler` (median / IQR) chosen over `StandardScaler` (mean / std) for `Amount` on the grounds that mean/std would be inflated by extreme outliers and compress the inlier mass into a narrow band, destroying distance-based signal for downstream LOF. `Time` was scaled with `RobustScaler` for pipeline uniformity (its skewness was -0.0356, so the choice was mathematically neutral on that column). `V1`-`V28` left untouched: confirmed mean = 0.0, std approx 0.97, already PCA-transformed by the dataset curators.
+
+### Tensions Identified at This Stage
+1. **Label-in-CSV hazard:** Writing `Class` into the same CSV as the features set a trap for any downstream code that ingested the file blindly. A model pointed at this CSV could accidentally train on the target.
+2. **Single-output-file opacity:** One "final" CSV did not document which feature transformations had been tried or why one was chosen. A reviewer could not reconstruct alternatives.
+3. **No stable observation identifier:** No `row_id` existed. All downstream alignment relied on array position, which is fragile.
+
+### Internal self critique (Review) and Redesign
+An external review of the initial preprocessing pass produced three substantive critiques that were accepted:
+
+1. **Mathematical redundancy in the planned FS-B variant.** Applying `RobustScaler` after `log1p` compresses the distribution twice; the variance-stabilising benefit of the log is partially washed out. Amended: FS-B uses `log1p(Amount)` followed by `StandardScaler` to provide a mathematically distinct contrast, not a redundant double-compression.
+2. **Label-leakage hazard.** Amended: target isolated to a separate `ground_truth_registry.csv` containing only `row_id` and `Class`. Feature-space CSVs contain strictly features plus `row_id`.
+3. **String-list concatenation syntax.** Minor: column lists consolidated into single variables for DRY.
+
+### Final Phase 2 Outputs (Track A)
+Two controlled feature-space variants produced, both leak-proof and `row_id`-tracked:
+
+| Feature Space | Features | Amount Treatment | Time Treatment | Scaling | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FS-A (Baseline)** | V1-V28, Time, Amount | None | None | RobustScaler on (Time, Amount) | Primary baseline (median/IQR) |
+| **FS-B (Sensitivity)** | V1-V28, Time, Amount | log1p | None | StandardScaler on (Time, Amount) | Sensitivity (variance stabilisation) |
+
+Companion artefacts: `ground_truth_registry.csv` (row_id, Class), `feature_space_manifest.md` documenting the variants.
+
+### Decision
+FS-A selected as the primary feature space for Phase 3. FS-B retained for sensitivity testing if Phase 3/4 results warrant it. The single-file `creditcard_preprocessed.csv` is **deprecated** and retained only as a historical record of the initial pass.
+
+*Refer - `notebooks/phase2_trackA_preprocessing.ipynb`*
+
+
+## Phase 3 (Track A) - Methodological Execution: First Attempt and Revision
+
+**Date:** 2026-10-21 to 2026-10-22
+
+### First Attempt (Deprecated)
+The first Phase 3 pass ran a 5x3x2 grid for iForest (contamination x n_estimators x max_samples) and a 4x5x2 grid for LOF (n_neighbors x contamination x metric). The `contamination` parameter was passed directly to both models, allowing them to set the binary flag threshold internally. Outputs were stored as raw NumPy arrays keyed by run name; `row_id` was not stored alongside predictions.
+
+**Critical bug discovered retrospectively in Phase 4:** The first attempt's LOF grid included both `'euclidean'` and `'minkowski'` metrics. Because scikit-learn's `minkowski` defaults to `p=2`, this is mathematically identical to `'euclidean'`. The grid was running the same computation twice. Amended in the revised run: alternative metric changed to `'manhattan'` (Minkowski with `p=1`).
+
+### External Review (ChatGPT) and Methodological Restructuring
+A second external review produced a structural critique that fundamentally reshaped Phase 3:
+
+1. **`contamination` is a decision rule, not truth.** Passing `contamination` to the model conflates the detector (which produces a continuous anomaly score) with the decision rule (which thresholds that score into a binary flag). Phase 3 should produce scores; Phase 4 should apply thresholds.
+2. **Phase 3 must not be label-informed.** Using `Class` to select the "best" configuration turns unsupervised detection into supervised model selection. Phase 3 should investigate parameter sensitivity and seed stability without consulting labels; Phase 4 may use labels to evaluate the resulting outputs.
+3. **Every prediction must carry `row_id` and run metadata.** No array-position alignment downstream.
+
+### Revised Phase 3 Design (Adopted)
+- Both detectors fit on the frozen FS-A feature matrix only. No `Class` consulted during fitting.
+- `contamination` removed from both model constructors. Both produce continuous anomaly scores.
+- Explicit decision rule applied post-hoc: flag the bottom 1% of scores (exactly 300 flags per run on the 30k sample, 2,848 on the full dataset).
+- Five iForest configurations: parameter sensitivity (n_estimators, max_samples) plus seed stability (random_state 42/43/44).
+- Five LOF configurations: neighbourhood-scale sensitivity (k = 5, 15, 30, 50) plus metric sensitivity (manhattan at k=30).
+- Every run stored as a canonical prediction record: `row_id`, continuous `score`, binary `flag`, plus a metadata row recording parameters, seed, runtime, threshold rule.
+- Score direction canonicalised: `anomaly_score = -raw_score` so that higher = more anomalous for both detectors, eliminating per-method inversion ambiguity in Phase 4.
+
+### Implementation Notes and Bug Fixes Accepted During Revision
+Several implementation critiques were accepted during the revision. They are documented here for completeness, not because they altered the methodology:
+
+| Critique | Resolution |
+| :--- | :--- |
+| `max_samples='auto'` is mathematically equal to 256 when n_samples > 256. | Amended: alternative value set to 0.05 (5% sub-sample). |
+| Storing pandas DataFrames inside a prediction dictionary bloats memory. | Amended: raw NumPy arrays stored, with `uint8` flags and `float32` scores. |
+| `del` of local array variables before all references resolved risks namespace confusion. | Amended: cleanup moved to loop boundary. |
+| `n_jobs=-1` deadlocks joblib on Colab for LOF. | Amended: `n_jobs=2` (later `n_jobs=1` on full data). |
+| `algorithm='auto'` for LOF silently selects `ball_tree` when D > 20; relying on this heuristic is opaque. | Amended: `algorithm='ball_tree', leaf_size=40` set explicitly. |
+
+### Compute Constraint - Colab Free Tier
+The revised Phase 3 was first executed on a 30,000-row random unsupervised subsample of FS-A. The sample was drawn without consulting `Class`. The same 30,000 `row_id`s were supplied to all 10 runs (5 iForest + 5 LOF).
+
+LOF on the full 284,807-row matrix deadlocks the Colab free-tier CPU even with `ball_tree`, `n_jobs=1`, and `leaf_size=40`. A second pass on the full dataset was later completed using LOF **Novelty Mode** (`novelty=True`): LOF was fit on a 50,000-row random unsupervised subsample and used `score_samples` to predict anomaly scores for all 284,807 rows. This is a computational compromise with documented consequences (see Phase 4).
+
+### Decision
+The 30k subsample run is the **primary Phase 3 artefact** because LOF operates in native `fit_predict` mode there. The 284k full-dataset run is retained as a **scale-sensitivity companion artefact** with the LOF Novelty Mode limitation explicitly flagged. Both are documented; neither is silently dropped.
+
+*Refer - `notebooks/phase3_trackA_modelling_30k.ipynb`, `notebooks/phase3_trackA_modelling_full.ipynb`*
+
+
+## Phase 4 (Track A) - Label-Informed Validation: Bug Discovery and Correction
+
+**Date:** 2026-10-22
+
+### First Evaluation Run (Buggy)
+The first Phase 4 evaluation produced catastrophic metrics: iForest ROC-AUC approx 0.50, AP matching the base fraud rate. The numbers indicated the models were no better than random.
+
+### Root Cause
+The Phase 3 predictions were stored in the order of the 30k random subsample. Phase 4 code extracted the matching `row_id`s from `ground_truth_registry.csv` and **sorted them** before merging with the unsorted prediction arrays. The labels were decoupled from the scores they were meant to evaluate. The models had not failed; the evaluation had silently shuffled the answer key.
+
+### Correction
+Predictions and ground truth merged into a single Pandas DataFrame on `row_id` as the join key. No array-position alignment permitted downstream. This is the same `row_id`-alignment discipline that the Phase 2 redesign introduced; the bug existed because the first Phase 4 code predated full adoption of that discipline.
+
+### Corrected Phase 4 Results - 30k Sample (47 frauds, 1% threshold = 300 flags)
+
+| Run | Model | Config | AP | ROC-AUC | Prec@1% | Rec@1% | F1@1% | TP |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| IF_003 | iForest | n_est=100, msamp=0.05, seed=42 | 0.3126 | 0.9803 | 0.1000 | 0.6383 | 0.1729 | 30 |
+| IF_004 | iForest | n_est=100, msamp=256, seed=43 | 0.2094 | 0.9787 | 0.1067 | 0.6809 | 0.1844 | 32 |
+| LOF_004 | LOF | k=50, euclidean | 0.3229 | 0.9536 | 0.1267 | 0.8085 | 0.2190 | 38 |
+| LOF_001 | LOF | k=5, euclidean | 0.0024 | 0.5220 | 0.0033 | 0.0213 | 0.0058 | 1 |
+
+(Full 10-run table retained in `phase4_validation_metrics_CORRECTED.csv`.)
+
+### Corrected Phase 4 Results - Full 284k Dataset (492 frauds, 1% threshold = 2,848 flags)
+
+| Run | Model | AP | ROC-AUC | Prec@1% | Rec@1% | F1@1% | TP |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| IF_003 | iForest | 0.2340 | 0.9494 | 0.1113 | 0.6443 | 0.1898 | 317 |
+| LOF_004 | LOF (Novelty) | 0.0562 | 0.9070 | 0.0586 | 0.3394 | 0.1000 | 167 |
+
+(Full 10-run table retained in `FULL_phase4_metrics.csv`.)
+
+### Key Findings
+1. **iForest is scale-invariant.** Recall on 30k = 63.8%; recall on 284k = 64.4%. AP drops modestly (0.31 to 0.23) but ranking quality remains high. iForest's tree-based isolation paths do not degrade with sample size.
+2. **LOF degrades under Novelty Mode.** Recall on 30k native `fit_predict` = 80.9%; recall on 284k Novelty Mode = 33.9%. The 50k density map cannot capture the micro-density fluctuations of the full 284k space. This is the cost of the compute compromise, not a property of the algorithm itself.
+3. **LOF neighbourhood-scale sensitivity is dramatic.** On the 30k sample: k=5 -> AP 0.0024, k=50 -> AP 0.3229. The choice of `n_neighbors` is not a tuning detail; it determines whether LOF is useful at all on this data.
+4. **iForest flags are 100% false positives when LOF disagrees.** On the 30k sample at 1%: iForest-only flags = 193 observations, 0 frauds. LOF-only flags = 193 observations, 8 frauds. Both-methods flags = 107 observations, 30 frauds (28.0% precision vs 0.16% base rate).
+
+### Decision
+Both 30k and 284k results retained as complementary evidence. The 30k run is the methodologically cleaner artefact (native LOF); the 284k run is the scale-stress artefact (LOF Novelty Mode compromise). Neither is silently discarded.
+
+*Refer - `notebooks/phase4_trackA_validation_30k.ipynb`, `notebooks/phase4_trackA_validation_full.ipynb`*
+
+
+## Phase 5 (Track A) - Diagnostic Analysis and Visualization
+
+**Date:** 2026-10-22 to 2026-10-23
+
+### Scope
+Phase 5 was treated as **visualization + quantitative diagnostic analysis**, not a cosmetic plotting exercise. All computations consumed the canonical Phase 3/4 artefacts; no models were refit.
+
+### Quantitative Diagnostics Computed
+
+1. **Stratified bootstrap confidence intervals (2,000 replicates).** Performed for IF_003, IF_004, LOF_004 on AP, ROC-AUC, Precision@1%, Recall@1%, F1@1%. Fraud and legitimate rows resampled separately to preserve imbalance. Example: LOF_004 Recall@1% 95% CI on 30k = [0.6809, 0.9149]; IF_003 = [0.5106, 0.7872]. LOF's worst-case recall exceeds IF's best-case recall, supporting the claim that LOF_004's superiority at 1% is statistically meaningful, not a point-estimate artefact.
+
+2. **Exact hypergeometric overlap test.** Expected random overlap at 1%: 3.0 (30k), 28.48 (284k). Observed: 107 (30k), 457 (284k). Enrichment: 35.67x (30k), 16.05x (284k). P-value reported via `logsf` to avoid underflow: p < 10^-140.30 (30k), p < 10^-396.37 (284k). The consensus overlap is not a chance event.
+
+3. **10x10 pairwise score-correlation matrix (Spearman).** IF<->IF Spearman approx 0.93; LOF<->LOF Spearman varies with k; IF<->LOF Spearman approx 0.37. The two methods produce substantially different anomaly rankings.
+
+4. **10x10 pairwise top-1% Jaccard matrix.** Visualises intra-method stability vs inter-method disagreement in one compact figure.
+
+5. **Multi-threshold agreement analysis.** At 0.1%, 0.2%, 0.5%, 1%, 2%, 5% top-k. At 0.1% on 30k: iForest-only captures 11 unique frauds, LOF-only captures 10, both capture 3. At 1%: iForest-only captures 0, LOF-only captures 8. iForest dominates at the extreme edge; LOF dominates as the budget expands. This is the most informative single table in the project.
+
+6. **PCA explained variance.** PC1 + PC2 capture a modest fraction of total variance (documented in plot captions). All PCA visualisations are explicitly labelled as lossy projections, not as faithful geometry.
+
+### Visualizations Produced
+Eight diagnostic figures produced for each of 30k and 284k runs (16 total), saved as high-resolution PNGs:
+
+1. Precision-Recall curves (5 IF + 5 LOF, best runs highlighted)
+2. Fraud discovery curve (recall vs review budget) + precision vs budget
+3. Hypergeometric null distribution with observed overlap marked
+4. 10x10 Spearman correlation heatmap
+5. 10x10 top-1% Jaccard heatmap
+6. Top-k Jaccard curve (0.1% to 5%)
+7. Rank-vs-rank scatter (IF percentile vs LOF percentile, agreement groups highlighted)
+8. PCA agreement map (Both / IF-only / LOF-only / Neither, with flagged-only overlay)
+
+### Decision
+Phase 5 closed. No additional visualisations or computations will be added unless Phase 7 gap analysis identifies a specific need.
+
+*Refer - `notebooks/phase5_trackA_diagnostics_30k.ipynb`, `notebooks/phase5_trackA_diagnostics_full.ipynb`*
+
+
+## Phase 6 (Track A) - Cross-Method Consistency Analysis
+
+**Date:** 2026-10-23
+
+### Scope
+Phase 6 investigated whether iForest and LOF identify the same observations or different forms of unusualness, and whether their agreement is greater than chance.
+
+### Primary Findings (30k sample, IF_003 vs LOF_004)
+
+| Metric | Value | Interpretation |
+| :--- | :--- | :--- |
+| Spearman rank correlation (IF vs LOF) | 0.37 | Substantially different rankings; positive but far from agreement |
+| Top-1% Jaccard | 0.2170 | ~22% of flagged items overlap |
+| Top-0.5% Jaccard (peak) | ~0.27 | Agreement strongest at the extreme edge |
+| Expected random overlap | 3.0 | - |
+| Observed overlap | 107 | 35.67x enrichment |
+| Hypergeometric p-value | < 10^-140 | Overlap is not chance |
+
+### Agreement-Group Composition (30k, 1% threshold)
+
+| Group | Count | Fraud | Fraud % | Recall Contribution |
+| :--- | :--- | :--- | :--- | :--- |
+| Both | 107 | 30 | 28.04% | 63.83% |
+| iForest-only | 193 | 0 | 0.00% | 0.00% |
+| LOF-only | 193 | 8 | 4.15% | 17.02% |
+| Neither | 29,507 | 9 | 0.03% | 19.15% |
+
+### Five Questions Answered (per the Phase 6 framework)
+
+1. **Are the two methods producing similar anomaly rankings?** No. Spearman approx 0.37 confirms substantially different rankings, consistent with their different detection mechanisms.
+2. **How much do their highest-ranked observations overlap?** Modestly. Jaccard peaks at ~0.27 (top 0.5%) and declines as k increases.
+3. **Is the overlap greater than expected by chance?** Yes, overwhelmingly. 35.67x enrichment on 30k, 16.05x on 284k, with p-values so extreme they require `logsf` to express.
+4. **When they disagree, which method-specific groups contain the known frauds?** On 30k: iForest-only = 0 frauds (100% false positives); LOF-only = 8 frauds; Both = 30 frauds (28% precision). The intersection is the highest-precision group.
+5. **Is the disagreement caused by fundamentally different anomaly definitions, or by LOF's neighbourhood-scale sensitivity?** Both. LOF's k-sensitivity is dramatic (AP ranges from 0.0024 at k=5 to 0.3229 at k=50 on 30k). Even at the best k, however, the IF<->LOF Spearman remains ~0.37, indicating the methods respond to different geometric properties of the data, not merely to different scale parameters.
+
+### Interpretive Discipline Applied
+Per external review: the finding supports "the two methods identify substantially different high-anomaly populations, consistent with their different detection mechanisms." It does **not** support the stronger mechanistic claim that "LOF catches local-density anomalies invisible to iForest's isolation paths." The latter is an interpretation of why the algorithms disagree, not something the overlap experiment directly establishes.
+
+Similarly: "the consensus group had approximately 179x the sample's baseline fraud prevalence" is defensible. "The consensus detector is 179x more accurate" is not, and is not claimed.
+
+### Decision
+Phase 6 closed. No score fusion or ensemble construction attempted. Per framework guidance, understanding *why* the methods disagree precedes any attempt to combine them.
+
+*Refer - `notebooks/phase6_trackA_consistency.ipynb`*
+
+
+## Phase 6a (Track A) - 30k vs 284k Comparison
+
+**Date:** 2026-10-23
+
+### Purpose
+To document the effect of the LOF Novelty Mode compute compromise by comparing the 30k native-LOF run against the 284k Novelty-LOF run on identical configurations.
+
+### Headline Comparison
+
+| Run | Metric | 30k (native LOF) | 284k (LOF Novelty) |
+| :--- | :--- | :--- | :--- |
+| IF_003 | AP | 0.3126 | 0.2340 |
+| IF_003 | Recall@1% | 0.6383 | 0.6443 |
+| LOF_004 | AP | 0.3229 | 0.0562 |
+| LOF_004 | Recall@1% | 0.8085 | 0.3394 |
+| Consensus | Observed overlap | 107 | 457 |
+| Consensus | Enrichment vs random | 35.67x | 16.05x |
+
+### Findings
+1. **iForest is scale-robust.** Recall essentially identical (63.8% to 64.4%). AP drops modestly. The algorithm's tree-based isolation does not depend on native density estimation over the full sample.
+2. **LOF degrades sharply under Novelty Mode.** AP drops 5.7x, recall drops 2.4x. The 50k density map learned by LOF in Novelty Mode cannot represent the micro-density structure of the full 284k space. This is the cost of the Colab compute constraint, not a property of LOF on this data.
+3. **Consensus enrichment dilutes with scale but remains extreme.** 35.67x to 16.05x. Expected random overlap grows quadratically with k; observed overlap grows sub-quadratically. The consensus signal remains overwhelmingly non-random (p < 10^-396 on 284k).
+
+### Decision
+The 30k run remains the **primary methodological artefact** for LOF characterization. The 284k run is the **scale-stress companion**. Both are reported; the LOF Novelty Mode limitation is documented in Phase 7.
+
+
+## Current Status (as of 2026-10-23)
+
+### Stream A - COMPLETE (Phases 1-6)
+- Phase 1: Data acquired and verified. (Done)
+- Phase 2: Two feature-space variants produced (FS-A primary, FS-B sensitivity). (Done)
+- Phase 3: 10 runs (5 iForest + 5 LOF) on 30k sample; 10 runs on 284k full dataset (LOF Novelty Mode). (Done)
+- Phase 4: Label-informed validation on both 30k and 284k. Alignment bug discovered and corrected. (Done)
+- Phase 5: Bootstrap CIs, hypergeometric test, 10x10 matrices, multi-threshold analysis, 8 diagnostic plots per scale. (Done)
+- Phase 6: Cross-method consistency analysis with five-question framework answered. (Done)
+
+### Stream B - Phase 1 COMPLETE, Phase 2 IN PROGRESS
+- Phase 1: PMGSY-III six-state dataset accepted (9,634 unique records after dedup). Adversarial validation performed. (Done)
+- Phase 2: Extended EDA initiated. Provisional data-handling approach documented. In progress.
+
+### Phases 7 and 8 - NOT YET STARTED
+- Phase 7 (Limitations, Gap Analysis, Domain Transfer Conditions): to be drafted after Stream B Phase 2-6 completion, or as a single-stream gap analysis if Stream B proves non-viable.
+- Phase 8 (Documentation, Reproducibility, Provenance Finalization): this log is the living draft of that phase.
+
+### Outstanding Tensions to Resolve
+1. The LOF Novelty Mode compromise on 284k is methodologically defensible but limits the strength of full-scale LOF claims. The 30k native-LOF run is the cleaner artefact and should be the primary citation for LOF behaviour.
+2. The first Phase 4 alignment bug, while corrected, is a documented instance of the kind of array-position fragility the Phase 2 `row_id` redesign was meant to prevent. It is retained in this log as evidence that the redesign was necessary, not optional.
+3. Stream B (PMGSY-III) has no labels. Phase 4 for Stream B will be score-distribution + manual top-N inspection only. This is anticipated by the framework but lowers the analytical ceiling for that stream.
+4. The scope claim for Stream B is "pipeline reusability demonstration," not "domain anomaly findings." This must be respected in Phase 7 to avoid overclaiming.
+
+---
+
+*End of Stream A execution trail. Stream B execution trail will be appended as Phase 2 progresses.*

@@ -1,0 +1,200 @@
+{
+  "analytical_conventions": {
+    "group_assignment": "Both (IF=1, LOF=1) / IF-only (IF=1, LOF=0) / LOF-only (IF=0, LOF=1) / Neither (IF=0, LOF=0) on the saved canonical 1% flags; disjoint and exhaustive partition, every observation exactly once",
+    "join": "one-to-one merge on row_id between the IF_003 and LOF_004 run blocks extracted by run_id; duplicated, missing or extra row IDs are hard errors; canonical row-ID alignment preserved",
+    "lightweight_checks": "flag counts, intersection, union, group counts and frauds, saved Jaccard, ten-run union/intersection at 1%, and the flag-based precision/recall/F1-at-1% point estimates recomputed from the Phase 4 observation-level data and matched against the saved Phase 5A values (all matched)",
+    "references": "PHASE6_REFERENCE_VALUES are historical acceptance references used for validation only; they are never written into an output as if computed, and a mismatch is reported as a failed validation rather than forced",
+    "report_determinism": "the Markdown report contains no timestamps, paths or random elements; identical inputs regenerate byte-identical text",
+    "saved_value_policy": "bootstrap estimates, hypergeometric probabilities and correlation matrices are READ from the frozen Phase 5A outputs, never recomputed"
+  },
+  "comparison_pair": {
+    "flag_source": "saved canonical Phase 3 top-1% flags (never recomputed)",
+    "if_run_id": "IF_003",
+    "lof_run_id": "LOF_004",
+    "threshold_pct": 1.0
+  },
+  "created_utc": "2026-11-05T18:00:38.655249+00:00",
+  "environment": {
+    "executable": "C:\\Users\\53542\\miniconda3\\python.exe",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.13"
+  },
+  "input_manifests": {
+    "phase4": {
+      "artifacts": {
+        "phase4_evaluation_dataset.csv": {
+          "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+          "size_bytes": 12352469,
+          "verified": true
+        },
+        "phase4_metrics.csv": {
+          "sha256": "6535001ce38766d7e52fef84253a7d95e6335b6183fd34f6ead12210eec99acd",
+          "size_bytes": 2397,
+          "verified": true
+        },
+        "phase4_run_metadata.json": {
+          "sha256": "b17f40635e73cbc11932447a9616bc9288f9bfbbc50103e2441b8d3aeb736ac1",
+          "size_bytes": 3199,
+          "verified": true
+        }
+      },
+      "mode": "manifest_verified",
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_commit_manifest.json",
+      "present": true,
+      "verified": true
+    },
+    "phase5": {
+      "artifacts": {
+        "phase5_agreement_groups.csv": {
+          "sha256": "17822c729c10f0af9ab2eb1cc5b64263fecc7e0df1ae337379d56835b2e2e07f",
+          "size_bytes": 397,
+          "verified": true
+        },
+        "phase5_bootstrap_metrics.csv": {
+          "sha256": "7bcb1f6eab5c5401a2a14a667a8305f8dfccd5e29332f0a72e723708246753b8",
+          "size_bytes": 1947,
+          "verified": true
+        },
+        "phase5_fraud_discovery_curve.csv": {
+          "sha256": "ab5a00c5fde95b8b55f1e30bf30989a5b2b556f366f605dfe9083499cac9a2fb",
+          "size_bytes": 15036571,
+          "verified": true
+        },
+        "phase5_hypergeometric_overlap.csv": {
+          "sha256": "509d417f5824c730ed671ad9246d0e383a1943b369dfe7314eafc344b8e2e3fc",
+          "size_bytes": 639,
+          "verified": true
+        },
+        "phase5_multithreshold_agreement.csv": {
+          "sha256": "af6db9f919358b19591be27be6b460d5ecdc420ada7decd0944288834babe719",
+          "size_bytes": 1967,
+          "verified": true
+        },
+        "phase5_paired_bootstrap_differences.csv": {
+          "sha256": "237d7c952bf9dd2e4fc0ef02fd6c2156f23745fa3f564836d1abca309f2bf6ec",
+          "size_bytes": 882,
+          "verified": true
+        },
+        "phase5_pairwise_jaccard_1pct.csv": {
+          "sha256": "b8e5b7f4b5b666d6a58df248b43c986a4f9d3a1b4b39683ca33188bd506ec48b",
+          "size_bytes": 1960,
+          "verified": true
+        },
+        "phase5_pairwise_spearman.csv": {
+          "sha256": "673f4793cf8f5f79f98ace128ad1c358dfd233435507e95cae4e1e928feb4fcf",
+          "size_bytes": 1929,
+          "verified": true
+        },
+        "phase5_run_metadata.json": {
+          "sha256": "719ec5240f6b3852bf14604c4bc32148545f13cc96ee9e12863849c571d68f2f",
+          "size_bytes": 9474,
+          "verified": true
+        }
+      },
+      "mode": "manifest_verified",
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_commit_manifest.json",
+      "present": true,
+      "verified": true
+    }
+  },
+  "inputs": {
+    "phase4_evaluation_dataset": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_evaluation_dataset.csv",
+      "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+      "size_bytes": 12352469
+    },
+    "phase5_agreement_groups": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_agreement_groups.csv",
+      "sha256": "17822c729c10f0af9ab2eb1cc5b64263fecc7e0df1ae337379d56835b2e2e07f",
+      "size_bytes": 397
+    },
+    "phase5_bootstrap_metrics": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_bootstrap_metrics.csv",
+      "sha256": "7bcb1f6eab5c5401a2a14a667a8305f8dfccd5e29332f0a72e723708246753b8",
+      "size_bytes": 1947
+    },
+    "phase5_hypergeometric_overlap": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_hypergeometric_overlap.csv",
+      "sha256": "509d417f5824c730ed671ad9246d0e383a1943b369dfe7314eafc344b8e2e3fc",
+      "size_bytes": 639
+    },
+    "phase5_jaccard_1pct": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_jaccard_1pct.csv",
+      "sha256": "b8e5b7f4b5b666d6a58df248b43c986a4f9d3a1b4b39683ca33188bd506ec48b",
+      "size_bytes": 1960
+    },
+    "phase5_multithreshold_agreement": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_multithreshold_agreement.csv",
+      "sha256": "af6db9f919358b19591be27be6b460d5ecdc420ada7decd0944288834babe719",
+      "size_bytes": 1967
+    },
+    "phase5_paired_bootstrap_differences": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_paired_bootstrap_differences.csv",
+      "sha256": "237d7c952bf9dd2e4fc0ef02fd6c2156f23745fa3f564836d1abca309f2bf6ec",
+      "size_bytes": 882
+    },
+    "phase5_run_metadata": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_run_metadata.json",
+      "sha256": "719ec5240f6b3852bf14604c4bc32148545f13cc96ee9e12863849c571d68f2f",
+      "size_bytes": 9474
+    },
+    "phase5_spearman": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_spearman.csv",
+      "sha256": "673f4793cf8f5f79f98ace128ad1c358dfd233435507e95cae4e1e928feb4fcf",
+      "size_bytes": 1929
+    }
+  },
+  "layer": "cross_method_consistency",
+  "model_fitting": {
+    "models_fitted": 0,
+    "note": "Phase 6 is an evidence-synthesis layer: no detector was constructed, fitted or refitted; no anomaly score or threshold was created; no bootstrap estimate, hypergeometric probability or correlation matrix was recomputed; no plot was produced."
+  },
+  "non_canonical_overrides": {},
+  "outputs": {
+    "consistency_report": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 6\\reproduction\\phase6_consistency_report.md",
+    "consistency_scorecard": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 6\\reproduction\\phase6_consistency_scorecard.csv",
+    "group_assignments": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 6\\reproduction\\phase6_group_assignments.csv",
+    "manifest": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 6\\reproduction\\phase6_commit_manifest.json",
+    "run_metadata": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 6\\reproduction\\phase6_run_metadata.json"
+  },
+  "phase": "6",
+  "reference_validation": {
+    "enabled": true,
+    "mismatches": [],
+    "n_references_checked": 18,
+    "passed": true
+  },
+  "run_ids": [
+    "IF_001",
+    "IF_002",
+    "IF_003",
+    "IF_004",
+    "IF_005",
+    "LOF_001",
+    "LOF_002",
+    "LOF_003",
+    "LOF_004",
+    "LOF_005"
+  ],
+  "run_mode": "execute",
+  "sample": {
+    "fraud_count": 47,
+    "fraud_prevalence": 0.0015666666666666667,
+    "per_run_flagged_counts": {
+      "IF_001": 300,
+      "IF_002": 300,
+      "IF_003": 300,
+      "IF_004": 300,
+      "IF_005": 300,
+      "LOF_001": 300,
+      "LOF_002": 300,
+      "LOF_003": 300,
+      "LOF_004": 300,
+      "LOF_005": 300
+    },
+    "sample_size": 30000
+  },
+  "selection_caveat": "Exploratory analysis: the highlighted runs (IF_003, IF_004, LOF_004 and the IF_003/LOF_004 pair) were selected after inspecting the label-informed Phase 4 evaluation results; comparisons involving them are post-hoc and must not be read as confirmatory.",
+  "stream": "A"
+}

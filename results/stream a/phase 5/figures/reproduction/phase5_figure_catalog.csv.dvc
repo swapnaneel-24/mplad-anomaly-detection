@@ -1,0 +1,5 @@
+outs:
+- md5: a556c223afc2885c28fc9043cf49c6cf
+  size: 4307
+  hash: md5
+  path: phase5_figure_catalog.csv

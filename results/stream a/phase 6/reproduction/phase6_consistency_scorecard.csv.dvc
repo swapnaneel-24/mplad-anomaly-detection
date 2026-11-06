@@ -1,0 +1,5 @@
+outs:
+- md5: 1e61539248489a818dc70ba484930721
+  size: 21726
+  hash: md5
+  path: phase6_consistency_scorecard.csv

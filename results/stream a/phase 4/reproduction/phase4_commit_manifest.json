@@ -1,0 +1,18 @@
+{
+  "artifacts": {
+    "phase4_evaluation_dataset.csv": {
+      "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+      "size_bytes": 12352469
+    },
+    "phase4_metrics.csv": {
+      "sha256": "6535001ce38766d7e52fef84253a7d95e6335b6183fd34f6ead12210eec99acd",
+      "size_bytes": 2397
+    },
+    "phase4_run_metadata.json": {
+      "sha256": "b17f40635e73cbc11932447a9616bc9288f9bfbbc50103e2441b8d3aeb736ac1",
+      "size_bytes": 3199
+    }
+  },
+  "created_utc": "2026-11-05T06:36:03.788929+00:00",
+  "manifest_version": 1
+}

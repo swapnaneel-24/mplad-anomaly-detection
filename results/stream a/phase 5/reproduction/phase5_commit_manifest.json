@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "phase5_agreement_groups.csv": {
+      "sha256": "17822c729c10f0af9ab2eb1cc5b64263fecc7e0df1ae337379d56835b2e2e07f",
+      "size_bytes": 397
+    },
+    "phase5_bootstrap_metrics.csv": {
+      "sha256": "7bcb1f6eab5c5401a2a14a667a8305f8dfccd5e29332f0a72e723708246753b8",
+      "size_bytes": 1947
+    },
+    "phase5_fraud_discovery_curve.csv": {
+      "sha256": "ab5a00c5fde95b8b55f1e30bf30989a5b2b556f366f605dfe9083499cac9a2fb",
+      "size_bytes": 15036571
+    },
+    "phase5_hypergeometric_overlap.csv": {
+      "sha256": "509d417f5824c730ed671ad9246d0e383a1943b369dfe7314eafc344b8e2e3fc",
+      "size_bytes": 639
+    },
+    "phase5_multithreshold_agreement.csv": {
+      "sha256": "af6db9f919358b19591be27be6b460d5ecdc420ada7decd0944288834babe719",
+      "size_bytes": 1967
+    },
+    "phase5_paired_bootstrap_differences.csv": {
+      "sha256": "237d7c952bf9dd2e4fc0ef02fd6c2156f23745fa3f564836d1abca309f2bf6ec",
+      "size_bytes": 882
+    },
+    "phase5_pairwise_jaccard_1pct.csv": {
+      "sha256": "b8e5b7f4b5b666d6a58df248b43c986a4f9d3a1b4b39683ca33188bd506ec48b",
+      "size_bytes": 1960
+    },
+    "phase5_pairwise_spearman.csv": {
+      "sha256": "673f4793cf8f5f79f98ace128ad1c358dfd233435507e95cae4e1e928feb4fcf",
+      "size_bytes": 1929
+    },
+    "phase5_run_metadata.json": {
+      "sha256": "719ec5240f6b3852bf14604c4bc32148545f13cc96ee9e12863849c571d68f2f",
+      "size_bytes": 9474
+    }
+  },
+  "created_utc": "2026-11-05T14:11:43.840722+00:00",
+  "manifest_version": 1
+}

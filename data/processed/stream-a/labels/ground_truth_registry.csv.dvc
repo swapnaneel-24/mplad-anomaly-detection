@@ -1,0 +1,5 @@
+outs:
+- md5: 5cd738f19c8c54ae38b3d74da33b3da4
+  size: 2736974
+  hash: md5
+  path: ground_truth_registry.csv

@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "phase5_figure_catalog.csv": {
+      "sha256": "b5ce8938e4ca75fbeffe99f79cdebd268e750a0fe0b5729b94a230184101bbf2",
+      "size_bytes": 4307
+    },
+    "phase5_plot1_precision_recall.png": {
+      "sha256": "a509b57e34dd2c51c549e53bb18e927bd1cb963295d725824be78428f92ce44d",
+      "size_bytes": 229243
+    },
+    "phase5_plot2_fraud_discovery.png": {
+      "sha256": "38978c09fd2c1e34ee028b46a1013cd480f37ead8496ca2ff76e5dd07ce7702a",
+      "size_bytes": 200277
+    },
+    "phase5_plot3_hypergeometric_overlap.png": {
+      "sha256": "960c1ac7c40dfc57654981eb589aba8bba832e13180d23c73b777b9f40a2ee8e",
+      "size_bytes": 146198
+    },
+    "phase5_plot4_spearman_matrix.png": {
+      "sha256": "1f720ab0f9eb1a5256cdf91ecb3433ee32c9030fecb729bde12c67532af25799",
+      "size_bytes": 211218
+    },
+    "phase5_plot5_jaccard_matrix.png": {
+      "sha256": "212b170f1b0e1c364500cd72979fae7c0f5b757c6029d2c930895cd30ac154ba",
+      "size_bytes": 185635
+    },
+    "phase5_plot6_topk_jaccard.png": {
+      "sha256": "d2bc04ea47e3d2e0f8869a690d9d3a5fa2e99281306a1a003946127dd4f0c695",
+      "size_bytes": 120134
+    },
+    "phase5_plot7_rank_vs_rank.png": {
+      "sha256": "066de2da938b177cc47a6388669eb92450ea3323b70481b100edcf140fa75a15",
+      "size_bytes": 369793
+    },
+    "phase5_plot8_pca_agreement.png": {
+      "sha256": "9b8bbb620c38ef3234655812e41ae19ff15018c563024ab4cc4cd23f53c8b52c",
+      "size_bytes": 230576
+    },
+    "phase5_plot_metadata.json": {
+      "sha256": "98115ef410e51dfb10fac449072794f15cd759c0bb2fd7731667ca3b71c0c82f",
+      "size_bytes": 21575
+    }
+  },
+  "created_utc": "2026-11-05T16:52:43.685491+00:00",
+  "manifest_version": 1
+}

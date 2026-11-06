@@ -1,0 +1,513 @@
+{
+  "created_utc": "2026-11-05T16:52:43.669424+00:00",
+  "environment": {
+    "executable": "C:\\Users\\53542\\miniconda3\\python.exe",
+    "matplotlib": "3.11.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.13",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1"
+  },
+  "figure_inventory": {
+    "1": {
+      "ap": {
+        "IF_001": 0.20626192145069602,
+        "IF_002": 0.15563245338464657,
+        "IF_003": 0.31255635861626146,
+        "IF_004": 0.2093880104581939,
+        "IF_005": 0.13501220249833587,
+        "LOF_001": 0.0024168065789076073,
+        "LOF_002": 0.0073548066687975045,
+        "LOF_003": 0.060859210921700914,
+        "LOF_004": 0.3228904793023986,
+        "LOF_005": 0.025279585786336645
+      },
+      "figure_no": 1,
+      "filename": "phase5_plot1_precision_recall.png",
+      "highlighted": [
+        "IF_003",
+        "IF_004",
+        "LOF_004"
+      ],
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot1_precision_recall.png",
+      "prevalence": 0.0015666666666666667,
+      "runs": [
+        "IF_001",
+        "IF_002",
+        "IF_003",
+        "IF_004",
+        "IF_005",
+        "LOF_001",
+        "LOF_002",
+        "LOF_003",
+        "LOF_004",
+        "LOF_005"
+      ],
+      "size_bytes": 229243,
+      "title": "Precision-Recall curves \u2014 ten canonical runs"
+    },
+    "2": {
+      "baselines": {
+        "random_precision": "expected precision = prevalence (0.001567)",
+        "random_recall": "expected recall = reviewed fraction (identity)"
+      },
+      "figure_no": 2,
+      "filename": "phase5_plot2_fraud_discovery.png",
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot2_fraud_discovery.png",
+      "runs": [
+        "IF_001",
+        "IF_002",
+        "IF_003",
+        "IF_004",
+        "IF_005",
+        "LOF_001",
+        "LOF_002",
+        "LOF_003",
+        "LOF_004",
+        "LOF_005"
+      ],
+      "sample_size": 30000,
+      "size_bytes": 200277,
+      "title": "Fraud discovery and precision versus review budget"
+    },
+    "3": {
+      "enrichment": 35.666666666666664,
+      "expected_intersection": 3.0,
+      "figure_no": 3,
+      "filename": "phase5_plot3_hypergeometric_overlap.png",
+      "log10_survival": -140.29798400060054,
+      "null_model": "independent uniform random selection: run_a's flags and run_b's flags are two independent uniform random subsets of the n observations; the upper-tail probability is the extremity of the observed overlap under THIS null only and does not establish that flagged observations are true anomalies",
+      "observed_intersection": 107,
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot3_hypergeometric_overlap.png",
+      "size_bytes": 146198,
+      "support": [
+        0,
+        300
+      ],
+      "title": "Hypergeometric overlap of the saved 1% flags"
+    },
+    "4": {
+      "figure_no": 4,
+      "filename": "phase5_plot4_spearman_matrix.png",
+      "highlight_cells": [
+        [
+          8,
+          2
+        ],
+        [
+          2,
+          8
+        ]
+      ],
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot4_spearman_matrix.png",
+      "pair_value": 0.3666397906943298,
+      "run_ids": [
+        "IF_001",
+        "IF_002",
+        "IF_003",
+        "IF_004",
+        "IF_005",
+        "LOF_001",
+        "LOF_002",
+        "LOF_003",
+        "LOF_004",
+        "LOF_005"
+      ],
+      "size_bytes": 211218,
+      "title": "Pairwise Spearman rank correlation \u2014 anomaly scores",
+      "value_range": [
+        -1.0,
+        1.0
+      ]
+    },
+    "5": {
+      "figure_no": 5,
+      "filename": "phase5_plot5_jaccard_matrix.png",
+      "highlight_cells": [
+        [
+          8,
+          2
+        ],
+        [
+          2,
+          8
+        ]
+      ],
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot5_jaccard_matrix.png",
+      "pair_value": 0.2170385395537525,
+      "run_ids": [
+        "IF_001",
+        "IF_002",
+        "IF_003",
+        "IF_004",
+        "IF_005",
+        "LOF_001",
+        "LOF_002",
+        "LOF_003",
+        "LOF_004",
+        "LOF_005"
+      ],
+      "size_bytes": 185635,
+      "title": "Pairwise Jaccard similarity \u2014 saved 1% flags",
+      "value_range": [
+        0.0,
+        1.0
+      ]
+    },
+    "6": {
+      "canonical_threshold_pct": 1.0,
+      "figure_no": 6,
+      "filename": "phase5_plot6_topk_jaccard.png",
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot6_topk_jaccard.png",
+      "size_bytes": 120134,
+      "title": "Top-k Jaccard agreement versus review budget"
+    },
+    "7": {
+      "figure_no": 7,
+      "filename": "phase5_plot7_rank_vs_rank.png",
+      "group_counts": {
+        "both": 107,
+        "if_only": 193,
+        "lof_only": 193,
+        "neither": 29507
+      },
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot7_rank_vs_rank.png",
+      "percentile_convention": "axis percentile = 1 - descending_average_rank / n, with the descending rank computed as the tie-averaged rank of -anomaly_score (1 = most anomalous, 0 = least anomalous); the boundary of the top-1% region is therefore the percentile 0.99 (rank = n/100)",
+      "run_a": "IF_003",
+      "run_b": "LOF_004",
+      "size_bytes": 369793,
+      "title": "Rank-versus-rank agreement \u2014 IF_003 vs LOF_004"
+    },
+    "8": {
+      "explained_variance_pct": {
+        "pc1": 28.290975314022166,
+        "pc2": 9.320608856500504
+      },
+      "feature_columns": [
+        "Time",
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8",
+        "V9",
+        "V10",
+        "V11",
+        "V12",
+        "V13",
+        "V14",
+        "V15",
+        "V16",
+        "V17",
+        "V18",
+        "V19",
+        "V20",
+        "V21",
+        "V22",
+        "V23",
+        "V24",
+        "V25",
+        "V26",
+        "V27",
+        "V28",
+        "Amount"
+      ],
+      "figure_no": 8,
+      "filename": "phase5_plot8_pca_agreement.png",
+      "fitted_on": "the joined sample (row_id-aligned FS-A rows)",
+      "fs_scaling": "the FS-A matrix already embodies the frozen Phase 2 preprocessing (V1-V28 untouched PCA outputs; Time and Amount RobustScaler-scaled); Phase 5B applies NO additional rescaling and never standardizes the full matrix -- the stored FS-A values are projected as-is",
+      "neither_background": "the full Neither group is plotted as the background (no subsampling); when subsampling is explicitly requested it draws strictly from the Neither group with a fixed recorded seed -- never from the full population relabelled as Neither",
+      "output_path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot8_pca_agreement.png",
+      "pca_disclaimer": "PCA is a LOSSY 2-D projection used for visualization only: the two components capture only part of the 30-dimensional FS-A variance, so distances and overlaps in this map must not be read as detector inputs or as evidence about the feature space",
+      "pca_solver": "full",
+      "run_a": "IF_003",
+      "run_b": "LOF_004",
+      "size_bytes": 230576,
+      "title": "PCA agreement map \u2014 IF_003 vs LOF_004 flag groups"
+    }
+  },
+  "figures_rendered": 8,
+  "input_manifests": {
+    "phase4_commit_manifest": {
+      "artifacts": {
+        "phase4_evaluation_dataset.csv": {
+          "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+          "size_bytes": 12352469,
+          "verified": true
+        },
+        "phase4_metrics.csv": {
+          "sha256": "6535001ce38766d7e52fef84253a7d95e6335b6183fd34f6ead12210eec99acd",
+          "size_bytes": 2397,
+          "verified": true
+        },
+        "phase4_run_metadata.json": {
+          "sha256": "b17f40635e73cbc11932447a9616bc9288f9bfbbc50103e2441b8d3aeb736ac1",
+          "size_bytes": 3199,
+          "verified": true
+        }
+      },
+      "mode": "manifest_verified",
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_commit_manifest.json",
+      "present": true,
+      "verified": true
+    },
+    "phase5_commit_manifest": {
+      "artifacts": {
+        "phase5_agreement_groups.csv": {
+          "sha256": "17822c729c10f0af9ab2eb1cc5b64263fecc7e0df1ae337379d56835b2e2e07f",
+          "size_bytes": 397,
+          "verified": true
+        },
+        "phase5_bootstrap_metrics.csv": {
+          "sha256": "7bcb1f6eab5c5401a2a14a667a8305f8dfccd5e29332f0a72e723708246753b8",
+          "size_bytes": 1947,
+          "verified": true
+        },
+        "phase5_fraud_discovery_curve.csv": {
+          "sha256": "ab5a00c5fde95b8b55f1e30bf30989a5b2b556f366f605dfe9083499cac9a2fb",
+          "size_bytes": 15036571,
+          "verified": true
+        },
+        "phase5_hypergeometric_overlap.csv": {
+          "sha256": "509d417f5824c730ed671ad9246d0e383a1943b369dfe7314eafc344b8e2e3fc",
+          "size_bytes": 639,
+          "verified": true
+        },
+        "phase5_multithreshold_agreement.csv": {
+          "sha256": "af6db9f919358b19591be27be6b460d5ecdc420ada7decd0944288834babe719",
+          "size_bytes": 1967,
+          "verified": true
+        },
+        "phase5_paired_bootstrap_differences.csv": {
+          "sha256": "237d7c952bf9dd2e4fc0ef02fd6c2156f23745fa3f564836d1abca309f2bf6ec",
+          "size_bytes": 882,
+          "verified": true
+        },
+        "phase5_pairwise_jaccard_1pct.csv": {
+          "sha256": "b8e5b7f4b5b666d6a58df248b43c986a4f9d3a1b4b39683ca33188bd506ec48b",
+          "size_bytes": 1960,
+          "verified": true
+        },
+        "phase5_pairwise_spearman.csv": {
+          "sha256": "673f4793cf8f5f79f98ace128ad1c358dfd233435507e95cae4e1e928feb4fcf",
+          "size_bytes": 1929,
+          "verified": true
+        },
+        "phase5_run_metadata.json": {
+          "sha256": "719ec5240f6b3852bf14604c4bc32148545f13cc96ee9e12863849c571d68f2f",
+          "size_bytes": 9474,
+          "verified": true
+        }
+      },
+      "mode": "manifest_verified",
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_commit_manifest.json",
+      "present": true,
+      "verified": true
+    }
+  },
+  "inputs": {
+    "fs_a_feature_matrix": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\data\\processed\\stream-a\\features\\ULB_FS_A_Baseline.csv",
+      "sha256": "5cd3982d32e26413336380fc7020dd5a5f4eb5a91c32c8e4ae5042f922a2c59b",
+      "size_bytes": 159737666
+    },
+    "phase4_evaluation_dataset": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_evaluation_dataset.csv",
+      "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+      "size_bytes": 12352469
+    },
+    "phase5_agreement_groups": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_agreement_groups.csv",
+      "sha256": "17822c729c10f0af9ab2eb1cc5b64263fecc7e0df1ae337379d56835b2e2e07f",
+      "size_bytes": 397
+    },
+    "phase5_fraud_discovery_curve": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_fraud_discovery_curve.csv",
+      "sha256": "ab5a00c5fde95b8b55f1e30bf30989a5b2b556f366f605dfe9083499cac9a2fb",
+      "size_bytes": 15036571
+    },
+    "phase5_hypergeometric_overlap": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_hypergeometric_overlap.csv",
+      "sha256": "509d417f5824c730ed671ad9246d0e383a1943b369dfe7314eafc344b8e2e3fc",
+      "size_bytes": 639
+    },
+    "phase5_jaccard_1pct": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_jaccard_1pct.csv",
+      "sha256": "b8e5b7f4b5b666d6a58df248b43c986a4f9d3a1b4b39683ca33188bd506ec48b",
+      "size_bytes": 1960
+    },
+    "phase5_run_metadata": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_run_metadata.json",
+      "sha256": "719ec5240f6b3852bf14604c4bc32148545f13cc96ee9e12863849c571d68f2f",
+      "size_bytes": 9474
+    },
+    "phase5_spearman": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_spearman.csv",
+      "sha256": "673f4793cf8f5f79f98ace128ad1c358dfd233435507e95cae4e1e928feb4fcf",
+      "size_bytes": 1929
+    }
+  },
+  "layer": "visualization",
+  "model_fitting": {
+    "models_fitted": 0,
+    "note": "Phase 5B is a visualization-only layer: no anomaly detector was constructed, fitted or refitted; the only scikit-learn estimator used is a 2-component PCA (a lossy projection for visualization); Phase 4 scores and saved flags were consumed exactly as stored; no Phase 5A quantity was recalculated."
+  },
+  "outputs": {
+    "figure_1": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot1_precision_recall.png",
+    "figure_2": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot2_fraud_discovery.png",
+    "figure_3": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot3_hypergeometric_overlap.png",
+    "figure_4": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot4_spearman_matrix.png",
+    "figure_5": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot5_jaccard_matrix.png",
+    "figure_6": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot6_topk_jaccard.png",
+    "figure_7": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot7_rank_vs_rank.png",
+    "figure_8": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot8_pca_agreement.png",
+    "figure_catalog": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_figure_catalog.csv",
+    "manifest": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot_commit_manifest.json",
+    "plot_metadata": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\figures\\reproduction\\phase5_plot_metadata.json"
+  },
+  "phase": "5B",
+  "plotting_conventions": {
+    "colours": {
+      "agreement_groups": "Okabe-Ito colourblind-safe palette with distinct markers per group",
+      "if_family": "shades of blue (#08519c / #08306b for the highlighted IF runs)",
+      "lof_family": "shades of orange (#a63603 for the highlighted LOF run)",
+      "matrices": "numeric annotation in every cell; colour is never the only channel"
+    },
+    "dpi": 200,
+    "exploratory_selection_caveat": "Exploratory analysis: the highlighted runs (IF_003, IF_004, LOF_004 and the IF_003/LOF_004 pair) were selected after inspecting the label-informed Phase 4 evaluation results; comparisons involving them are post-hoc and must not be read as confirmatory.",
+    "fixed_threshold_policy": "saved Phase 3 flags consumed exactly as supplied; the 1% rule is never recomputed, re-optimised or re-thresholded",
+    "hypergeometric_reporting": "upper-tail probabilities reported via log10 (sf/logsf); an underflowed probability is never presented as exactly zero; the full valid support is displayed and labelled",
+    "pca": {
+      "disclaimer": "PCA is a LOSSY 2-D projection used for visualization only: the two components capture only part of the 30-dimensional FS-A variance, so distances and overlaps in this map must not be read as detector inputs or as evidence about the feature space",
+      "explained_variance_pct": {
+        "pc1": 28.290975314022166,
+        "pc2": 9.320608856500504
+      },
+      "fitted_on": "the joined 30,000-observation sample (row_id-aligned FS-A rows)",
+      "neither_background": "the full Neither group is plotted as the background (no subsampling); when subsampling is explicitly requested it draws strictly from the Neither group with a fixed recorded seed -- never from the full population relabelled as Neither",
+      "preprocessing": "the FS-A matrix already embodies the frozen Phase 2 preprocessing (V1-V28 untouched PCA outputs; Time and Amount RobustScaler-scaled); Phase 5B applies NO additional rescaling and never standardizes the full matrix -- the stored FS-A values are projected as-is",
+      "solver": "exact full SVD (deterministic; no randomized solver)"
+    },
+    "percentile_convention": "axis percentile = 1 - descending_average_rank / n, with the descending rank computed as the tie-averaged rank of -anomaly_score (1 = most anomalous, 0 = least anomalous); the boundary of the top-1% region is therefore the percentile 0.99 (rank = n/100)",
+    "random_baselines": "random expected recall = reviewed fraction (identity line); random expected precision = positive-class prevalence; the obsolete incorrectly scaled discovery baseline is not used",
+    "rank_vs_rank_boundaries": "top-1% boundaries drawn at percentile 0.99",
+    "score_orientation": "anomaly_score from the Phase 4 evaluation dataset (higher = more anomalous); native_score never used for ranking",
+    "tie_breaking": "descending anomaly_score; ties resolved by ascending position in the canonical Phase 4 evaluation dataset row order (first-stored row wins; stable sort)",
+    "topk_derivation": {
+      "canonical_threshold_pct": 1.0,
+      "canonical_threshold_source": "saved Phase 3 flags (never rederived)",
+      "diagonal_excluded": "within-method means average the i<j pairs only",
+      "k_rule": "k = round(n * pct / 100), required to satisfy 1 <= k <= n",
+      "per_budget_selection_sizes": {
+        "0.1%": {
+          "IF_001": 30,
+          "IF_002": 30,
+          "IF_003": 30,
+          "IF_004": 30,
+          "IF_005": 30,
+          "LOF_001": 30,
+          "LOF_002": 30,
+          "LOF_003": 30,
+          "LOF_004": 30,
+          "LOF_005": 30
+        },
+        "0.2%": {
+          "IF_001": 60,
+          "IF_002": 60,
+          "IF_003": 60,
+          "IF_004": 60,
+          "IF_005": 60,
+          "LOF_001": 60,
+          "LOF_002": 60,
+          "LOF_003": 60,
+          "LOF_004": 60,
+          "LOF_005": 60
+        },
+        "0.5%": {
+          "IF_001": 150,
+          "IF_002": 150,
+          "IF_003": 150,
+          "IF_004": 150,
+          "IF_005": 150,
+          "LOF_001": 150,
+          "LOF_002": 150,
+          "LOF_003": 150,
+          "LOF_004": 150,
+          "LOF_005": 150
+        },
+        "1%": {
+          "IF_001": 300,
+          "IF_002": 300,
+          "IF_003": 300,
+          "IF_004": 300,
+          "IF_005": 300,
+          "LOF_001": 300,
+          "LOF_002": 300,
+          "LOF_003": 300,
+          "LOF_004": 300,
+          "LOF_005": 300
+        },
+        "2%": {
+          "IF_001": 600,
+          "IF_002": 600,
+          "IF_003": 600,
+          "IF_004": 600,
+          "IF_005": 600,
+          "LOF_001": 600,
+          "LOF_002": 600,
+          "LOF_003": 600,
+          "LOF_004": 600,
+          "LOF_005": 600
+        },
+        "5%": {
+          "IF_001": 1500,
+          "IF_002": 1500,
+          "IF_003": 1500,
+          "IF_004": 1500,
+          "IF_005": 1500,
+          "LOF_001": 1500,
+          "LOF_002": 1500,
+          "LOF_003": 1500,
+          "LOF_004": 1500,
+          "LOF_005": 1500
+        }
+      },
+      "tie_breaking": "descending anomaly_score; ties resolved by ascending position in the canonical Phase 4 evaluation dataset row order (first-stored row wins; stable sort)"
+    }
+  },
+  "run_ids": [
+    "IF_001",
+    "IF_002",
+    "IF_003",
+    "IF_004",
+    "IF_005",
+    "LOF_001",
+    "LOF_002",
+    "LOF_003",
+    "LOF_004",
+    "LOF_005"
+  ],
+  "run_mode": "execute",
+  "sample": {
+    "fraud_count": 47,
+    "fraud_prevalence": 0.0015666666666666667,
+    "per_run_flagged_counts": {
+      "IF_001": 300,
+      "IF_002": 300,
+      "IF_003": 300,
+      "IF_004": 300,
+      "IF_005": 300,
+      "LOF_001": 300,
+      "LOF_002": 300,
+      "LOF_003": 300,
+      "LOF_004": 300,
+      "LOF_005": 300
+    },
+    "sample_size": 30000
+  },
+  "stream": "A"
+}

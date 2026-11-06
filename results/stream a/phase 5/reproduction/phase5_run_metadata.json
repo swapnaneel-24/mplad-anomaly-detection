@@ -1,0 +1,211 @@
+{
+  "analytical_conventions": {
+    "agreement_groups": "disjoint exhaustive partition (both / if_only / lof_only / neither) of the saved 1% flag pair; partition validated",
+    "fixed_threshold_policy": "saved Phase 3 flags consumed exactly as supplied; the 1% rule is never recomputed or re-optimised",
+    "fraud_discovery_curve": "ranking by descending anomaly_score under the shared tie-breaking policy; ground-truth labels used post hoc only",
+    "hypergeometric": {
+      "null_model": "independent uniform random selection: run_a's flags and run_b's flags are two independent uniform random subsets of the n observations; the upper-tail probability is the extremity of the observed overlap under THIS null only and does not establish that flagged observations are true anomalies",
+      "parameterisation": "P(X >= observed) with X ~ Hypergeometric(N=n, successes=run_a flags, draws=run_b flags), evaluated with scipy.stats.hypergeom.sf / logsf"
+    },
+    "jaccard": "intersection over union of the saved Phase 3 1% flags; two empty selections defined as 1.0",
+    "multithreshold": {
+      "canonical_threshold_pct": 1.0,
+      "canonical_threshold_source": "saved Phase 3 flags (never rederived)",
+      "k_rule": "k = round(n * pct / 100), required to satisfy 1 <= k <= n",
+      "per_run_selection_sizes": {
+        "0.1": {
+          "IF_001": 30,
+          "IF_002": 30,
+          "IF_003": 30,
+          "IF_004": 30,
+          "IF_005": 30,
+          "LOF_001": 30,
+          "LOF_002": 30,
+          "LOF_003": 30,
+          "LOF_004": 30,
+          "LOF_005": 30
+        },
+        "0.2": {
+          "IF_001": 60,
+          "IF_002": 60,
+          "IF_003": 60,
+          "IF_004": 60,
+          "IF_005": 60,
+          "LOF_001": 60,
+          "LOF_002": 60,
+          "LOF_003": 60,
+          "LOF_004": 60,
+          "LOF_005": 60
+        },
+        "0.5": {
+          "IF_001": 150,
+          "IF_002": 150,
+          "IF_003": 150,
+          "IF_004": 150,
+          "IF_005": 150,
+          "LOF_001": 150,
+          "LOF_002": 150,
+          "LOF_003": 150,
+          "LOF_004": 150,
+          "LOF_005": 150
+        },
+        "1.0": {
+          "IF_001": 300,
+          "IF_002": 300,
+          "IF_003": 300,
+          "IF_004": 300,
+          "IF_005": 300,
+          "LOF_001": 300,
+          "LOF_002": 300,
+          "LOF_003": 300,
+          "LOF_004": 300,
+          "LOF_005": 300
+        },
+        "2.0": {
+          "IF_001": 600,
+          "IF_002": 600,
+          "IF_003": 600,
+          "IF_004": 600,
+          "IF_005": 600,
+          "LOF_001": 600,
+          "LOF_002": 600,
+          "LOF_003": 600,
+          "LOF_004": 600,
+          "LOF_005": 600
+        },
+        "5.0": {
+          "IF_001": 1500,
+          "IF_002": 1500,
+          "IF_003": 1500,
+          "IF_004": 1500,
+          "IF_005": 1500,
+          "LOF_001": 1500,
+          "LOF_002": 1500,
+          "LOF_003": 1500,
+          "LOF_004": 1500,
+          "LOF_005": 1500
+        }
+      },
+      "tie_breaking": "descending anomaly_score; ties resolved by ascending position in the canonical Phase 4 evaluation dataset row order (first-stored row wins; stable sort)"
+    },
+    "score_orientation": "anomaly_score from the Phase 4 evaluation dataset (higher = more anomalous); native_score never used for ranking",
+    "spearman": "Pearson correlation of tie-corrected average ranks (scipy.stats.rankdata) between anomaly_score vectors; the identical cross-run row_id sequence is validated first",
+    "tie_breaking": "descending anomaly_score; ties resolved by ascending position in the canonical Phase 4 evaluation dataset row order (first-stored row wins; stable sort)"
+  },
+  "bootstrap": {
+    "ci_level": 0.95,
+    "ci_method": "percentile",
+    "n_replicates": 2000,
+    "paired_comparison": {
+      "definition": "LOF_004 - IF_003",
+      "paired": true,
+      "run_a": "IF_003",
+      "run_b": "LOF_004",
+      "shared_indices": true
+    },
+    "resampling": "class-stratified with replacement; positives and negatives resampled separately; prevalence preserved exactly per replicate",
+    "rng": "numpy.random.default_rng (PCG64)",
+    "runs_evaluated": [
+      "IF_003",
+      "IF_004",
+      "LOF_004"
+    ],
+    "seed": 42,
+    "selection_caveat": "Exploratory analysis: the highlighted runs (IF_003, IF_004, LOF_004 and the IF_003/LOF_004 pair) were selected after inspecting the label-informed Phase 4 evaluation results; comparisons involving them are post-hoc and must not be read as confirmatory.",
+    "threshold_policy": "saved Phase 3 flags consumed as supplied on every replicate (attached to the resampled observations); the 1% threshold is never reselected, re-optimised or recomputed inside replicates -- deliberately distinct from an optional top-1%-reselected bootstrap, which is NOT performed"
+  },
+  "created_utc": "2026-11-05T14:11:41.562156+00:00",
+  "environment": {
+    "executable": "C:\\Users\\53542\\miniconda3\\python.exe",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.13",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1"
+  },
+  "input_manifest": {
+    "artifacts": {
+      "phase4_evaluation_dataset.csv": {
+        "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+        "size_bytes": 12352469,
+        "verified": true
+      },
+      "phase4_metrics.csv": {
+        "sha256": "6535001ce38766d7e52fef84253a7d95e6335b6183fd34f6ead12210eec99acd",
+        "size_bytes": 2397,
+        "verified": true
+      },
+      "phase4_run_metadata.json": {
+        "sha256": "b17f40635e73cbc11932447a9616bc9288f9bfbbc50103e2441b8d3aeb736ac1",
+        "size_bytes": 3199,
+        "verified": true
+      }
+    },
+    "mode": "manifest_verified",
+    "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_commit_manifest.json",
+    "present": true,
+    "verified": true
+  },
+  "inputs": {
+    "evaluation_dataset": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_evaluation_dataset.csv",
+      "sha256": "affbf02c63da594d1fdb2c66d07121f39221f7e24082eed4770b59d4598bb048",
+      "size_bytes": 12352469
+    },
+    "phase4_run_metadata": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_run_metadata.json",
+      "sha256": "b17f40635e73cbc11932447a9616bc9288f9bfbbc50103e2441b8d3aeb736ac1",
+      "size_bytes": 3199
+    }
+  },
+  "layer": "quantitative_diagnostic_analysis",
+  "model_fitting": {
+    "models_fitted": 0,
+    "note": "Phase 5A is an analysis-only layer: no detector was constructed, fitted or refitted; Phase 4 scores and flags were consumed exactly as stored; no threshold was reselected and no plot was produced."
+  },
+  "outputs": {
+    "agreement_groups": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_agreement_groups.csv",
+    "bootstrap_metrics": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_bootstrap_metrics.csv",
+    "fraud_discovery_curve": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_fraud_discovery_curve.csv",
+    "hypergeometric_overlap": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_hypergeometric_overlap.csv",
+    "manifest": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_commit_manifest.json",
+    "multithreshold_agreement": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_multithreshold_agreement.csv",
+    "paired_bootstrap_differences": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_paired_bootstrap_differences.csv",
+    "pairwise_jaccard_1pct": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_jaccard_1pct.csv",
+    "pairwise_spearman": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_pairwise_spearman.csv",
+    "run_metadata": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 5\\reproduction\\phase5_run_metadata.json"
+  },
+  "phase": "5A",
+  "run_ids": [
+    "IF_001",
+    "IF_002",
+    "IF_003",
+    "IF_004",
+    "IF_005",
+    "LOF_001",
+    "LOF_002",
+    "LOF_003",
+    "LOF_004",
+    "LOF_005"
+  ],
+  "run_mode": "execute",
+  "sample": {
+    "fraud_count": 47,
+    "fraud_prevalence": 0.0015666666666666667,
+    "per_run_flagged_counts": {
+      "IF_001": 300,
+      "IF_002": 300,
+      "IF_003": 300,
+      "IF_004": 300,
+      "IF_005": 300,
+      "LOF_001": 300,
+      "LOF_002": 300,
+      "LOF_003": 300,
+      "LOF_004": 300,
+      "LOF_005": 300
+    },
+    "sample_size": 30000
+  },
+  "selection_caveat": "Exploratory analysis: the highlighted runs (IF_003, IF_004, LOF_004 and the IF_003/LOF_004 pair) were selected after inspecting the label-informed Phase 4 evaluation results; comparisons involving them are post-hoc and must not be read as confirmatory.",
+  "stream": "A"
+}

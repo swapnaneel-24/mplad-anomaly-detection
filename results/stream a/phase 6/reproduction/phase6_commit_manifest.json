@@ -1,0 +1,22 @@
+{
+  "artifacts": {
+    "phase6_consistency_report.md": {
+      "sha256": "c0550da26f68267fce4860be3c3b4d413773e108f40c8509ff146ab4597b1d1f",
+      "size_bytes": 13993
+    },
+    "phase6_consistency_scorecard.csv": {
+      "sha256": "9171d182a020be0acaba3bf52befa3fffd29252415c5b23cb9727c01a2e480b2",
+      "size_bytes": 21726
+    },
+    "phase6_group_assignments.csv": {
+      "sha256": "e8be57471b53a0064b0e574cdfb31de3e5b62a9c0f24d8fa914873b129745f6e",
+      "size_bytes": 1754351
+    },
+    "phase6_run_metadata.json": {
+      "sha256": "bec544f4cd0396f2963676bb20ad5c84f05518e1942d2e9ba4bb9fd01910ee92",
+      "size_bytes": 9654
+    }
+  },
+  "created_utc": "2026-11-05T18:00:38.809932+00:00",
+  "manifest_version": 1
+}

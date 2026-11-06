@@ -1,0 +1,5 @@
+outs:
+- md5: b0a70f86c6046ec55ab04c73e2daabee
+  size: 4402768
+  hash: md5
+  path: phase6_group_assignments.csv

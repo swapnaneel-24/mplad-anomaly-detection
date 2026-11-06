@@ -1,0 +1,76 @@
+{
+  "created_utc": "2026-11-05T06:36:02.825684+00:00",
+  "environment": {
+    "executable": "C:\\Users\\53542\\miniconda3\\python.exe",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "python": "3.13.13",
+    "scikit-learn": "1.9.0"
+  },
+  "input_manifest": {
+    "mode": "legacy_unmanifested",
+    "note": "No Phase 3 commit manifest exists (the canonical Phase 3 artifacts predate manifest generation). Strict structural validation was applied and the input SHA-256 hashes are recorded in this provenance record. Manifest verification was NOT performed.",
+    "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 3\\phase3_commit_manifest.json",
+    "present": false,
+    "verified": false
+  },
+  "inputs": {
+    "ground_truth": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\data\\processed\\stream-a\\labels\\ground_truth_registry.csv",
+      "sha256": "69aab44f8241efc7ab33ffd481576376d7ce7fbc6642fdd464c2b82c7ad7b78f",
+      "size_bytes": 2736974
+    },
+    "predictions": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 3\\phase3_canonical_predictions.pkl",
+      "sha256": "a20e0c72c4cdd7b2085837241157d8919394fe231d8bde36312f713aa6cb63e0",
+      "size_bytes": 1741037
+    },
+    "run_metadata": {
+      "path": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 3\\phase3_run_metadata.csv",
+      "sha256": "94f278680b838203f3acc5dd03e9126bb3613cc4dfb8d7238f015e5cb9364bbd",
+      "size_bytes": 795
+    }
+  },
+  "layer": "label_based_evaluation",
+  "model_fitting": {
+    "models_fitted": 0,
+    "note": "Phase 4 is an evaluation-only layer: no detector was constructed, fitted or refitted; Phase 3 scores and flags were consumed exactly as stored."
+  },
+  "outputs": {
+    "evaluation_dataset": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_evaluation_dataset.csv",
+    "manifest": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_commit_manifest.json",
+    "metrics": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_metrics.csv",
+    "run_metadata": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\results\\stream a\\phase 4\\reproduction\\phase4_run_metadata.json"
+  },
+  "phase": "4",
+  "registry_summary": {
+    "matched_to_sample": 30000,
+    "positive_labels": 492,
+    "total_observations": 284807
+  },
+  "run_ids": [
+    "IF_001",
+    "IF_002",
+    "IF_003",
+    "IF_004",
+    "IF_005",
+    "LOF_001",
+    "LOF_002",
+    "LOF_003",
+    "LOF_004",
+    "LOF_005"
+  ],
+  "run_mode": "execute",
+  "sample": {
+    "fraud_count": 47,
+    "fraud_prevalence": 0.0015666666666666667,
+    "sample_size": 30000
+  },
+  "score_orientation": {
+    "anomaly_score": "-native_score; higher = more anomalous",
+    "native_score": "Phase 3 native estimator score; lower = more anomalous",
+    "ranking_metrics_use": "anomaly_score",
+    "threshold_metrics_use": "saved Phase 3 flags (never recomputed)"
+  },
+  "stream": "A"
+}

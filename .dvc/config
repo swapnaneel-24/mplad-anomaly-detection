@@ -1,5 +1,10 @@
 [core]
-    remote = b2
+    remote = b2-remote
 ['remote "b2"']
     url = s3://mplad-anomaly-detection-dvc
     endpointurl = https://s3.us-east-005.backblazeb2.com
+['remote "b2-remote"']
+    url = s3://mplad-dvc-artifacts/dvc-store
+    endpointurl = https://s3.us-east-005.backblazeb2.com
+    use_ssl = true
+    ssl_verify = true

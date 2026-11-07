@@ -9,3 +9,43 @@ data/**
 .ipynb_checkpoints/
 results/stream a/phase 3/*.pkl
 results/stream a/phase 4/FULL_phase4_evaluation_dataset.csv
+# ---------------------------------------------------------------------------
+# PEIARS application additions (PR-01) — APPEND THIS BLOCK AT THE END OF
+# THE EXISTING .gitignore. DO NOT REMOVE OR REORDER ANY PRE-EXISTING RULES;
+# in particular the existing DVC and data-tracking rules must remain intact.
+#
+# NOTE: research directories (data/, results/, notebooks/, docs/) are
+# intentionally NOT ignored here — canonical artifacts and DVC-tracked
+# inputs stay tracked. Duplicate patterns with existing rules are harmless.
+# ---------------------------------------------------------------------------
+
+# --- Local environment files (never commit real values) ---
+.env
+.env.*
+!.env.example
+
+# --- Python caches and virtual environments ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# --- Frontend build outputs and caches ---
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.vite/
+
+# --- Local database volumes (deploy/) ---
+deploy/pgdata/
+deploy/**/pgdata/
+
+# --- Logs and OS junk ---
+*.log
+.DS_Store
+Thumbs.db

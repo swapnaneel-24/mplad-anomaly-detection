@@ -1,0 +1,8 @@
+# PEIARS backend development/test dependencies (PR-02).
+#
+# The FastAPI TestClient requires httpx; the suite runs on pytest 9.x.
+# The maintainer's local research environment uses pytest 9.2.0; this
+# suite was validated with pytest 9.0.2 (any 9.x is expected to work).
+-r requirements.txt
+httpx==0.28.1
+pytest==9.0.2

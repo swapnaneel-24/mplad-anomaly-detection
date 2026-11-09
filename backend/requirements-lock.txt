@@ -1,0 +1,40 @@
+# PEIARS backend dependency lock (PR-02).
+#
+# Full transitive freeze of backend/requirements-dev.txt. Install with:
+#   pip install -r backend/requirements-lock.txt
+#
+# Reproducibility contract:
+#   * Supported interpreter: Python 3.12.x (validated on 3.12.16).
+#   * The committed OpenAPI snapshot (backend/contracts/openapi.json) is
+#     only reproducible under these exact versions. Regenerate the snapshot
+#     ONLY after ``pip install -r backend/requirements-lock.txt`` in a clean
+#     3.12 environment. Never regenerate it against arbitrary versions.
+#   * The installed versions are machine-checked by
+#     backend/tests/test_dependency_lock.py. If that test fails, install the
+#     locked versions — do not regenerate the snapshot to mask the drift.
+#
+# The frozen research environment is intentionally NOT represented here.
+
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.16.0
+certifi==2026.10.23
+click==8.5.1
+fastapi==0.128.0
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.20
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+Pygments==2.21.0
+pytest==9.0.2
+python-dotenv==1.2.4
+starlette==0.50.0
+typing-inspection==0.4.5
+typing_extensions==4.16.0
+uvicorn==0.44.0

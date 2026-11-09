@@ -1,0 +1,120 @@
+"""Typed application configuration (Pydantic Settings).
+
+All settings are injectable for tests. Values come from (in increasing
+priority) field defaults, an optional repository-root ``.env`` file, and
+``PEIARS_``-prefixed environment variables. Tests construct explicit
+``Settings`` objects with ``_env_file=None`` so results never depend on the
+machine's environment.
+
+Security notes:
+
+* ``git_commit_sha`` is *only* what a deployment environment supplies. The
+  application never fabricates a commit SHA.
+* No secret is ever logged or returned by the API; secrets live only in
+  the uncommitted ``.env`` file (see the repository-root ``.env.example``).
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Literal
+
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app import APP_NAME, __version__
+
+#: Repository root (<repo>/backend/app/core/config.py -> parents[3]).
+REPO_ROOT: Path = Path(__file__).resolve().parents[3]
+
+#: Default local-development CORS origins (explicit; never a wildcard).
+DEFAULT_CORS_ORIGINS: tuple[str, ...] = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+)
+
+EnvironmentName = Literal["development", "test", "production"]
+LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+
+
+class Settings(BaseSettings):
+    """Typed, injectable application settings."""
+
+    model_config = SettingsConfigDict(
+        env_prefix="PEIARS_",
+        env_file=str(REPO_ROOT / ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        frozen=True,
+    )
+
+    # --- Application identity -------------------------------------------------
+    app_name: str = APP_NAME
+    app_version: str = __version__
+    environment: EnvironmentName = "development"
+
+    # --- API server -----------------------------------------------------------
+    api_host: str = "127.0.0.1"
+    api_port: int = Field(default=8000, ge=1, le=65535)
+    #: URL prefix under which the versioned API is served (router prefix).
+    #: Note: this is the served URL prefix, not the ASGI ``root_path`` used
+    #: when a reverse proxy strips a prefix (uvicorn ``--root-path``).
+    api_root_path: str = "/api/v1"
+
+    # --- Cross-origin resource sharing ----------------------------------------
+    #: Explicit allowed origins only. Wildcard origins are never combined
+    #: with credentials.
+    cors_origins: list[str] = Field(default_factory=lambda: list(DEFAULT_CORS_ORIGINS))
+
+    # --- Build provenance -----------------------------------------------------
+    #: Supplied by the deployment environment only; never fabricated.
+    git_commit_sha: str | None = None
+
+    # --- Observability --------------------------------------------------------
+    log_level: LogLevel = "INFO"
+
+    # --- Local development conveniences ---------------------------------------
+    #: Serve the interactive API docs (``/docs`` and ``/openapi.json``).
+    #: Intended for non-production environments; the OpenAPI schema can
+    #: always be exported offline via ``backend/scripts/export_openapi.py``.
+    docs_enabled: bool = True
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _parse_cors_origins(cls, value: object) -> object:
+        """Accept a comma-separated string (as used in ``.env`` files)."""
+        if isinstance(value, str):
+            parts = [origin.strip() for origin in value.split(",")]
+            return [origin for origin in parts if origin]
+        return value
+
+    @field_validator("git_commit_sha", mode="before")
+    @classmethod
+    def _clean_commit_sha(cls, value: object) -> object:
+        """Treat an empty string as "not supplied"."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+    @field_validator("api_root_path", mode="after")
+    @classmethod
+    def _validate_root_path(cls, value: str) -> str:
+        if not value.startswith("/") or value.endswith("/") or ".." in value:
+            raise ValueError(
+                "api_root_path must be an absolute path segment without a "
+                "trailing slash (for example '/api/v1')"
+            )
+        return value
+
+
+def canonical_settings() -> Settings:
+    """Deterministic settings for offline OpenAPI export.
+
+    Reads neither ``.env`` nor environment variables so the exported
+    schema is reproducible on every machine for a given code version.
+    """
+    return Settings(
+        _env_file=None,
+        environment="development",
+        git_commit_sha=None,
+    )

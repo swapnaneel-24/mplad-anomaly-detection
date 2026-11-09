@@ -1,0 +1,11 @@
+# PEIARS backend runtime dependencies (PR-02).
+#
+# Installed separately from the frozen research environment: the research
+# tree (src/mplad, root requirements.txt) is never modified and its
+# dependency versions are never upgraded by application work.
+#
+# Validated on Python 3.12 (see backend/README.md for details).
+fastapi==0.128.0
+uvicorn==0.44.0
+pydantic==2.12.5
+pydantic-settings==2.13.1

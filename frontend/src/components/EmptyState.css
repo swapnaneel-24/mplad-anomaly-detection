@@ -1,0 +1,11 @@
+/* EmptyState — DESIGN_SYSTEM.md §9.3. */
+
+.empty-state {
+  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--space-8);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}

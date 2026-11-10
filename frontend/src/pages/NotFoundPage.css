@@ -1,0 +1,28 @@
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-bg);
+  text-align: center;
+}
+
+.not-found-page__title {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.not-found-page__lede {
+  max-width: 420px;
+}
+
+.not-found-page__link {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+}

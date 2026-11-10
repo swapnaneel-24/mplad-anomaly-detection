@@ -1,1 +1,4 @@
+# PEIARS Frontend — Node.js version pin
+# PR-01 baseline: Node 22 LTS. PR-05A validated on Node 24.22.2 (LTS line).
+# Both 22 LTS and 24 LTS are supported targets.
 22

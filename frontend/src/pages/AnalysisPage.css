@@ -1,0 +1,127 @@
+.analysis-page {
+  display: grid;
+  grid-template-rows: 1fr 220px;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  height: 100%;
+  min-height: 0;
+}
+
+.analysis-page__top {
+  display: grid;
+  grid-template-columns: var(--rail-parameter) 1fr var(--rail-observation);
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+.analysis-page__parameters,
+.analysis-page__inspector {
+  min-height: 0;
+}
+
+.analysis-page__canvas {
+  min-height: 0;
+  min-width: 0;
+}
+
+.analysis-page__canvas-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px dashed var(--color-border-strong);
+  margin: var(--space-3);
+  background: var(--color-bg-raised);
+}
+
+.analysis-page__canvas-heading {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-md);
+  font-style: italic;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.analysis-page__canvas-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  max-width: 480px;
+  line-height: var(--line-height-normal);
+}
+
+.param-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 var(--space-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.param-group:last-of-type {
+  margin-bottom: var(--space-2);
+}
+
+.param-group__legend {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0;
+}
+
+.param-select,
+.param-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 var(--space-2);
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  cursor: not-allowed;
+}
+
+.param-range {
+  width: 100%;
+  cursor: not-allowed;
+}
+
+.param-value {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.param-note {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  margin-top: var(--space-2);
+}
+
+.analysis-page__records {
+  min-height: 0;
+}
+
+.analysis-page__caption {
+  padding: var(--space-2) var(--space-3) 0;
+}
+
+@media (max-width: 1365px) {
+  .analysis-page {
+    grid-template-rows: 1fr 200px;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+  .analysis-page__top {
+    grid-template-columns: 200px 1fr 280px;
+    gap: var(--space-2);
+  }
+}

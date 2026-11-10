@@ -1,0 +1,29 @@
+/* Full-page state containers (loading + connectivity uncertainty). */
+/* These render WITHOUT the sidebar/header chrome. */
+
+.fullpage-state {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--color-bg);
+}
+
+.fullpage-state--centered {
+  align-items: center;
+  justify-content: center;
+}
+
+.fullpage-state--centered .error-panel {
+  max-width: 520px;
+  width: 100%;
+}
+
+.fullpage-state__hint {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}

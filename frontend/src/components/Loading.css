@@ -1,0 +1,9 @@
+/* Loading — DESIGN_SYSTEM.md §9.1. */
+
+.loading {
+  display: inline-block;
+  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}

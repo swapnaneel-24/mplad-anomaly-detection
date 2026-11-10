@@ -1,0 +1,108 @@
+/* PEIARS Design Tokens — see frontend/DESIGN_SYSTEM.md for rationale. */
+/* Single source of truth: components reference these by name only. */
+
+:root {
+  /* --- Surface and text ---------------------------------------------- */
+  --color-bg: #f6f3ec;
+  --color-bg-raised: #fbf9f3;
+  --color-bg-sunken: #ece8de;
+  --color-bg-inset: #e3dfd2;
+  --color-border: #c9c3b1;
+  --color-border-strong: #8f8a78;
+  --color-text: #1f2630;
+  --color-text-muted: #515966;
+  --color-text-faint: #7a8088;
+
+  /* --- Accent (analytical selection / navigation) -------------------- */
+  --color-accent: #1f5d5a;
+  --color-accent-hover: #174a48;
+  --color-accent-soft: #d6e3e0;
+  --color-accent-line: #3c807c;
+
+  /* --- Semantic ------------------------------------------------------- */
+  --color-success: #3a6b3e;
+  --color-success-soft: #dde7d8;
+  --color-warning: #9c6b1f;
+  --color-warning-soft: #efe1c8;
+  --color-error: #8a2a2a;
+  --color-error-soft: #efd8d8;
+  --color-info: #3a5878;
+
+  /* --- Typography ----------------------------------------------------- */
+  --font-editorial: "Source Serif 4", "Source Serif Pro", "Charter",
+    "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-interface: "Inter", "SF Pro Text", "Segoe UI", "Roboto",
+    "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", "Consolas",
+    "DejaVu Sans Mono", monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-md: 17px;
+  --font-size-lg: 21px;
+  --font-size-xl: 28px;
+  --font-size-2xl: 36px;
+
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.6;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* --- Spacing -------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* --- Layout (PR-05A redesign: desktop-only horizontal shell) ------- */
+  /* Deprecated: --sidebar-width / --sidebar-collapsed-width removed.
+     Kept as comments for migration reference; do not use in new code. */
+  /* --sidebar-width: 240px;        (removed) */
+  /* --sidebar-collapsed-width: 56px; (removed) */
+
+  --shell-identity-height: 40px;
+  --shell-switcher-height: 36px;
+  --shell-context-height: 32px;
+  --shell-footer-height: 24px;
+  --desktop-min-width: 1280px;
+  --content-max-width: 1280px;
+  --editorial-column-width: 820px;
+  --research-index-width: 960px;
+
+  /* Workspace panel rail widths (purpose-specific, not shared) */
+  --rail-filter: 240px;
+  --rail-inspector: 320px;
+  --rail-parameter: 220px;
+  --rail-observation: 300px;
+  --rail-case-index: 260px;
+
+  /* --- Borders -------------------------------------------------------- */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-pill: 999px;
+
+  /* --- Motion --------------------------------------------------------- */
+  --motion-fast: 120ms;
+  --motion-normal: 150ms;
+  --motion-slow: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Z-index -------------------------------------------------------- */
+  --z-shell-band: 100;
+  --z-focus-ring: 1;
+}
+
+/* --- Breakpoints (as CSS media queries; tokens are documentation) ----- */
+/* --bp-xs: < 480px; --bp-sm: 480-767px; --bp-md: 768-1023px;
+   --bp-lg: 1024-1439px; --bp-xl: >= 1440px */

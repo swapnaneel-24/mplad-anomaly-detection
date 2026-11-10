@@ -1,0 +1,68 @@
+.identity-bar {
+  height: var(--shell-identity-height);
+  flex-shrink: 0;
+  background: var(--color-bg-raised);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  gap: var(--space-4);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-shell-band);
+}
+
+.identity-bar__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.identity-bar__mark {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.identity-bar__subtitle {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.identity-bar__sep {
+  color: var(--color-text-faint);
+  font-size: var(--font-size-xs);
+}
+
+.identity-bar__session {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.identity-bar__env {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.identity-bar__user-name {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.identity-bar__user-role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}

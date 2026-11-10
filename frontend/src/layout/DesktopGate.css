@@ -1,0 +1,34 @@
+.desktop-gate {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--color-bg);
+  overflow: auto;
+}
+
+.desktop-gate__card {
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.desktop-gate__title {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.desktop-gate__lede {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.desktop-gate__width {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}

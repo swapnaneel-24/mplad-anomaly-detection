@@ -1,0 +1,405 @@
+/* PEIARS global stylesheet — base element styles and shared utility classes.
+   Component-specific styles live alongside each component (co-located .css
+   files imported from the component module). Token references only; no
+   hardcoded colors, spacing or font sizes. */
+
+@import "./tokens.css";
+
+/* --- Reset (minimal, opinionated) -------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--color-text);
+}
+
+/* --- Focus ring (visible, accessible) --------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+  position: relative;
+  z-index: var(--z-focus-ring);
+}
+
+/* --- Shared utilities ------------------------------------------------- */
+
+/* Screen-reader-only text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Editorial serif body (used in Overview lede, Research methodology). */
+.editorial {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+}
+
+.editorial-muted {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-muted);
+}
+
+/* Mono / computational voice. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Numerical alignment helper for table cells. */
+.numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* --- Status pill ----------------------------------------------------- */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.status-pill::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-pill.ready {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+}
+
+.status-pill.not_ready {
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-color: var(--color-warning);
+}
+
+.status-pill.unreachable {
+  color: var(--color-error);
+  background: var(--color-error-soft);
+  border-color: var(--color-error);
+}
+
+.status-pill.unknown {
+  color: var(--color-text-muted);
+  background: var(--color-bg-sunken);
+  border-color: var(--color-border);
+}
+
+/* --- Loading indicator ----------------------------------------------- */
+.loading {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  display: inline-block;
+  outline: none;
+}
+
+/* --- Empty state ----------------------------------------------------- */
+.empty-state {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-8);
+  background: var(--color-bg-raised);
+}
+
+/* --- Inline code ----------------------------------------------------- */
+code.mono,
+.mono code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-sunken);
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+/* --- Shared page + panel utilities (PR-05A redesign) ----------------- */
+
+/* A workspace composition: fills the shell's composition area, no page-level
+   scroll (panels scroll internally). */
+.workspace-composition {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* A scrollable panel inside a composition. */
+.panel {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel__header {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-sunken);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.panel__title {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.panel__body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-3);
+  min-height: 0;
+}
+
+.panel__body--flush {
+  padding: 0;
+}
+
+/* Section heading inside a composition (h2-level). */
+.section-h2 {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: var(--line-height-snug);
+}
+
+.section-h3 {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+}
+
+.section-h4 {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-1);
+}
+
+/* Definition list (label/value pairs). */
+.def-list {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+
+.def-list__term {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  align-self: center;
+}
+
+.def-list__def {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  align-self: center;
+}
+
+/* Data table (shared). */
+.table-caption {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-bg-raised);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+}
+
+.data-table thead tr {
+  background: var(--color-bg-sunken);
+}
+
+.data-table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-bg-sunken);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table .numeric {
+  text-align: right;
+}
+
+/* Capability / limitation list. */
+.list-clean {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.list-clean li {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  padding-left: var(--space-4);
+  position: relative;
+  line-height: var(--line-height-normal);
+}
+
+.list-clean li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--color-text-faint);
+}
+
+/* Responsive: stack def-list on narrow desktop (but not below 1280 — the
+   desktop gate handles that). */
+@media (max-width: 1365px) {
+  .def-list {
+    grid-template-columns: 160px 1fr;
+  }
+}
+
+/* --- Reduced motion -------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

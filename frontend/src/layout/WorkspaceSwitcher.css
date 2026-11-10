@@ -1,0 +1,68 @@
+.workspace-switcher {
+  height: var(--shell-switcher-height);
+  flex-shrink: 0;
+  background: var(--color-bg-raised);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--shell-identity-height);
+  z-index: var(--z-shell-band);
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Hide the scrollbar but keep it functional. */
+  scrollbar-width: thin;
+}
+
+.workspace-switcher__tablist {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  min-width: min-content;
+  padding: 0 var(--space-3);
+  gap: var(--space-1);
+}
+
+.workspace-switcher__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--motion-fast) var(--ease),
+              color var(--motion-fast) var(--ease),
+              border-color var(--motion-fast) var(--ease);
+}
+
+.workspace-switcher__tab:hover {
+  background: var(--color-bg-sunken);
+  color: var(--color-text);
+}
+
+.workspace-switcher__tab.is-active {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  border-bottom-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.workspace-switcher__tab-number {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  letter-spacing: 0.04em;
+}
+
+.workspace-switcher__tab.is-active .workspace-switcher__tab-number {
+  color: var(--color-accent);
+}
+
+.workspace-switcher__tab-label {
+  white-space: nowrap;
+}

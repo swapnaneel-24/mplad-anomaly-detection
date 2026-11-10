@@ -21,6 +21,7 @@ from typing import Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import model_validator
 
 from app import APP_NAME, __version__
 
@@ -178,6 +179,12 @@ class Settings(BaseSettings):
                 "trailing slash (for example '/api/v1')"
             )
         return value
+    
+    @model_validator(mode='after')
+    def validate_secure_cookies(self) -> 'Settings':
+        if self.environment == 'production' and not self.session_cookie_secure:
+            raise ValueError('Production environment requires session_cookie_secure=True')
+        return self
 
 
 def canonical_settings() -> Settings:
@@ -191,3 +198,4 @@ def canonical_settings() -> Settings:
         environment="development",
         git_commit_sha=None,
     )
+

@@ -1,0 +1,23 @@
+.investigations-page {
+  display: grid;
+  grid-template-columns: var(--rail-case-index) 1fr var(--rail-inspector);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  height: 100%;
+  min-height: 0;
+}
+
+.investigations-page__index,
+.investigations-page__evidence,
+.investigations-page__assessment {
+  min-height: 0;
+  min-width: 0;
+}
+
+@media (max-width: 1365px) {
+  .investigations-page {
+    grid-template-columns: 220px 1fr 280px;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+}

@@ -1,4 +1,4 @@
-# PEIARS backend dependency lock (PR-02).
+# PEIARS backend dependency lock (PR-02 + PR-03).
 #
 # Full transitive freeze of backend/requirements-dev.txt. Install with:
 #   pip install -r backend/requirements-lock.txt
@@ -13,25 +13,38 @@
 #     backend/tests/test_dependency_lock.py. If that test fails, install the
 #     locked versions — do not regenerate the snapshot to mask the drift.
 #
-# The frozen research environment is intentionally NOT represented here.
+# PR-03 additions: SQLAlchemy 2.x, Alembic, psycopg 3 (PostgreSQL driver),
+# and pgserver (test-only; bundles a PostgreSQL 16.x server for integration
+# tests without a system-level install). The frozen research environment is
+# intentionally NOT represented here.
 
+Mako==1.4.3
+MarkupSafe==3.0.4
+Pygments==2.21.0
+SQLAlchemy==2.1.8
+alembic==1.20.1
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.16.0
 certifi==2026.10.23
 click==8.5.1
 fastapi==0.128.0
+fasteners==0.20
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
 idna==3.20
 iniconfig==2.3.1
 packaging==26.3
+pgserver==0.1.4
+platformdirs==4.14.5
 pluggy==1.7.0
-pydantic==2.12.5
+psutil==7.2.2
+psycopg-binary==3.3.8
+psycopg==3.3.8
 pydantic-settings==2.13.1
+pydantic==2.12.5
 pydantic_core==2.41.5
-Pygments==2.21.0
 pytest==9.0.2
 python-dotenv==1.2.4
 starlette==0.50.0

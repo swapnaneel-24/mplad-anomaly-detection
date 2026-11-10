@@ -21,7 +21,7 @@ class TestMeta:
         }
         assert body["application"] == "PEIARS API"
         assert body["api_version"] == "v1"
-        assert body["app_version"] == "0.2.0"
+        assert body["app_version"] == "0.3.0"
         assert body["environment"] == "test"
 
     def test_git_commit_sha_is_null_when_not_supplied(self, client):
@@ -48,7 +48,12 @@ class TestMeta:
         features = client.get("/api/v1/meta").json()["features"]
         assert features["health_endpoints"] == "implemented"
         assert features["source_registry_interface"] == "implemented"
-        assert features["database"] == "planned"
+        # PR-03 added implemented persistence features.
+        assert features["review_case_persistence"] == "implemented"
+        assert features["append_only_case_history"] == "implemented"
+        assert features["optimistic_concurrency"] == "implemented"
+        # Still planned.
+        assert features["public_case_api"] == "planned"
         assert features["authentication"] == "planned"
         assert features["case_management"] == "planned"
         assert set(features.values()) <= {"implemented", "planned"}
@@ -57,8 +62,12 @@ class TestMeta:
         subsystems = client.get("/api/v1/meta").json()["subsystems"]
         assert subsystems["api"] == "available"
         assert subsystems["source_registry"] == "available"
-        assert subsystems["database"] == "not_integrated"
+        # PR-03: persistence subsystem is available (internal repo/service).
+        assert subsystems["review_case_persistence"] == "available"
+        assert subsystems["database"] == "available"
+        # Not yet integrated.
         assert subsystems["authentication"] == "not_integrated"
+        assert subsystems["public_case_api"] == "not_integrated"
 
     def test_meta_contains_no_secrets_paths_or_hostnames(self, client):
         text = client.get("/api/v1/meta").text.lower()

@@ -270,7 +270,7 @@
   "info": {
     "description": "Public Expenditure & Infrastructure Anomaly Review System (PEIARS) — versioned JSON API. Research evidence is served read-only and manifest-verified; an anomaly flag never implies fraud. This API never fits models, recomputes thresholds or mutates frozen research artifacts.",
     "title": "PEIARS API",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "openapi": "3.1.0",
   "paths": {

@@ -1,8 +1,14 @@
-# PEIARS backend development/test dependencies (PR-02).
+# PEIARS backend development/test dependencies (PR-02 + PR-03).
 #
 # The FastAPI TestClient requires httpx; the suite runs on pytest 9.x.
 # The maintainer's local research environment uses pytest 9.2.0; this
 # suite was validated with pytest 9.0.2 (any 9.x is expected to work).
+#
+# PR-03 adds ``pgserver``: a pip-packaged PostgreSQL 16.x server used to
+# run real PostgreSQL integration tests without a system-level install.
+# It is a test-only dependency; production deployments use a real
+# PostgreSQL instance (provisioned separately, PR-06).
 -r requirements.txt
 httpx==0.28.1
 pytest==9.0.2
+pgserver==0.1.4

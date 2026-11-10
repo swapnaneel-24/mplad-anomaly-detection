@@ -12,4 +12,4 @@ requests through read-only, manifest-verified adapters only.
 APP_NAME = "PEIARS API"
 
 #: Backend application version (semantic, incremented per pull request).
-__version__ = "0.2.0"
+__version__ = "0.3.0"

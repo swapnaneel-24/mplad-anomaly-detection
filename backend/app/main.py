@@ -27,9 +27,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import APP_NAME, __version__
 from app.api.v1.router import api_router
 from app.core.config import Settings
+from app.core.config_errors import DatabaseConfigurationError
 from app.core.errors import register_exception_handlers
 from app.core.middleware import REQUEST_ID_HEADER, RequestIDMiddleware, configure_logging
 from app.core.openapi import build_openapi_schema
+from app.db.session import DatabaseSessionFactory
+from app.services.db_readiness import maybe_build_postgres_readiness_probe
 from app.services.readiness import ReadinessProbe
 from app.services.source_registry import EMPTY_SOURCE_REGISTRY
 
@@ -45,6 +48,8 @@ _API_DESCRIPTION = (
 def create_app(
     settings: Settings | None = None,
     readiness_probes: Iterable[ReadinessProbe] | None = None,
+    *,
+    db_session_factory_override: "DatabaseSessionFactory | None" = None,
 ) -> FastAPI:
     """Create a configured FastAPI application.
 
@@ -54,11 +59,45 @@ def create_app(
         Typed application settings; defaults to environment/``.env``
         driven settings. Tests inject explicit instances.
     readiness_probes:
-        Optional injectable dependency checks (deterministic tests). The
-        PR-02 default is an empty tuple: no required external dependency
-        is configured yet.
+        Optional injectable dependency checks (deterministic tests). When
+        ``settings.database_required`` is true and a database is
+        configured, a PostgreSQL probe is added automatically; explicit
+        probes passed here are appended.
+    db_session_factory_override:
+        Optional injectable :class:`DatabaseSessionFactory` for tests.
+        When provided, the application uses it instead of constructing
+        one from ``settings`` (useful for pointing at a disposable test
+        database). When ``None`` and the database is required, a factory
+        is built from ``settings``.
     """
     settings = settings if settings is not None else Settings()
+
+    # --- Database configuration validation (PR-03 hardening §1) ----------
+    # When PostgreSQL is declared a required dependency but no URL is
+    # configured, the application must fail at startup with a sanitized
+    # configuration error. This prevents a required dependency from
+    # silently disappearing from readiness validation (the original bug
+    # produced HTTP 200 with an empty checks list, misleading operators
+    # into thinking the database was verified).
+    if settings.database_required and not settings.database_url:
+        raise DatabaseConfigurationError(
+            "PostgreSQL is configured as a required dependency "
+            "(database_required=True) but no database_url is set. "
+            "Either set PEIARS_DATABASE_URL or set database_required=False."
+        )
+
+    # --- Database lifecycle (PR-03 §11) ----------------------------------
+    # The engine/session factory is created only when the database is
+    # configured. No import-time connection; no create_all() in
+    # production. The factory is stored on app.state so the service
+    # layer and readiness probe can consume it. The shutdown event
+    # disposes the engine pool on application exit.
+    db_factory: DatabaseSessionFactory | None = None
+    if settings.database_required and settings.database_url:
+        if db_session_factory_override is not None:
+            db_factory = db_session_factory_override
+        else:
+            db_factory = DatabaseSessionFactory.from_settings(settings)
 
     app = FastAPI(
         title=APP_NAME,
@@ -72,7 +111,17 @@ def create_app(
     # Application-scoped state (injectable in tests).
     app.state.settings = settings
     app.state.source_registry = EMPTY_SOURCE_REGISTRY
-    app.state.readiness_probes = tuple(readiness_probes or ())
+    app.state.db_session_factory = db_factory
+
+    # --- Readiness probes ------------------------------------------------
+    probes: list[ReadinessProbe] = list(readiness_probes or ())
+    probes.extend(maybe_build_postgres_readiness_probe(settings, db_factory))
+    app.state.readiness_probes = tuple(probes)
+
+    @app.on_event("shutdown")
+    async def _dispose_db_engine() -> None:
+        if db_factory is not None:
+            db_factory.dispose()
 
     # Observability and tracing. Added last so it is the outermost user
     # middleware: every response, including error responses, passes

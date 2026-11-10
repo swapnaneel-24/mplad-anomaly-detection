@@ -79,6 +79,33 @@ class Settings(BaseSettings):
     #: always be exported offline via ``backend/scripts/export_openapi.py``.
     docs_enabled: bool = True
 
+    # --- Database (PR-03) -----------------------------------------------------
+    #: Full SQLAlchemy PostgreSQL URL, e.g.
+    #: ``postgresql+psycopg://user:password@host:5432/dbname``. Supplied by
+    #: the deployment environment; never fabricated. When unset, the
+    #: database is not configured and no engine is created.
+    database_url: str | None = None
+
+    #: When true, PostgreSQL is a required dependency and readiness probes
+    #: it. When false, readiness behaves as in PR-02 (no required deps).
+    #: This explicit flag means "no required dependencies" can never
+    #: accidentally imply PostgreSQL was verified (PR-03 §13).
+    database_required: bool = False
+
+    #: Connection-pool lifecycle (PR-03 §11). All injectable for tests.
+    db_pool_size: int = Field(default=5, ge=1, le=50)
+    db_max_overflow: int = Field(default=10, ge=0, le=100)
+    db_pool_pre_ping: bool = True
+    db_pool_recycle_seconds: int = Field(default=1800, ge=10, le=86400)
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _clean_database_url(cls, value: object) -> object:
+        """Treat an empty string as "not configured"."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _parse_cors_origins(cls, value: object) -> object:

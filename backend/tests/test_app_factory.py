@@ -15,7 +15,7 @@ class TestAppFactory:
     def test_create_app_returns_fastapi_with_identity(self, app):
         assert isinstance(app, FastAPI)
         assert app.title == "PEIARS API"
-        assert app.version == "0.2.0"
+        assert app.version == "0.3.0"
 
     def test_routes_are_served_under_configured_prefix(self, client):
         response = client.get("/api/v1/health/live")

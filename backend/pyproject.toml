@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+# Set the root logger level to INFO so caplog can capture peiars.api records
+# (the peiars logger has its own StreamHandler, but records propagate to the
+# root logger where caplog's LogCaptureHandler lives).
+log_level = "INFO"
+log_format = "%(levelname)s %(name)s %(message)s"
+testpaths = ["tests"]

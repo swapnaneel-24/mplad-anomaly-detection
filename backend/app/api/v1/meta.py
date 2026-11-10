@@ -17,7 +17,7 @@ from app.contracts.common import MetaResponse
 
 router = APIRouter(tags=["metadata"])
 
-#: Implemented features (PR-02 scope).
+#: Implemented features (PR-02 + PR-03 scope).
 _IMPLEMENTED_FEATURES: dict[str, str] = {
     "health_endpoints": "implemented",
     "metadata_endpoint": "implemented",
@@ -26,7 +26,14 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "cors_configuration": "implemented",
     "source_registry_interface": "implemented",
     "openapi_contract_export": "implemented",
-    "database": "planned",
+    # PR-03: persistence foundation implemented; no public CRUD endpoints yet.
+    "review_case_persistence": "implemented",
+    "append_only_case_history": "implemented",
+    "optimistic_concurrency": "implemented",
+    "schema_migrations": "implemented",
+    "database_readiness_probe": "implemented",
+    # Still planned
+    "public_case_api": "planned",
     "authentication": "planned",
     "case_management": "planned",
     "research_evidence_access": "planned",
@@ -36,12 +43,16 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "deployment": "planned",
 }
 
-#: Availability of major application subsystems (PR-02 state).
+#: Availability of major application subsystems (PR-03 state).
 _SUBSYSTEM_STATES: dict[str, str] = {
     "api": "available",
     "source_registry": "available",
-    "database": "not_integrated",
+    # PR-03: persistence layer implemented (internal repository/service only).
+    "review_case_persistence": "available",
+    "database": "available",
+    # Still not integrated
     "authentication": "not_integrated",
+    "public_case_api": "not_integrated",
     "research_evidence_service": "not_integrated",
 }
 

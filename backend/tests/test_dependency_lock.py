@@ -31,10 +31,23 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = BACKEND_ROOT / "requirements-lock.txt"
 
 #: Packages whose installed version must match the lock exactly for the
-#: OpenAPI snapshot to be reproducible.
-_PINNED_PACKAGES = ("fastapi", "pydantic", "pydantic-settings", "starlette", "httpx")
+#: OpenAPI snapshot and the PostgreSQL integration tests to be reproducible.
+#: PR-02: web framework + test client.
+#: PR-03: persistence stack (SQLAlchemy, Alembic, psycopg) + pgserver.
+_PINNED_PACKAGES = (
+    "fastapi",
+    "pydantic",
+    "pydantic-settings",
+    "starlette",
+    "httpx",
+    "sqlalchemy",
+    "alembic",
+    "psycopg",
+    "psycopg-binary",
+    "pgserver",
+)
 
-#: Major.minor Python versions supported by the backend (PR-02).
+#: Major.minor Python versions supported by the backend (PR-02 + PR-03).
 _SUPPORTED_PYTHON = (3, 12)
 
 
@@ -87,12 +100,14 @@ class TestInstalledVersionsMatchLock:
 
     @pytest.mark.parametrize("package", _PINNED_PACKAGES)
     def test_installed_matches_lock(self, locked_versions, package):
-        import importlib
+        import importlib.metadata as md
 
-        mod = importlib.import_module(package.replace("-", "_"))
-        installed = getattr(mod, "__version__", None)
+        try:
+            installed = md.distribution(package).version
+        except md.PackageNotFoundError:
+            installed = None
         locked = locked_versions[package]
-        assert installed is not None, f"cannot determine version of {package}"
+        assert installed is not None, f"package {package} is not installed"
         assert installed == locked, (
             f"{package}: installed {installed} != locked {locked}. "
             "Install the locked versions: pip install -r backend/requirements-lock.txt"

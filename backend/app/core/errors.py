@@ -21,13 +21,16 @@ Rules enforced here:
 * Pydantic/FastAPI validation failures are reformatted into the same
   envelope, and the raw request input is never echoed back.
 
+PR-03 adds: ``CONFLICT`` (optimistic case versioning), ``CASE_NOT_FOUND``
+(case lookup miss), and ``INVALID_TRANSITION`` (illegal review-status
+transition). These are wired up for the internal service layer; no
+public case-writing HTTP endpoints exist in PR-03 (PR-03 §14).
+
 Reserved-but-not-implemented codes (documented for later pull requests;
 they must not be wired up before the corresponding subsystem exists):
 ``UNAUTHORIZED`` and ``FORBIDDEN`` (PR-04 authentication),
-``CONFLICT`` (PR-03 optimistic case versioning),
-``CASE_NOT_FOUND`` (PR-03), ``ARTIFACT_INTEGRITY_FAILED`` and
-``ARTIFACT_UNAVAILABLE`` (M2 research-evidence access), and
-``RATE_LIMITED`` (hardening).
+``ARTIFACT_INTEGRITY_FAILED`` and ``ARTIFACT_UNAVAILABLE`` (M2
+research-evidence access), and ``RATE_LIMITED`` (hardening).
 """
 
 from __future__ import annotations
@@ -46,8 +49,9 @@ logger = logging.getLogger("peiars.api.errors")
 
 
 class ErrorCode:
-    """Stable machine-readable error codes (implemented in PR-02)."""
+    """Stable machine-readable error codes."""
 
+    # PR-02
     VALIDATION_ERROR = "VALIDATION_ERROR"
     BAD_REQUEST = "BAD_REQUEST"
     NOT_FOUND = "NOT_FOUND"
@@ -57,12 +61,17 @@ class ErrorCode:
     SERVICE_NOT_READY = "SERVICE_NOT_READY"
     INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR"
     REQUEST_FAILED = "REQUEST_FAILED"
+    # PR-03
+    CONFLICT = "CONFLICT"
+    CASE_NOT_FOUND = "CASE_NOT_FOUND"
+    INVALID_TRANSITION = "INVALID_TRANSITION"
 
 
 _STATUS_CODE_MAP: dict[int, str] = {
     400: ErrorCode.BAD_REQUEST,
     404: ErrorCode.NOT_FOUND,
     405: ErrorCode.METHOD_NOT_ALLOWED,
+    409: ErrorCode.CONFLICT,
     422: ErrorCode.VALIDATION_ERROR,
     503: ErrorCode.SERVICE_NOT_READY,
 }
@@ -77,6 +86,10 @@ _DEFAULT_MESSAGES: dict[str, str] = {
     ErrorCode.SERVICE_NOT_READY: "A required application dependency is unavailable.",
     ErrorCode.INTERNAL_SERVER_ERROR: "An unexpected internal error occurred.",
     ErrorCode.REQUEST_FAILED: "The request could not be completed.",
+    # PR-03
+    ErrorCode.CONFLICT: "The case version supplied is stale; re-read and retry.",
+    ErrorCode.CASE_NOT_FOUND: "The requested review case was not found.",
+    ErrorCode.INVALID_TRANSITION: "The requested review-status transition is not permitted.",
 }
 
 

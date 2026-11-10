@@ -34,6 +34,7 @@ LOCK_PATH = BACKEND_ROOT / "requirements-lock.txt"
 #: OpenAPI snapshot and the PostgreSQL integration tests to be reproducible.
 #: PR-02: web framework + test client.
 #: PR-03: persistence stack (SQLAlchemy, Alembic, psycopg) + pgserver.
+#: PR-04: authentication (argon2-cffi).
 _PINNED_PACKAGES = (
     "fastapi",
     "pydantic",
@@ -45,6 +46,7 @@ _PINNED_PACKAGES = (
     "psycopg",
     "psycopg-binary",
     "pgserver",
+    "argon2-cffi",
 )
 
 #: Major.minor Python versions supported by the backend (PR-02 + PR-03).

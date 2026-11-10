@@ -98,6 +98,52 @@ class Settings(BaseSettings):
     db_pool_pre_ping: bool = True
     db_pool_recycle_seconds: int = Field(default=1800, ge=10, le=86400)
 
+    # --- Authentication & sessions (PR-04) -------------------------------------
+    #: Server-side signing secret for CSRF tokens (HMAC-SHA256). Required
+    #: for any authenticated operation; when unset, the auth routes fail
+    #: closed with a sanitized 503. Never logged or returned by the API.
+    session_secret: str | None = None
+
+    #: Absolute session lifetime (minutes), server-enforced.
+    session_ttl_minutes: int = Field(default=480, ge=5, le=43200)
+
+    #: Idle-timeout window (minutes) based on last_seen_at, server-enforced.
+    session_idle_timeout_minutes: int = Field(default=240, ge=5, le=43200)
+
+    #: Session cookie name. A single-host HTTPS deployment may set this to
+    #: ``__Host-peiars_session`` for browser-enforced cookie guarantees.
+    session_cookie_name: str = "peiars_session"
+
+    #: Cookie Secure flag. Production default True; local HTTP development
+    #: may explicitly relax it via PEIARS_SESSION_COOKIE_SECURE=false.
+    session_cookie_secure: bool = True
+
+    #: Readable (non-HttpOnly) CSRF cookie name (double-submit).
+    csrf_cookie_name: str = "peiars_csrf"
+
+    #: Failed-login lockout policy (database-backed, shared across workers).
+    auth_lockout_threshold: int = Field(default=5, ge=1, le=100)
+    auth_lockout_minutes: int = Field(default=15, ge=1, le=1440)
+
+    @field_validator("session_secret", mode="before")
+    @classmethod
+    def _clean_session_secret(cls, value: object) -> object:
+        """Treat an empty string as "not configured"."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+    @field_validator("session_secret", mode="after")
+    @classmethod
+    def _validate_session_secret(cls, value: str | None) -> str | None:
+        """Require at least 32 characters of secret material when set."""
+        if value is not None and len(value) < 32:
+            raise ValueError(
+                "session_secret must be at least 32 characters when configured; "
+                "generate a unique random value (e.g. `openssl rand -hex 32`)."
+            )
+        return value
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _clean_database_url(cls, value: object) -> object:

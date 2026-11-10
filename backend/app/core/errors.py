@@ -21,16 +21,20 @@ Rules enforced here:
 * Pydantic/FastAPI validation failures are reformatted into the same
   envelope, and the raw request input is never echoed back.
 
-PR-03 adds: ``CONFLICT`` (optimistic case versioning), ``CASE_NOT_FOUND``
+PR-03 added: ``CONFLICT`` (optimistic case versioning), ``CASE_NOT_FOUND``
 (case lookup miss), and ``INVALID_TRANSITION`` (illegal review-status
 transition). These are wired up for the internal service layer; no
 public case-writing HTTP endpoints exist in PR-03 (PR-03 §14).
 
-Reserved-but-not-implemented codes (documented for later pull requests;
-they must not be wired up before the corresponding subsystem exists):
-``UNAUTHORIZED`` and ``FORBIDDEN`` (PR-04 authentication),
+PR-04 implements the previously-reserved authentication codes:
+``UNAUTHORIZED`` (401, anonymous or invalid session), ``FORBIDDEN``
+(403, insufficient role/permission) and ``RATE_LIMITED`` (429,
+database-backed login throttling), plus ``CSRF_TOKEN_INVALID`` (403,
+failed signed double-submit validation).
+
+Still reserved-but-not-implemented:
 ``ARTIFACT_INTEGRITY_FAILED`` and ``ARTIFACT_UNAVAILABLE`` (M2
-research-evidence access), and ``RATE_LIMITED`` (hardening).
+research-evidence access).
 """
 
 from __future__ import annotations
@@ -65,14 +69,22 @@ class ErrorCode:
     CONFLICT = "CONFLICT"
     CASE_NOT_FOUND = "CASE_NOT_FOUND"
     INVALID_TRANSITION = "INVALID_TRANSITION"
+    # PR-04
+    UNAUTHORIZED = "UNAUTHORIZED"
+    FORBIDDEN = "FORBIDDEN"
+    RATE_LIMITED = "RATE_LIMITED"
+    CSRF_TOKEN_INVALID = "CSRF_TOKEN_INVALID"
 
 
 _STATUS_CODE_MAP: dict[int, str] = {
     400: ErrorCode.BAD_REQUEST,
+    401: ErrorCode.UNAUTHORIZED,
+    403: ErrorCode.FORBIDDEN,
     404: ErrorCode.NOT_FOUND,
     405: ErrorCode.METHOD_NOT_ALLOWED,
     409: ErrorCode.CONFLICT,
     422: ErrorCode.VALIDATION_ERROR,
+    429: ErrorCode.RATE_LIMITED,
     503: ErrorCode.SERVICE_NOT_READY,
 }
 
@@ -90,6 +102,11 @@ _DEFAULT_MESSAGES: dict[str, str] = {
     ErrorCode.CONFLICT: "The case version supplied is stale; re-read and retry.",
     ErrorCode.CASE_NOT_FOUND: "The requested review case was not found.",
     ErrorCode.INVALID_TRANSITION: "The requested review-status transition is not permitted.",
+    # PR-04
+    ErrorCode.UNAUTHORIZED: "Authentication is required to access this resource.",
+    ErrorCode.FORBIDDEN: "You do not have permission to perform this action.",
+    ErrorCode.RATE_LIMITED: "Too many failed login attempts. Try again later.",
+    ErrorCode.CSRF_TOKEN_INVALID: "The request failed CSRF validation.",
 }
 
 

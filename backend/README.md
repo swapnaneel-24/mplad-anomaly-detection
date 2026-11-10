@@ -7,11 +7,61 @@ PostgreSQL database (PR-03); research artifacts are consumed strictly
 read-only through approved server-side adapters with manifest verification
 (later pull requests).
 
-**Status (PR-02): FastAPI foundation implemented** — application factory,
-health/metadata endpoints, structured error envelope, request-ID tracing,
-CORS, an approved-source-registry seam, deterministic OpenAPI export and a
-113-test suite. No database, authentication, case management or React
-functionality exists yet.
+**Status (PR-04): authentication and authorization foundation
+implemented** — local PostgreSQL-backed accounts with Argon2id password
+hashing, opaque server-side sessions in secure HttpOnly cookies, signed
+double-submit CSRF protection, role-based authorization (viewer/reviewer/
+admin), database-backed login throttling, a bootstrap CLI for the first
+administrator, and authenticated actor identity bound to the PR-03
+append-only review history. No public case CRUD or user-management
+endpoints exist yet (PR-05+).
+
+## Implemented in PR-04
+
+| Area | Detail |
+|---|---|
+| Accounts | `users` table (migration 0003): normalized unique usernames (NFKC + casefold), Argon2id hashes via `argon2-cffi` (never plaintext, never in responses), bounded display names, server-side roles, activation flag, UTC timestamps |
+| Sessions | `auth_sessions` table: opaque 256-bit tokens (CSPRNG) issued in HttpOnly cookies; only the SHA-256 verifier is stored; server-enforced absolute expiry (`PEIARS_SESSION_TTL_MINUTES`), idle timeout (`PEIARS_SESSION_IDLE_TIMEOUT_MINUTES`) and irreversible revocation; fresh session per login (fixation prevention); `last_seen_at` refreshed at most every 5 minutes |
+| Cookies | Session cookie: `HttpOnly; Secure; SameSite=Lax; Path=/`, no `Domain` (production defaults; `PEIARS_SESSION_COOKIE_SECURE=false` is the documented local-HTTP relaxation). CSRF cookie readable for double-submit. `__Host-` names supported via configuration |
+| CSRF | Signed double-submit cookie + `X-CSRF-Token` header (HMAC-SHA256 over the server session secret) plus Origin allowlist defence in depth; applied to `POST /auth/login` and `POST /auth/logout`; no global test bypass. **Convention for PR-05+: every new state-changing route must carry the `require_csrf` dependency** |
+| RBAC | `viewer` (read:public, read:analytics) ⊂ `reviewer` (+ cases:read/write) ⊂ `admin` (+ admin:users); dependencies `get_current_user`, `require_authenticated`, `require_role(...)`, `require_permission(...)`; role always read from the database, never from payloads; deactivation and role changes apply to existing sessions immediately |
+| Endpoints | `POST /api/v1/auth/login` (generic failures; 429 when throttled), `POST /api/v1/auth/logout` (revoke + expire cookies; replay fails), `GET /api/v1/auth/me` (sanitized public fields + effective permissions), `GET /api/v1/auth/csrf` (bootstrap token) |
+| Throttling | `login_throttles` table keyed by normalized username, atomic upsert increment (multi-worker safe); configurable threshold/lockout; locked keys fail closed with 429 `RATE_LIMITED` |
+| Actor identity | `AuthenticatedPrincipal` → `actor_ref_from_principal()` → PR-03 review history records the stable user UUID; client payloads never carry actor identity; historical synthetic actor refs (non-UUID) remain distinguishable, no event rows rewritten |
+| Bootstrap | `python scripts/create_admin.py --username ... --display-name ...` — interactive hidden prompt or `PEIARS_BOOTSTRAP_ADMIN_PASSWORD` env var; no defaults, no startup auto-creation, refuses duplicates |
+| OpenAPI | Cookie security scheme (`APIKeyCookie`, name `peiars_session`) on `/auth/me` and `/auth/logout`; auth error responses documented as `ErrorEnvelope`; byte-reproducible snapshot |
+
+### Error codes (PR-04 additions)
+
+Implemented: `UNAUTHORIZED` (401), `FORBIDDEN` (403),
+`RATE_LIMITED` (429, login throttling), `CSRF_TOKEN_INVALID` (403).
+
+### Auth fail-closed behaviour
+
+- No `PEIARS_SESSION_SECRET` → auth endpoints return a sanitized 503
+  (`SERVICE_NOT_READY`); the rest of the API keeps working.
+- No database configured → auth endpoints return a sanitized 503. In
+  deployed authenticated mode, login/session storage never silently
+  falls back to an in-memory substitute for PostgreSQL.
+- Disabled account or wrong password → the same generic 401 message
+  (no username enumeration; unknown users pay one Argon2id verification
+  for timing uniformity).
+
+### How the future React client authenticates
+
+1. `GET /api/v1/auth/csrf` → readable `peiars_csrf` cookie + token in body.
+2. `POST /api/v1/auth/login` with `X-CSRF-Token` header (value = token)
+   and JSON credentials → session cookie set (HttpOnly — never readable
+   by JavaScript), CSRF token rotated.
+3. All subsequent requests send cookies automatically
+   (`credentials: 'include'` for cross-origin dev; the Vite dev proxy in
+   PR-05 will make them same-origin).
+4. Every state-changing request echoes the current CSRF token in
+   `X-CSRF-Token`.
+5. `GET /api/v1/auth/me` returns the user's role and permissions for UI
+   visibility only — authorization is always enforced server-side.
+
+No token is ever stored in `localStorage`/`sessionStorage`.
 
 ## Implemented in PR-02
 
@@ -204,10 +254,120 @@ CORS allowed/disallowed origins; OpenAPI determinism and drift; OpenAPI
 dependency-lock version match (Python 3.12 + pinned framework versions);
 source-ID path rejection (service and HTTP level); frozen-research import
 isolation (static AST scan of backend source + runtime subprocess proving
-`mplad` is not loaded by the app).
+`mplad` is not loaded by the app); PR-03 review-case workflow,
+transactions, append-only enforcement and event ordering; PR-04
+authentication (Argon2id, generic failures, throttling), sessions
+(expiry/revocation/idle/replacement), cookies (production attributes),
+CSRF (missing/incorrect/correct tokens, cross-origin, no bypass), RBAC
+(role gates, escalation attempts, immediate privilege changes), actor
+provenance and no-leakage scans (logs + committed files).
+
+## PR-04 local setup
+
+### 1. Provision a disposable local PostgreSQL database
+
+Either install PostgreSQL locally (any 13+; 16 recommended) or, for a
+throwaway test instance, `pip install pgserver` (bundled PostgreSQL 16).
+Create a database and a dedicated role; assemble the URL:
+
+```
+postgresql+psycopg://peiars_app:<password>@localhost:5432/peiars_review
+```
+
+### 2. Configure the environment without committing secrets
+
+Copy `.env.example` to `.env` (uncommitted) and set:
+
+```ini
+PEIARS_DATABASE_URL=postgresql+psycopg://peiars_app:...@localhost:5432/peiars_review
+PEIARS_DATABASE_REQUIRED=true
+PEIARS_SESSION_SECRET=<openssl rand -hex 32>   # >= 32 chars, unique per env
+PEIARS_SESSION_COOKIE_SECURE=false              # ONLY for local HTTP dev
+```
+
+### 3. Run migrations
+
+```bash
+cd backend
+alembic upgrade head          # applies 0001 → 0002 → 0003
+alembic history               # verify the chain
+```
+
+### 4. Create the first administrator (secure bootstrap)
+
+```bash
+# Interactive (hidden password prompt):
+python scripts/create_admin.py --username admin --display-name "Administrator"
+
+# Or non-interactive (secret from the process environment):
+PEIARS_BOOTSTRAP_ADMIN_PASSWORD='...' python scripts/create_admin.py \
+    --username admin --display-name "Administrator"
+```
+
+The command refuses duplicate usernames and never displays the password.
+Later user provisioning (viewer/reviewer accounts) is deferred to a
+separately approved administrator workflow.
+
+### 5. Start the API
+
+```bash
+python scripts/serve.py
+# or: uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+### 6. Exercise login / logout / CSRF / me (curl examples)
+
+```bash
+BASE=http://127.0.0.1:8000/api/v1
+
+# CSRF bootstrap (sets the readable peiars_csrf cookie):
+CSRF=$(curl -s -c cookies.txt $BASE/auth/csrf | sed -E 's/.*"csrf_token":"([^"]+)".*/\1/')
+
+# Login (echo the CSRF token; -b/-c persist cookies):
+curl -s -b cookies.txt -c cookies.txt -H "X-CSRF-Token: $CSRF" \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"..."}' $BASE/auth/login
+
+# Current user (session cookie only):
+curl -s -b cookies.txt $BASE/auth/me
+
+# Logout (fresh CSRF token after rotation, then revoke):
+CSRF=$(curl -s -b cookies.txt -c cookies.txt $BASE/auth/csrf | sed -E 's/.*"csrf_token":"([^"]+)".*/\1/')
+curl -s -b cookies.txt -c cookies.txt -H "X-CSRF-Token: $CSRF" -X POST $BASE/auth/logout
+```
+
+### 7. Run the authentication tests
+
+```bash
+python -m pytest tests/test_auth_*.py -q     # real PostgreSQL via pgserver
+```
+
+### 8. Inspect session revocation
+
+```sql
+-- After logout, the row shows revoked_at set; replaying the old cookie
+-- returns 401:
+SELECT s.id, u.username, s.created_at, s.expires_at, s.revoked_at
+FROM auth_sessions s JOIN users u ON u.id = s.user_id
+ORDER BY s.created_at DESC;
+```
+
+### 9. Reset a disposable development database
+
+```sql
+-- From an admin connection (destroys all application data):
+DROP DATABASE peiars_review;
+CREATE DATABASE peiars_review OWNER peiars_app;
+```
+then re-run `alembic upgrade head` and the bootstrap CLI. Never run
+destructive steps against a database containing real review history.
 
 ## What deliberately does not exist yet
 
-PostgreSQL models and migrations (PR-03), authentication (PR-04), React
-pages (PR-05), Docker Compose and CI (PR-06), research-artifact serving
-(M2) and any PMGSY/MPLADS ingestion. No write endpoints exist.
+Public case CRUD endpoints and any review-case mutation routes (PR-05+),
+user-management/administration endpoints, password-reset and email
+services, MFA/SSO/OAuth, the React application (PR-05), Docker Compose
+and CI (PR-06), research-artifact serving (M2) and any PMGSY/MPLADS
+ingestion. The only write endpoints that exist are
+`POST /api/v1/auth/login` and `POST /api/v1/auth/logout`, both
+CSRF-protected.

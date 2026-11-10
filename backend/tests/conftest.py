@@ -225,3 +225,119 @@ def db_app(db_settings, db_session_factory):
 def db_client(db_app):
     """TestClient over the DB-backed application."""
     return TestClient(db_app)
+
+
+# --- PR-04 authentication fixtures -----------------------------------------
+
+#: Deterministic test-only session secret (>= 32 chars; never a real secret).
+TEST_SESSION_SECRET = "test-session-secret-0123456789abcdef0123456789abcdef"
+
+
+def _truncate_auth_tables(session_factory) -> None:
+    """Reset all PR-03/PR-04 tables (FK order respected)."""
+    with session_factory() as session:
+        session.execute(text("TRUNCATE TABLE case_events RESTART IDENTITY CASCADE"))
+        session.execute(text("TRUNCATE TABLE review_cases RESTART IDENTITY CASCADE"))
+        session.execute(text("TRUNCATE TABLE auth_sessions RESTART IDENTITY CASCADE"))
+        session.execute(text("TRUNCATE TABLE login_throttles RESTART IDENTITY CASCADE"))
+        session.execute(text("TRUNCATE TABLE users RESTART IDENTITY CASCADE"))
+        session.commit()
+
+
+@pytest.fixture()
+def auth_settings(db_url):
+    """Settings with the database AND authentication configured.
+
+    ``session_cookie_secure=False`` is the documented local-development
+    relaxation (the TestClient speaks plain HTTP, and httpx's cookie jar
+    honours the Secure attribute). Production defaults are tested
+    separately via Set-Cookie attribute inspection.
+    """
+    return Settings(
+        _env_file=None,
+        environment="test",
+        cors_origins=["http://test.example"],
+        git_commit_sha=None,
+        docs_enabled=True,
+        database_url=db_url,
+        database_required=True,
+        session_secret=TEST_SESSION_SECRET,
+        session_cookie_secure=False,
+    )
+
+
+@pytest.fixture()
+def auth_app(auth_settings, db_session_factory):
+    """Application with DB + authentication wired in."""
+    _truncate_auth_tables(db_session_factory)
+    return create_app(
+        settings=auth_settings,
+        db_session_factory_override=DatabaseSessionFactory(
+            db_session_factory.kw["bind"], db_session_factory
+        ),
+    )
+
+
+@pytest.fixture()
+def auth_client(auth_app):
+    """TestClient over the authenticated application (cookie jar enabled)."""
+    return TestClient(auth_app)
+
+
+def get_csrf_token(client: TestClient) -> str:
+    """Fetch a fresh CSRF token (sets the readable cookie)."""
+    response = client.get("/api/v1/auth/csrf")
+    assert response.status_code == 200, response.text
+    return response.json()["csrf_token"]
+
+
+def login(client: TestClient, username: str, password: str, *, csrf: str | None = None):
+    """Perform the documented login flow (CSRF bootstrap + POST)."""
+    if csrf is None:
+        csrf = get_csrf_token(client)
+    return client.post(
+        "/api/v1/auth/login",
+        json={"username": username, "password": password},
+        headers={"X-CSRF-Token": csrf},
+    )
+
+
+@pytest.fixture()
+def user_factory(db_session_factory):
+    """Factory creating users directly in the database.
+
+    Truncates the auth tables first so tests that use the factory
+    directly (without ``auth_app``) still start from a clean state.
+    Returns a callable ``(username, password, *, role, is_active,
+    display_name) -> User``. Synthetic fixture credentials only.
+    """
+    from app.auth.passwords import hash_password
+    from app.db.models import User
+
+    _truncate_auth_tables(db_session_factory)
+
+    def _make(
+        username: str,
+        password: str = "correct-horse-battery-staple",
+        *,
+        role: str = "reviewer",
+        is_active: bool = True,
+        display_name: str | None = None,
+    ) -> User:
+        from app.services.auth import normalize_username
+
+        normalized = normalize_username(username)
+        with db_session_factory() as session:
+            user = User(
+                username=normalized,
+                password_hash=hash_password(password),
+                display_name=display_name or normalized.title(),
+                role=role,
+                is_active=is_active,
+            )
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+            return user
+
+    return _make

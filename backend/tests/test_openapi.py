@@ -19,6 +19,11 @@ EXPECTED_PATHS = {
     "/api/v1/meta",
     "/api/v1/sources",
     "/api/v1/sources/{source_id}",
+    # PR-04: authentication routes.
+    "/api/v1/auth/login",
+    "/api/v1/auth/logout",
+    "/api/v1/auth/me",
+    "/api/v1/auth/csrf",
 }
 
 
@@ -69,7 +74,8 @@ class TestOpenApiContract:
         schema = create_app(settings=canonical_settings()).openapi()
         for path, operations in schema["paths"].items():
             for method in operations:
-                assert method in {"get", "options"}, f"unexpected {method} on {path}"
+                # PR-04 adds POST (auth login/logout); writes remain CSRF-protected.
+                assert method in {"get", "options", "post"}, f"unexpected {method} on {path}"
 
     def test_served_openapi_json_matches_export(self, client):
         response = client.get("/openapi.json")

@@ -21,7 +21,7 @@ class TestMeta:
         }
         assert body["application"] == "PEIARS API"
         assert body["api_version"] == "v1"
-        assert body["app_version"] == "0.3.0"
+        assert body["app_version"] == "0.4.0"
         assert body["environment"] == "test"
 
     def test_git_commit_sha_is_null_when_not_supplied(self, client):
@@ -52,9 +52,16 @@ class TestMeta:
         assert features["review_case_persistence"] == "implemented"
         assert features["append_only_case_history"] == "implemented"
         assert features["optimistic_concurrency"] == "implemented"
+        # PR-04 added implemented authentication features.
+        assert features["local_account_authentication"] == "implemented"
+        assert features["server_side_sessions"] == "implemented"
+        assert features["role_based_authorization"] == "implemented"
+        assert features["csrf_protection"] == "implemented"
+        assert features["login_throttling"] == "implemented"
+        assert features["authenticated_actor_identity"] == "implemented"
         # Still planned.
         assert features["public_case_api"] == "planned"
-        assert features["authentication"] == "planned"
+        assert features["user_management_api"] == "planned"
         assert features["case_management"] == "planned"
         assert set(features.values()) <= {"implemented", "planned"}
 
@@ -65,9 +72,11 @@ class TestMeta:
         # PR-03: persistence subsystem is available (internal repo/service).
         assert subsystems["review_case_persistence"] == "available"
         assert subsystems["database"] == "available"
+        # PR-04: authentication is available.
+        assert subsystems["authentication"] == "available"
         # Not yet integrated.
-        assert subsystems["authentication"] == "not_integrated"
         assert subsystems["public_case_api"] == "not_integrated"
+        assert subsystems["research_evidence_service"] == "not_integrated"
 
     def test_meta_contains_no_secrets_paths_or_hostnames(self, client):
         text = client.get("/api/v1/meta").text.lower()

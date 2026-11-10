@@ -1,4 +1,4 @@
-# PEIARS backend dependency lock (PR-02 + PR-03).
+# PEIARS backend dependency lock (PR-02 + PR-03 + PR-04).
 #
 # Full transitive freeze of backend/requirements-dev.txt. Install with:
 #   pip install -r backend/requirements-lock.txt
@@ -15,8 +15,11 @@
 #
 # PR-03 additions: SQLAlchemy 2.x, Alembic, psycopg 3 (PostgreSQL driver),
 # and pgserver (test-only; bundles a PostgreSQL 16.x server for integration
-# tests without a system-level install). The frozen research environment is
-# intentionally NOT represented here.
+# tests without a system-level install).
+# PR-04 additions: argon2-cffi (Argon2id password hashing; no JWT libraries
+# by design — sessions are opaque server-side tokens).
+#
+# The frozen research environment is intentionally NOT represented here.
 
 Mako==1.4.3
 MarkupSafe==3.0.4
@@ -26,7 +29,10 @@ alembic==1.20.1
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.16.0
+argon2-cffi-bindings==26.1.0
+argon2-cffi==25.1.0
 certifi==2026.10.23
+cffi==2.1.1
 click==8.5.1
 fastapi==0.128.0
 fasteners==0.20
@@ -42,6 +48,7 @@ pluggy==1.7.0
 psutil==7.2.2
 psycopg-binary==3.3.8
 psycopg==3.3.8
+pycparser==3.12
 pydantic-settings==2.13.1
 pydantic==2.12.5
 pydantic_core==2.41.5

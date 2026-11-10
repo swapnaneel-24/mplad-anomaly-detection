@@ -17,7 +17,7 @@ from app.contracts.common import MetaResponse
 
 router = APIRouter(tags=["metadata"])
 
-#: Implemented features (PR-02 + PR-03 scope).
+#: Implemented features (PR-02 + PR-03 + PR-04 scope).
 _IMPLEMENTED_FEATURES: dict[str, str] = {
     "health_endpoints": "implemented",
     "metadata_endpoint": "implemented",
@@ -32,9 +32,16 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "optimistic_concurrency": "implemented",
     "schema_migrations": "implemented",
     "database_readiness_probe": "implemented",
+    # PR-04: authentication foundation implemented.
+    "local_account_authentication": "implemented",
+    "server_side_sessions": "implemented",
+    "role_based_authorization": "implemented",
+    "csrf_protection": "implemented",
+    "login_throttling": "implemented",
+    "authenticated_actor_identity": "implemented",
     # Still planned
     "public_case_api": "planned",
-    "authentication": "planned",
+    "user_management_api": "planned",
     "case_management": "planned",
     "research_evidence_access": "planned",
     "record_lookup": "planned",
@@ -43,15 +50,16 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "deployment": "planned",
 }
 
-#: Availability of major application subsystems (PR-03 state).
+#: Availability of major application subsystems (PR-04 state).
 _SUBSYSTEM_STATES: dict[str, str] = {
     "api": "available",
     "source_registry": "available",
     # PR-03: persistence layer implemented (internal repository/service only).
     "review_case_persistence": "available",
     "database": "available",
+    # PR-04: authentication implemented (login/logout/me/csrf endpoints).
+    "authentication": "available",
     # Still not integrated
-    "authentication": "not_integrated",
     "public_case_api": "not_integrated",
     "research_evidence_service": "not_integrated",
 }

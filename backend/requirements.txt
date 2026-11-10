@@ -1,4 +1,4 @@
-# PEIARS backend runtime dependencies (PR-02 + PR-03).
+# PEIARS backend runtime dependencies (PR-02 + PR-03 + PR-04).
 #
 # Installed separately from the frozen research environment: the research
 # tree (src/mplad, root requirements.txt) is never modified and its
@@ -7,6 +7,8 @@
 # Validated on Python 3.12 (see backend/README.md for details).
 # PR-02: FastAPI foundation.
 # PR-03: PostgreSQL persistence (SQLAlchemy 2.x, Alembic, psycopg 3).
+# PR-04: authentication (Argon2id via argon2-cffi; opaque server-side
+#        sessions — no JWT libraries by design).
 fastapi==0.128.0
 uvicorn==0.44.0
 pydantic==2.12.5
@@ -14,3 +16,4 @@ pydantic-settings==2.13.1
 sqlalchemy==2.1.8
 alembic==1.20.1
 psycopg[binary]==3.3.8
+argon2-cffi==25.1.0

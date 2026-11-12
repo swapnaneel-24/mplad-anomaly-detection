@@ -8,7 +8,7 @@
 //   4. Workspace composition (flexible) — workspace-specific panel grid
 //   5. Provenance footer (24px) — API status + version + git commit
 //
-// Desktop-only: when window.innerWidth < 1280, the composition area is
+// Desktop-only: when window.innerWidth < 1024, the composition area is
 // replaced by a DesktopGate panel. The identity bar, switcher, context
 // strip, and footer remain visible (the user is still authenticated).
 
@@ -62,5 +62,5 @@ export function AppShell(): JSX.Element {
 
 function isDesktopWidth(): boolean {
   if (typeof window === "undefined") return true;
-  return window.innerWidth >= 1280;
+  return window.innerWidth >= 1024;
 }

@@ -1,4 +1,4 @@
-.analysis-page {
+.analysis-page.workspace-composition {
   display: grid;
   grid-template-rows: 1fr 220px;
   gap: var(--space-3);
@@ -115,7 +115,7 @@
 }
 
 @media (max-width: 1365px) {
-  .analysis-page {
+  .analysis-page.workspace-composition {
     grid-template-rows: 1fr 200px;
     gap: var(--space-2);
     padding: var(--space-2);

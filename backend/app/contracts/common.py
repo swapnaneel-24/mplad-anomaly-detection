@@ -94,6 +94,53 @@ class SourceListResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Synthetic demonstration records (PR-05B §5)
+# ---------------------------------------------------------------------------
+
+
+class SyntheticRecordSummary(BaseModel):
+    """One synthetic demonstration record (list view).
+
+    Explicitly fictional — NOT a research finding. The ``synthetic`` flag
+    is always true; the ``label`` field carries the prominent
+    ``SYNTHETIC DEMONSTRATION RECORD`` warning.
+    """
+
+    record_ref: str = Field(description="Stable opaque reference to the synthetic record.")
+    title: str = Field(description="Synthetic record title (always carries the SYNTHETIC warning).")
+    dataset_id: str = Field(description="Synthetic dataset identifier.")
+    snapshot_id: str = Field(description="Synthetic snapshot identifier.")
+    synthetic: bool = Field(default=True, description="Always true for demonstration records.")
+
+
+class SyntheticRecordDetail(BaseModel):
+    """Full detail of one synthetic demonstration record.
+
+    Explicitly fictional. No ML anomaly score is included. The evidence
+    fields are illustrative descriptions, not measured results.
+    """
+
+    record_ref: str
+    title: str
+    description: str = Field(description="Fictional description; NOT a research finding.")
+    evidence_summary: str = Field(description="Illustrative evidence description; not a measured result.")
+    administrative_context: str
+    limitations: str = Field(description="Explicit scientific limitations of the synthetic data.")
+    dataset_id: str
+    snapshot_id: str
+    synthetic: bool = Field(default=True)
+
+
+class SyntheticRecordListResponse(BaseModel):
+    """List of synthetic demonstration records."""
+
+    items: list[SyntheticRecordSummary]
+    total: int
+    dataset_id: str = Field(description="The synthetic dataset identifier.")
+    snapshot_id: str = Field(description="The synthetic snapshot identifier.")
+
+
+# ---------------------------------------------------------------------------
 # Structured error envelope
 # ---------------------------------------------------------------------------
 

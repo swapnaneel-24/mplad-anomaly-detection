@@ -38,7 +38,7 @@ export const WORKSPACES: readonly Workspace[] = [
     path: "/investigations",
     shortTitle: "Investigations",
     title: "Investigation Workspace",
-    contextBreadcrumb: "cases: 0 / status: deferred",
+    contextBreadcrumb: "source: synthetic demonstration / cases: live",
   },
   {
     number: "05",
@@ -52,7 +52,7 @@ export const WORKSPACES: readonly Workspace[] = [
     path: "/research",
     shortTitle: "Research",
     title: "Research & Provenance",
-    contextBreadcrumb: "pipeline: frozen / tests: 445",
+    contextBreadcrumb: "pipeline: frozen / backend tests: 472",
   },
 ] as const;
 

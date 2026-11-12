@@ -263,6 +263,10 @@ def auth_settings(db_url):
         database_required=True,
         session_secret=TEST_SESSION_SECRET,
         session_cookie_secure=False,
+        # PR-05B: enable the synthetic demonstration source for the
+        # authenticated test application so the case API can create
+        # cases from synthetic records.
+        demonstration_sources=True,
     )
 
 

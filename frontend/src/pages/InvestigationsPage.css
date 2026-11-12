@@ -1,22 +1,277 @@
-.investigations-page {
+/* Compound selector (.investigations-page.workspace-composition) has higher
+   specificity than .workspace-composition alone, guaranteeing the grid
+   layout wins over the flex-column default from global.css. Without this,
+   the three panels stack vertically because .workspace-composition sets
+   display: flex; flex-direction: column. */
+.investigations-page.workspace-composition {
   display: grid;
-  grid-template-columns: var(--rail-case-index) 1fr var(--rail-inspector);
+  grid-template-columns: 280px 1fr 340px;
   gap: var(--space-3);
   padding: var(--space-3);
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
-.investigations-page__index,
-.investigations-page__evidence,
-.investigations-page__assessment {
+.inv__index,
+.inv__evidence,
+.inv__review {
   min-height: 0;
   min-width: 0;
 }
 
+.inv__index-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.inv__index-section {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inv__index-section:last-child {
+  border-bottom: none;
+}
+
+.inv__index-heading {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-2);
+}
+
+.inv__index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inv__index-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease);
+}
+
+.inv__index-item:hover {
+  background: var(--color-bg-sunken);
+}
+
+.inv__index-item.is-active {
+  background: var(--color-accent-soft);
+  border-left-color: var(--color-accent);
+}
+
+.inv__index-item-id {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inv__index-item.is-active .inv__index-item-id {
+  color: var(--color-accent);
+}
+
+.inv__index-item-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* --- Region 2: Evidence --- */
+
+.inv__evidence-body {
+  overflow: auto;
+}
+
+.inv__evidence-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.inv__synthetic-banner {
+  background: var(--color-warning-soft);
+  border-left: 3px solid var(--color-warning);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-warning);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inv__case-title {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.inv__source-evidence-desc {
+  font-style: italic;
+}
+
+.inv__source-unavailable {
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+/* --- Region 3: Review + History --- */
+
+.inv__review-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: auto;
+}
+
+.inv__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border);
+}
+
+.inv__form--disabled {
+  opacity: 0.7;
+}
+
+.inv__readonly-note {
+  padding: var(--space-3);
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border);
+}
+
+.inv__sync-warning {
+  background: var(--color-warning-soft);
+  border-left: 3px solid var(--color-warning);
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.inv__sync-warning-text {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.inv__sync-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.field__input--textarea {
+  height: auto;
+  min-height: 60px;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  resize: vertical;
+}
+
+/* --- History --- */
+
+.inv__history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.inv__history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.inv__history-item {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-sunken);
+  border-left: 2px solid var(--color-border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.inv__history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.inv__history-event {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inv__history-version {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.inv__history-meta {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.inv__history-transition {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.inv__history-reason {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.inv__history-note {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-bg-raised);
+  padding: var(--space-2) var(--space-3);
+  border-left: 2px solid var(--color-accent);
+}
+
 @media (max-width: 1365px) {
-  .investigations-page {
-    grid-template-columns: 220px 1fr 280px;
+  .investigations-page.workspace-composition {
+    grid-template-columns: 240px 1fr 300px;
     gap: var(--space-2);
     padding: var(--space-2);
   }

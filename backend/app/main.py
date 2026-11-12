@@ -110,7 +110,16 @@ def create_app(
 
     # Application-scoped state (injectable in tests).
     app.state.settings = settings
-    app.state.source_registry = EMPTY_SOURCE_REGISTRY
+    # PR-05B §5: when the demonstration_sources flag is true, register the
+    # synthetic demonstration source adapter. Otherwise the registry
+    # remains empty as in PR-02. The flag is false by default and MUST be
+    # false in production.
+    if settings.demonstration_sources:
+        from app.services.synthetic_source import SYNTHETIC_SOURCE_REGISTRY
+
+        app.state.source_registry = SYNTHETIC_SOURCE_REGISTRY
+    else:
+        app.state.source_registry = EMPTY_SOURCE_REGISTRY
     app.state.db_session_factory = db_factory
 
     # --- Readiness probes ------------------------------------------------
@@ -136,8 +145,8 @@ def create_app(
             CORSMiddleware,
             allow_origins=list(settings.cors_origins),
             allow_credentials=True,
-            allow_methods=["GET", "OPTIONS"],
-            allow_headers=["Content-Type", REQUEST_ID_HEADER],
+            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_headers=["Content-Type", REQUEST_ID_HEADER, "X-CSRF-Token"],
         )
 
     register_exception_handlers(app)

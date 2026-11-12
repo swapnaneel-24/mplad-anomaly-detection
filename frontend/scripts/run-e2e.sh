@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# Run the PEIARS PR-05A E2E suite end-to-end:
+# Run the PEIARS PR-05B E2E suite end-to-end:
 #   1. Start a disposable pgserver-backed PostgreSQL.
 #   2. Apply migrations.
-#   3. Create the synthetic reviewer user.
-#   4. Start the FastAPI backend on :8000.
+#   3. Create the synthetic reviewer + viewer users.
+#   4. Start the FastAPI backend on :8000 with demonstration_sources=true.
 #   5. Start the Vite dev server on :5173.
 #   6. Run Playwright E2E tests (with screenshots).
 #   7. Tear everything down.
 #
-# All logs go to /tmp/e2e_*.log. The script exits non-zero on any failure.
+# All logs go to /tmp/e2e_run/. The script exits non-zero on any failure.
 set -euo pipefail
 
-REPO=/home/z/my-project/pr05a-work/repo
+REPO=/home/z/my-project/pr05b-work/repo
+FRONTEND=/home/z/my-project/pr05b-work/frontend-clean/frontend
 BACKEND="$REPO/backend"
-FRONTEND="$REPO/frontend"
 E2E_DIR=/tmp/e2e_run
 rm -rf "$E2E_DIR"
 mkdir -p "$E2E_DIR"
@@ -56,20 +56,23 @@ command.upgrade(cfg, 'head')
 print('migrations applied')
 " > "$E2E_DIR/migrate.log" 2>&1 || { cat "$E2E_DIR/migrate.log"; kill $PG_PID; exit 1; }
 
-# 3. Create synthetic reviewer.
-echo "[e2e] creating reviewer user..."
+# 3. Create synthetic reviewer + viewer.
+echo "[e2e] creating reviewer + viewer users..."
 PEIARS_DATABASE_URL="$PG_URL" \
 PEIARS_E2E_USERNAME=reviewer_e2e \
 PEIARS_E2E_PASSWORD='test-reviewer-password-1234' \
+PEIARS_E2E_VIEWER_USERNAME=viewer_e2e \
+PEIARS_E2E_VIEWER_PASSWORD='test-viewer-password-1234' \
   python3 "$FRONTEND/playwright/setup-reviewer.py" > "$E2E_DIR/reviewer.log" 2>&1 || { cat "$E2E_DIR/reviewer.log"; kill $PG_PID; exit 1; }
 cat "$E2E_DIR/reviewer.log"
 
-# 4. Start backend.
+# 4. Start backend with demonstration_sources=true.
 echo "[e2e] starting backend..."
 PEIARS_DATABASE_URL="$PG_URL" \
 PEIARS_DATABASE_REQUIRED=true \
 PEIARS_SESSION_SECRET='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' \
 PEIARS_SESSION_COOKIE_SECURE=false \
+PEIARS_DEMONSTRATION_SOURCES=true \
 PEIARS_CORS_ORIGINS='["http://127.0.0.1:5173"]' \
   python3 scripts/serve.py --host 127.0.0.1 --port 8000 > "$E2E_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
@@ -110,6 +113,8 @@ set +e
 cd "$FRONTEND"
 PEIARS_E2E_USERNAME=reviewer_e2e \
 PEIARS_E2E_PASSWORD='test-reviewer-password-1234' \
+PEIARS_E2E_VIEWER_USERNAME=viewer_e2e \
+PEIARS_E2E_VIEWER_PASSWORD='test-viewer-password-1234' \
   npx playwright test --reporter=list 2>&1 | tee "$E2E_DIR/playwright.log"
 PW_EXIT=$?
 set -e

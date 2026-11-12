@@ -126,6 +126,15 @@ class Settings(BaseSettings):
     auth_lockout_threshold: int = Field(default=5, ge=1, le=100)
     auth_lockout_minutes: int = Field(default=15, ge=1, le=1440)
 
+    # --- Synthetic demonstration sources (PR-05B §5) -------------------------
+    #: When true, the synthetic demonstration source adapter is registered
+    #: and its records are retrievable through /api/v1/sources and the case
+    #: API. When false (the default), the source registry remains empty as
+    #: in PR-02 and no synthetic data is exposed. This flag MUST be false
+    #: in production deployments — synthetic records are explicitly
+    #: fictional and must never be presented as research findings.
+    demonstration_sources: bool = False
+
     @field_validator("session_secret", mode="before")
     @classmethod
     def _clean_session_secret(cls, value: object) -> object:

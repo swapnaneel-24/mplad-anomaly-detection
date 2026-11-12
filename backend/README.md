@@ -74,7 +74,7 @@ No token is ever stored in `localStorage`/`sessionStorage`.
 | Source registry seam | `app/services/source_registry.py` + `GET /api/v1/sources`, `GET /api/v1/sources/{source_id}` over a **static empty** registry; opaque-slug IDs strictly validated (path-like input rejected); no filesystem access, no scanning, no DVC, no file-reading endpoints |
 | Error contract | Single envelope `{error: {code, message, request_id, details}}` for validation errors (422), not found (404), method not allowed (405), invalid source ID (422), source not found (404), not ready (503) and unhandled exceptions (500, sanitized — no tracebacks, no paths) |
 | Request tracing | `X-Request-ID` generated per request; caller-supplied IDs accepted only after strict validation (`[A-Za-z0-9._-]{1,64}`); returned on every response including errors; structured JSON access logs carry the ID and contain **no** headers, query strings, cookies or bodies |
-| CORS | Explicit origins from `PEIARS_API_CORS_ORIGINS`; credentials allowed, wildcard never used |
+| CORS | Explicit origins from `PEIARS_CORS_ORIGINS` (comma-separated; JSON-array syntax and wildcards rejected with clear errors); credentials allowed, wildcard never used |
 | OpenAPI | Deterministic export (`backend/scripts/export_openapi.py`), committed snapshot in `backend/contracts/openapi.json`, drift-guarded by tests |
 
 ### Error codes
@@ -111,6 +111,11 @@ research machine also uses a 3.13/pytest 9.2.0 environment — the backend
 targets the same interpreter line).
 
 ## Setup
+
+**Canonical local-startup guides** (PR-06A): `docs/dev/LOCAL_STARTUP_WINDOWS.md`
+(Windows 11, PowerShell) and `docs/dev/LOCAL_STARTUP_POSIX.md` (Linux /
+macOS) walk a fresh checkout to a running app stage by stage. The
+configuration reference is `docs/dev/CONFIGURATION_INVENTORY.md`.
 
 ### Windows PowerShell (from the repository root)
 
@@ -157,11 +162,15 @@ Then check `http://127.0.0.1:8000/api/v1/health/live` (PowerShell:
 
 Typed settings via Pydantic Settings, read from `PEIARS_`-prefixed
 environment variables and (for local development) the repository-root
-`.env` file — see `.env.example` for every supported variable (added in
-PR-02: `PEIARS_GIT_COMMIT_SHA`, `PEIARS_LOG_LEVEL`,
-`PEIARS_API_DOCS_ENABLED`). Tests inject explicit `Settings` objects and
-never read `.env`. Real `.env` files are git-ignored; never commit
-credentials.
+`.env` file — see `backend/.env.example` (the canonical template; the
+repository-root `.env.example` is a PR-01 legacy artifact) for every
+supported variable. Loading follows one documented procedure (see
+`docs/dev/CONFIGURATION_INVENTORY.md`): explicit environment variables
+always win over `.env` values, `python backend/scripts/serve.py` and
+`alembic upgrade head` both read the same file, and `session_secret`
+template placeholders are rejected at startup even when long enough.
+Tests inject explicit `Settings` objects and never read `.env`. Real
+`.env` files are git-ignored; never commit credentials.
 
 ## Local frontend-to-API proxy convention (documentation-only until PR-05)
 
@@ -276,7 +285,8 @@ postgresql+psycopg://peiars_app:<password>@localhost:5432/peiars_review
 
 ### 2. Configure the environment without committing secrets
 
-Copy `.env.example` to `.env` (uncommitted) and set:
+Copy `backend/.env.example` to the repository-root `.env` (uncommitted)
+and set:
 
 ```ini
 PEIARS_DATABASE_URL=postgresql+psycopg://peiars_app:...@localhost:5432/peiars_review
@@ -289,9 +299,13 @@ PEIARS_SESSION_COOKIE_SECURE=false              # ONLY for local HTTP dev
 
 ```bash
 cd backend
-alembic upgrade head          # applies 0001 → 0002 → 0003
+alembic upgrade head          # applies 0001 → 0002 → 0003 (reads ../.env)
 alembic history               # verify the chain
 ```
+
+`alembic` resolves `PEIARS_DATABASE_URL` from the environment first,
+then the repository-root `.env` — the same file `serve.py` loads — so no
+manual export is required.
 
 ### 4. Create the first administrator (secure bootstrap)
 

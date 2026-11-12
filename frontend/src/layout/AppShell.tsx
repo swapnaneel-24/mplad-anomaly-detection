@@ -8,8 +8,8 @@
 //   4. Workspace composition (flexible) — workspace-specific panel grid
 //   5. Provenance footer (24px) — API status + version + git commit
 //
-// Desktop-only: when window.innerWidth < 1024, the composition area is
-// replaced by a DesktopGate panel. The identity bar, switcher, context
+// Desktop-only: when window.innerWidth < 1024 (the PR-06A minimum), the
+// composition area is replaced by a DesktopGate panel. The identity bar, switcher, context
 // strip, and footer remain visible (the user is still authenticated).
 
 import { useEffect, useState } from "react";
@@ -18,7 +18,7 @@ import { IdentityBar } from "@/layout/IdentityBar";
 import { WorkspaceSwitcher } from "@/layout/WorkspaceSwitcher";
 import { ContextStrip } from "@/layout/ContextStrip";
 import { ProvenanceFooter } from "@/layout/ProvenanceFooter";
-import { DesktopGate } from "@/layout/DesktopGate";
+import { DesktopGate, DESKTOP_MIN_WIDTH } from "@/layout/DesktopGate";
 import "@/layout/AppShell.css";
 
 export function AppShell(): JSX.Element {
@@ -62,5 +62,5 @@ export function AppShell(): JSX.Element {
 
 function isDesktopWidth(): boolean {
   if (typeof window === "undefined") return true;
-  return window.innerWidth >= 1024;
+  return window.innerWidth >= DESKTOP_MIN_WIDTH;
 }

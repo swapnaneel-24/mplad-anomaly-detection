@@ -20,12 +20,29 @@
 //
 // Plus screenshot captures at 1440×900 and 1366×768.
 
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const REVIEWER_USERNAME = process.env.PEIARS_E2E_USERNAME ?? "reviewer_e2e";
 const REVIEWER_PASSWORD = process.env.PEIARS_E2E_PASSWORD ?? "test-reviewer-password-1234";
 const VIEWER_USERNAME = process.env.PEIARS_E2E_VIEWER_USERNAME ?? "viewer_e2e";
 const VIEWER_PASSWORD = process.env.PEIARS_E2E_VIEWER_PASSWORD ?? "test-viewer-password-1234";
+
+/**
+ * Assert no unintended page-wide horizontal overflow (PR-06A correction
+ * §7): the whole document must not be wider than the viewport. This is a
+ * genuine Chromium layout measurement of the rendered page.
+ */
+async function expectNoHorizontalOverflow(page: Page): Promise<void> {
+  const metrics = await page.evaluate(() => ({
+    docScrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  expect(
+    metrics.docScrollWidth,
+    `page-wide horizontal overflow: documentElement.scrollWidth ` +
+      `${metrics.docScrollWidth} > window.innerWidth ${metrics.innerWidth}`,
+  ).toBeLessThanOrEqual(metrics.innerWidth);
+}
 
 test.describe.configure({ mode: "serial" });
 
@@ -237,11 +254,12 @@ test.describe("PEIARS PR-05B investigation workflow", () => {
     await ctxB.close();
   });
 
-  test("12. Three-column geometry at 1280, 1366 and 1440 CSS pixels", async ({ browser }) => {
+  test("12. Three-column geometry at 1024, 1280, 1366, 1440 and 1920 CSS pixels", async ({ browser }) => {
     // Verify the three regions occupy distinct horizontal columns at each
-    // supported desktop width. This is the real Chromium layout assertion
-    // required by the PR-05B hardening prompt §1.
-    for (const width of [1280, 1366, 1440]) {
+    // supported desktop width (PR-06A: minimum is 1024px). This is the real
+    // Chromium layout assertion required by the PR-05B hardening prompt §1
+    // and the PR-06A viewport contract.
+    for (const width of [1024, 1280, 1366, 1440, 1920]) {
       const ctx = await browser.newContext({ viewport: { width, height: 900 } });
       const page = await ctx.newPage();
       await page.goto("/login");
@@ -280,6 +298,10 @@ test.describe("PEIARS PR-05B investigation workflow", () => {
       // The evidence panel should be the widest (dominant centre canvas).
       expect(evidenceBox!.width).toBeGreaterThan(indexBox!.width);
       expect(evidenceBox!.width).toBeGreaterThan(reviewBox!.width);
+
+      // PR-06A correction §7: no unintended page-wide horizontal overflow
+      // at this width — the whole document fits the viewport.
+      await expectNoHorizontalOverflow(page);
 
       await ctx.close();
     }
@@ -453,5 +475,73 @@ test.describe("PEIARS PR-05B investigation workflow", () => {
     await ctx1440.close();
     await ctx1366.close();
     await ctxViewer.close();
+  });
+
+  test("17. DesktopGate at 1023px; desktop layout at 1024px (PR-06A contract)", async ({ browser }) => {
+    // 1023px — the gate appears.
+    const ctx1023 = await browser.newContext({ viewport: { width: 1023, height: 768 } });
+    const page1023 = await ctx1023.newPage();
+    await page1023.goto("/login");
+    await page1023.getByLabel("Username").fill(REVIEWER_USERNAME);
+    await page1023.getByLabel("Password").fill(REVIEWER_PASSWORD);
+    await page1023.getByRole("button", { name: "Sign in" }).click();
+    await page1023.getByRole("tab", { name: /Investigations/ }).click();
+    await expect(page1023.getByText(/Desktop window required/i)).toBeVisible({ timeout: 5_000 });
+    // The gate mentions 1024.
+    await expect(page1023.getByText(/1024 CSS pixels/i)).toBeVisible();
+    await ctx1023.close();
+
+    // 1024px — the desktop layout renders (no gate).
+    const ctx1024 = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+    const page1024 = await ctx1024.newPage();
+    await page1024.goto("/login");
+    await page1024.getByLabel("Username").fill(REVIEWER_USERNAME);
+    await page1024.getByLabel("Password").fill(REVIEWER_PASSWORD);
+    await page1024.getByRole("button", { name: "Sign in" }).click();
+    await page1024.getByRole("tab", { name: /Investigations/ }).click();
+    // The workspace composition renders (synth-001 appears, no gate).
+    await expect(page1024.getByText("synth-001")).toBeVisible({ timeout: 10_000 });
+    await expect(page1024.getByText(/Desktop window required/i)).toHaveCount(0);
+    await ctx1024.close();
+  });
+
+  test("18. No page-wide horizontal overflow on every workspace at 1024, 1280, 1366 and 1440 CSS pixels", async ({ browser }) => {
+    // PR-06A correction §7: genuine Chromium layout check — the login page
+    // and every authenticated workspace must not scroll horizontally at
+    // any supported desktop width (the minimum is 1024 CSS px). The
+    // three-column Investigation Workspace and the existing visual
+    // identity are unchanged; this test only verifies that no page-wide
+    // horizontal overflow appears at the normalized widths.
+    const workspaceTabs: Array<{ tab: string; heading: string }> = [
+      { tab: "Overview", heading: "Study Overview" },
+      { tab: "Data", heading: "Data Observatory" },
+      { tab: "Analysis", heading: "Anomaly Analysis" },
+      { tab: "Investigations", heading: "Investigation Workspace" },
+      { tab: "Domains", heading: "Cross-Domain Study" },
+      { tab: "Research", heading: "Research & Provenance" },
+    ];
+    for (const width of [1024, 1280, 1366, 1440]) {
+      const ctx = await browser.newContext({ viewport: { width, height: 900 } });
+      const page = await ctx.newPage();
+
+      // Unauthenticated route.
+      await page.goto("/login");
+      await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+
+      // Authenticated workspaces.
+      await page.getByLabel("Username").fill(REVIEWER_USERNAME);
+      await page.getByLabel("Password").fill(REVIEWER_PASSWORD);
+      await page.getByRole("button", { name: "Sign in" }).click();
+      for (const { tab, heading } of workspaceTabs) {
+        await page.getByRole("tab", { name: new RegExp(tab) }).click();
+        // Wait for the workspace to actually render before measuring.
+        await expect(
+          page.getByRole("heading", { level: 1, name: heading }),
+        ).toBeVisible({ timeout: 10_000 });
+        await expectNoHorizontalOverflow(page);
+      }
+      await ctx.close();
+    }
   });
 });

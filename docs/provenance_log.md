@@ -9,25 +9,17 @@
 
 The project was initially assigned by the university as an academic project, after which further interest in the problem domain led to its expansion into an unsupervised anomaly-detection study motivated by documented governance concerns in the Members of Parliament Local Area Development Scheme (MPLADS). Publicly available critiquesâ€”including Comptroller and Auditor General findings noting unsupported expenditure, poor monitoring, and suspected irregularitiesâ€”established a prima facie case for exploring data-driven anomaly detection as a supplementary audit tool.&nbsp;
 
-&nbsp;
-
 The initial formulation posited three objectives: (a) data preparation and preprocessing, (b) application of Isolation Forest and Local Outlier Factor with comparative evaluation, and (c) assessment of detection consistency, false-positive implications, and ethical considerations.
 
-# **2\. Data Source Selection â€” Rationale and Identified Limitations**
+# **2\. Data Source Selection Rationale and Identified Limitations**
 
-Selection rationale: No publicly available MPLAD-specific transactional dataset of sufficient granularity, completeness, and volume was identified at the time of project commencement. The ULB (UniversitÃ© Libre de Bruxelles) Credit Card Fraud Detection dataset, hosted on Kaggle, was selected as a methodological proxy on the following grounds:
-
-&nbsp;
+Selection rationale: No publicly available MPLAD-specific transactional dataset of sufficient granularity, completeness, and volume was identified at the time of project commencement. The ULB (Université libre de Bruxelles) Credit Card Fraud Detection dataset, hosted on Kaggle, was selected as a methodological proxy on the following grounds:
 
 * Extreme class imbalance (492 positive instances in 284,807 total; 0.172% positive rate), approximating the rarity expected in fund misutilization scenarios.  
 * Availability of binary labels enabling post-hoc, label-informed evaluation of unsupervised outputs.  
 * Sufficient volume to support meaningful parameter sweeps and comparative analysis.
 
-&nbsp;
-
 **Limitations identified at selection and reaffirmed during execution:**
-
-&nbsp;
 
 | LIMITATION | DETAIL |
 | :---- | :---- |
@@ -37,15 +29,11 @@ Selection rationale: No publicly available MPLAD-specific transactional dataset 
 | Structural mismatch in anomaly topology | Credit card fraud anomalies are point-level transactional outliers. MPLAD anomalies are expected to manifest as project-level patterns (e.g., clustered incomplete works, concentration of sanctions to specific contractors, electoral-cycle-driven expenditure spikes). The two anomaly topologies are not equivalent. |
 | Benchmark overuse | The ULB dataset is the single most widely used benchmark in credit card fraud detection literature, with numerous studies reporting near-perfect metrics. Results obtained on this dataset are well-characterized in the literature and carry limited incremental informational value. |
 
-&nbsp;
-
 Decision: The dataset was retained as a methodological proxy, but the project documentation was required to clearly state that no domain-valid conclusions regarding MPLAD fund utilization can be drawn from results obtained on this data.
 
-# **3\. Methodological Choices â€” Assumptions and Constraints**
+# **3\. Methodological Choices Assumptions and Constraints**
 
 **Isolation Forest (iForest):**
-
-&nbsp;
 
 * Assumes anomalies are "few and different" and can be isolated with fewer random partitions than normal observations.  
 * Known sensitivity to the contamination parameter; mis-specification directly alters the anomaly set.  
@@ -53,39 +41,25 @@ Decision: The dataset was retained as a methodological proxy, but the project do
 * Stochastic by design; results may vary across runs, particularly with limited tree counts or small subsampling sizes.  
 * More efficient than density-based methods at higher dimensions and larger sample sizes.
 
-&nbsp;
-
 **Local Outlier Factor (LOF):**
-
-&nbsp;
 
 * Identifies anomalies based on local density deviation from neighbours.  
 * Sensitive to the neighbourhood parameter (k); different values can yield substantially different anomaly rankings.  
 * Relies on distance-based density estimation, which is known to face degradation in high-dimensional spaces due to distance concentration effects, though this is partially mitigated here by the prior PCA reduction to 28 components.  
 * Computationally more expensive than iForest at scale; does not scale as favourably with increasing observation count.
 
-&nbsp;
-
 **PCA Visualization:**
-
-&nbsp;
 
 * Applied for exploratory visualization of the detection output in reduced space.  
 * Noted tension: the dataset's features are already PCA-transformed; applying PCA again for visualization serves a different purpose (dimensionality reduction for display) than the original transformation (anonymization), and this distinction must be disambiguated to avoid conflation.
 
-&nbsp;
-
 **Evaluation approach:**
-
-&nbsp;
 
 * Label-informed evaluation (using the Class variable) is employed to assess detector outputs. This is explicitly characterized as semi-supervised evaluation of unsupervised methods, not as purely unsupervised validation. The project does not claim unsupervised evaluation.
 
-# **4\. Critical Reassessment â€” Points of Tension Identified**
+# **4\. Critical Reassessment Points of Tension Identified**
 
 During the course of the project, the following structural tensions were identified between the project's stated domain motivation and its actual executable scope:
-
-&nbsp;
 
 * The proxy-dataâ€“domain-claim gap: The project title references MPLAD fund utilization, but no MPLAD data is used. Any reader or reviewer examining the methodology would encounter this dissonance immediately. Continuing without acknowledgment would constitute overclaiming.  
 * The preprocessingâ€“reality gap: Objective 1's emphasis on missing-value handling and categorical encoding, while sound as pipeline design, is not exercised by the chosen dataset. Presenting these as challenges addressed would be inaccurate.  
@@ -97,8 +71,6 @@ During the course of the project, the following structural tensions were identif
 
 The following decisions were made in response to the identified tensions:
 
-&nbsp;
-
 | DECISION | RATIONALE |
 | :---- | :---- |
 | Retain the ULB dataset as primary benchmark but reframe its role explicitly as "methodological proxy for imbalanced anomaly detection," not as MPLAD data. | The dataset serves a legitimate benchmarking function. Removing it would leave no executable methodology. Reframing preserves honesty without discarding the analytical work. |
@@ -109,22 +81,16 @@ The following decisions were made in response to the identified tensions:
 | Structure the limitations section as an engineering gap analysis directed at methods, data conditions, and deployment requirementsâ€”not at the assignment design. | A limitations section addressing what minimum data conditions, feature types, and temporal structures would be required for domain-valid deployment reads as professional maturity. A section addressing the assignment's design reads as grievance. The former serves the project; the latter does not. |
 | Document this provenance log as part of the project submission. | Transparency. Any reviewer examining the project's decisions should have access to the reasoning trail, including acknowledged limitations and scope qualifications made before rather than after evaluation. |
 
-# **6\. Scope of Claims â€” What This Study Can and Cannot Support**
+# **6\. Scope of Claims What This Study Can and Cannot Support**
 
 **This study can support:**
-
-&nbsp;
 
 * Comparative characterization of Isolation Forest and LOF behaviour under extreme class imbalance on a standardized benchmark.  
 * Parameter sensitivity analysis (contamination rate, tree count, neighbourhood size) and its effect on detection consistency.  
 * A reproducible preprocessing and detection pipeline applicable to analogous imbalanced anomaly-detection tasks.  
 * Identification of minimum data conditions (interpretable features, temporal scope, domain-relevant anomaly topology) required before unsupervised methods could be responsibly applied to MPLAD fund utilization data.
 
-&nbsp;
-
 **This study cannot support:**
-
-&nbsp;
 
 * Any claim about anomaly patterns in MPLAD fund utilization.  
 * Any inference about the prevalence, nature, or distribution of irregularities in the MPLAD scheme.  
@@ -134,8 +100,6 @@ The following decisions were made in response to the identified tensions:
 # **7\. Sources Informing This Log**
 
 The following sources informed the identification of limitations and the framing of decisions documented above:
-
-&nbsp;
 
 * ULB Machine Learning Group. Credit Card Fraud Detection Dataset. Kaggle. â€” Dataset description, PCA transformation, feature anonymization, class distribution.  
 * Impact Cyber Trust. Credit Card Fraud Detection â€” Dataset Entry. â€” Feature descriptions (V1â€“V28 as PCA components; Time and Amount untransformed).  
@@ -152,8 +116,6 @@ The following sources informed the identification of limitations and the framing
 * Popova, I. (2025). Credit Card Fraud Detection (arXiv). â€” Identification of ULB dataset as the most widely used benchmark; discussion of class-imbalance handling approaches.  
 * Preprints.org. "A Systematic Review of Machine Learning in Credit Card Fraud Detection" (2025). â€” Review of 52 studies on the ULB benchmark; ensemble methods' performance; noted lack of temporal validation in most benchmark usage.
 
-&nbsp;
-
 ## Phase 1: Data Acquisition & Integrity Verification (Stream A)
 
 - **Dataset Identifier:** `ULB_CC_Fraud_2013`
@@ -163,19 +125,20 @@ The following sources informed the identification of limitations and the framing
 - **Acquisition Date:** 2026-08-29
 
 ### Integrity Audit
-- **Expected Dimensions:** 284,807 rows Ã— 31 columns
-- **Verified Dimensions:** 284,807 rows Ã— 31 columns (`Passed`)
+
+- **Expected Dimensions:** 284,807 rows — 31 columns
+- **Verified Dimensions:** 284,807 rows — 31 columns (`Passed`)
 - **Class Breakdown:** 492 Fraud (0.172%), 284,315 Genuine (99.828%) (`Passed`)
 - **Missing Values:** 0 (`Passed`)
 - **Verification Script:** `notebooks/phase1_verification.ipynb`
-- **SHA-256 Hash:** 76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89
+- **SHA-256 Hash:** 76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89  
 *Refer - notebooks/phase1_verification.ipynb*
 
 ### Stream B Update: PMGSY-III Dataset Accepted
 
 **Date:** 2026-09-02
 **Dataset:** PMGSY-III Geospatial Registry (`PMGSY_Master_Dataset_Combined(1).csv`)
-**Source:** â€œMinistry of Rural Development, 2022. PMGSY Rural Connectivity Datasets, https://geosadak-pmgsy.nic.in/opendata/. Published under Indiaâ€™s Government Open Data License: https://data.gov.in/government-open-data-license-indiaâ€
+**Source:** Ministry of Rural Development, 2022. PMGSY Rural Connectivity Datasets, https://geosadak-pmgsy.nic.in/opendata/. Published under Indian Government Open Data License: https://data.gov.in/government-open-data-license-indiaâ€
 
 The earlier PMGSY combined file was found to be incorrectly generated, so it was replaced with the corrected dataset.
 
@@ -226,7 +189,6 @@ A final adversarial test using only `PROPOSED_L` produced an AUC of **0.664** fo
 The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will be addressed during Phase 2 through EDA, feature engineering, preprocessing and feature-space validation rather than by discarding the expanded dataset.
 *Refer - notebooks/phase1_verification_PMGSY.ipynb*
 
-
 ## Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
 
 **Date:** 2026-09-19
@@ -252,7 +214,6 @@ No final preprocessing or feature-space decision is considered locked at the sta
 # **STREAM A EXECUTION TRAIL - Phases 2 through 6 (ULB Proxy Benchmark)**
 
 *This section documents the complete execution trail for Stream A, in chronological order, with all substantive decisions, identified tensions, bug discoveries, and methodology revisions. It is written to be auditable: a reviewer reading this section should be able to reconstruct why every design choice was made and what alternatives were rejected and why.*
-
 
 ## Phase 2 (Track A) - Initial Preprocessing and Scaling Decision
 
@@ -305,7 +266,6 @@ FS-A selected as the primary feature space for Phase 3. FS-B retained for sensit
 
 *Refer - `notebooks/phase2_trackA_preprocessing.ipynb`*
 
-
 ## Phase 3 (Track A) - Methodological Execution: First Attempt and Revision
 
 **Date:** 2026-10-21 to 2026-10-22
@@ -352,7 +312,6 @@ The 30k subsample run is the **primary Phase 3 artefact** because LOF operates i
 
 *Refer - `notebooks/phase3_trackA_modelling_30k.ipynb`, `notebooks/phase3_trackA_modelling_full.ipynb`*
 
-
 ## Phase 4 (Track A) - Label-Informed Validation: Bug Discovery and Correction
 
 **Date:** 2026-10-22
@@ -397,7 +356,6 @@ Both 30k and 284k results retained as complementary evidence. The 30k run is the
 
 *Refer - `notebooks/phase4_trackA_validation_30k.ipynb`, `notebooks/phase4_trackA_validation_full.ipynb`*
 
-
 ## Phase 5 (Track A) - Diagnostic Analysis and Visualization
 
 **Date:** 2026-10-22 to 2026-10-23
@@ -435,7 +393,6 @@ Eight diagnostic figures produced for each of 30k and 284k runs (16 total), save
 Phase 5 closed. No additional visualisations or computations will be added unless Phase 7 gap analysis identifies a specific need.
 
 *Refer - `notebooks/phase5_trackA_diagnostics_30k.ipynb`, `notebooks/phase5_trackA_diagnostics_full.ipynb`*
-
 
 ## Phase 6 (Track A) - Cross-Method Consistency Analysis
 
@@ -482,7 +439,6 @@ Phase 6 closed. No score fusion or ensemble construction attempted. Per framewor
 
 *Refer - `notebooks/phase6_trackA_consistency.ipynb`*
 
-
 ## Phase 6a (Track A) - 30k vs 284k Comparison
 
 **Date:** 2026-10-23
@@ -508,7 +464,6 @@ To document the effect of the LOF Novelty Mode compute compromise by comparing t
 
 ### Decision
 The 30k run remains the **primary methodological artefact** for LOF characterization. The 284k run is the **scale-stress companion**. Both are reported; the LOF Novelty Mode limitation is documented in Phase 7.
-
 
 ## Current Status (as of 2026-10-23)
 
@@ -551,25 +506,17 @@ The 30k run remains the **primary methodological artefact** for LOF characteriza
 
 The project was initially assigned by the university as an academic project, after which further interest in the problem domain led to its expansion into an unsupervised anomaly-detection study motivated by documented governance concerns in the Members of Parliament Local Area Development Scheme (MPLADS). Publicly available critiquesâ€”including Comptroller and Auditor General findings noting unsupported expenditure, poor monitoring, and suspected irregularitiesâ€”established a prima facie case for exploring data-driven anomaly detection as a supplementary audit tool.&nbsp;
 
-&nbsp;
-
 The initial formulation posited three objectives: (a) data preparation and preprocessing, (b) application of Isolation Forest and Local Outlier Factor with comparative evaluation, and (c) assessment of detection consistency, false-positive implications, and ethical considerations.
 
 # **2\. Data Source Selection â€” Rationale and Identified Limitations**
 
 Selection rationale: No publicly available MPLAD-specific transactional dataset of sufficient granularity, completeness, and volume was identified at the time of project commencement. The ULB (UniversitÃ© Libre de Bruxelles) Credit Card Fraud Detection dataset, hosted on Kaggle, was selected as a methodological proxy on the following grounds:
 
-&nbsp;
-
 * Extreme class imbalance (492 positive instances in 284,807 total; 0.172% positive rate), approximating the rarity expected in fund misutilization scenarios.  
 * Availability of binary labels enabling post-hoc, label-informed evaluation of unsupervised outputs.  
 * Sufficient volume to support meaningful parameter sweeps and comparative analysis.
 
-&nbsp;
-
 **Limitations identified at selection and reaffirmed during execution:**
-
-&nbsp;
 
 | LIMITATION | DETAIL |
 | :---- | :---- |
@@ -579,15 +526,11 @@ Selection rationale: No publicly available MPLAD-specific transactional dataset 
 | Structural mismatch in anomaly topology | Credit card fraud anomalies are point-level transactional outliers. MPLAD anomalies are expected to manifest as project-level patterns (e.g., clustered incomplete works, concentration of sanctions to specific contractors, electoral-cycle-driven expenditure spikes). The two anomaly topologies are not equivalent. |
 | Benchmark overuse | The ULB dataset is the single most widely used benchmark in credit card fraud detection literature, with numerous studies reporting near-perfect metrics. Results obtained on this dataset are well-characterized in the literature and carry limited incremental informational value. |
 
-&nbsp;
-
 Decision: The dataset was retained as a methodological proxy, but the project documentation was required to clearly state that no domain-valid conclusions regarding MPLAD fund utilization can be drawn from results obtained on this data.
 
 # **3\. Methodological Choices â€” Assumptions and Constraints**
 
 **Isolation Forest (iForest):**
-
-&nbsp;
 
 * Assumes anomalies are "few and different" and can be isolated with fewer random partitions than normal observations.  
 * Known sensitivity to the contamination parameter; mis-specification directly alters the anomaly set.  
@@ -595,39 +538,25 @@ Decision: The dataset was retained as a methodological proxy, but the project do
 * Stochastic by design; results may vary across runs, particularly with limited tree counts or small subsampling sizes.  
 * More efficient than density-based methods at higher dimensions and larger sample sizes.
 
-&nbsp;
-
 **Local Outlier Factor (LOF):**
-
-&nbsp;
 
 * Identifies anomalies based on local density deviation from neighbours.  
 * Sensitive to the neighbourhood parameter (k); different values can yield substantially different anomaly rankings.  
 * Relies on distance-based density estimation, which is known to face degradation in high-dimensional spaces due to distance concentration effects, though this is partially mitigated here by the prior PCA reduction to 28 components.  
 * Computationally more expensive than iForest at scale; does not scale as favourably with increasing observation count.
 
-&nbsp;
-
 **PCA Visualization:**
-
-&nbsp;
 
 * Applied for exploratory visualization of the detection output in reduced space.  
 * Noted tension: the dataset's features are already PCA-transformed; applying PCA again for visualization serves a different purpose (dimensionality reduction for display) than the original transformation (anonymization), and this distinction must be disambiguated to avoid conflation.
 
-&nbsp;
-
 **Evaluation approach:**
-
-&nbsp;
 
 * Label-informed evaluation (using the Class variable) is employed to assess detector outputs. This is explicitly characterized as semi-supervised evaluation of unsupervised methods, not as purely unsupervised validation. The project does not claim unsupervised evaluation.
 
 # **4\. Critical Reassessment â€” Points of Tension Identified**
 
 During the course of the project, the following structural tensions were identified between the project's stated domain motivation and its actual executable scope:
-
-&nbsp;
 
 * The proxy-dataâ€“domain-claim gap: The project title references MPLAD fund utilization, but no MPLAD data is used. Any reader or reviewer examining the methodology would encounter this dissonance immediately. Continuing without acknowledgment would constitute overclaiming.  
 * The preprocessingâ€“reality gap: Objective 1's emphasis on missing-value handling and categorical encoding, while sound as pipeline design, is not exercised by the chosen dataset. Presenting these as challenges addressed would be inaccurate.  
@@ -638,8 +567,6 @@ During the course of the project, the following structural tensions were identif
 # **5\. Decisions Taken**
 
 The following decisions were made in response to the identified tensions:
-
-&nbsp;
 
 | DECISION | RATIONALE |
 | :---- | :---- |
@@ -655,18 +582,12 @@ The following decisions were made in response to the identified tensions:
 
 **This study can support:**
 
-&nbsp;
-
 * Comparative characterization of Isolation Forest and LOF behaviour under extreme class imbalance on a standardized benchmark.  
 * Parameter sensitivity analysis (contamination rate, tree count, neighbourhood size) and its effect on detection consistency.  
 * A reproducible preprocessing and detection pipeline applicable to analogous imbalanced anomaly-detection tasks.  
 * Identification of minimum data conditions (interpretable features, temporal scope, domain-relevant anomaly topology) required before unsupervised methods could be responsibly applied to MPLAD fund utilization data.
 
-&nbsp;
-
 **This study cannot support:**
-
-&nbsp;
 
 * Any claim about anomaly patterns in MPLAD fund utilization.  
 * Any inference about the prevalence, nature, or distribution of irregularities in the MPLAD scheme.  
@@ -676,8 +597,6 @@ The following decisions were made in response to the identified tensions:
 # **7\. Sources Informing This Log**
 
 The following sources informed the identification of limitations and the framing of decisions documented above:
-
-&nbsp;
 
 * ULB Machine Learning Group. Credit Card Fraud Detection Dataset. Kaggle. â€” Dataset description, PCA transformation, feature anonymization, class distribution.  
 * Impact Cyber Trust. Credit Card Fraud Detection â€” Dataset Entry. â€” Feature descriptions (V1â€“V28 as PCA components; Time and Amount untransformed).  
@@ -693,8 +612,6 @@ The following sources informed the identification of limitations and the framing
 * Ideas for India. "Electoral Cycles and Incomplete Public Works Projects: An Analysis of the MPLAD Scheme." â€” Structural patterns in MPLAD project completion driven by electoral timing.  
 * Popova, I. (2025). Credit Card Fraud Detection (arXiv). â€” Identification of ULB dataset as the most widely used benchmark; discussion of class-imbalance handling approaches.  
 * Preprints.org. "A Systematic Review of Machine Learning in Credit Card Fraud Detection" (2025). â€” Review of 52 studies on the ULB benchmark; ensemble methods' performance; noted lack of temporal validation in most benchmark usage.
-
-&nbsp;
 
 ## Phase 1: Data Acquisition & Integrity Verification (Stream A)
 
@@ -768,7 +685,6 @@ A final adversarial test using only `PROPOSED_L` produced an AUC of **0.664** fo
 The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will be addressed during Phase 2 through EDA, feature engineering, preprocessing and feature-space validation rather than by discarding the expanded dataset.
 *Refer - notebooks/phase1_verification_PMGSY.ipynb*
 
-
 ## Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
 
 **Date:** 2026-09-19
@@ -794,7 +710,6 @@ No final preprocessing or feature-space decision is considered locked at the sta
 # **STREAM A EXECUTION TRAIL - Phases 2 through 6 (ULB Proxy Benchmark)**
 
 *This section documents the complete execution trail for Stream A, in chronological order, with all substantive decisions, identified tensions, bug discoveries, and methodology revisions. It is written to be auditable: a reviewer reading this section should be able to reconstruct why every design choice was made and what alternatives were rejected and why.*
-
 
 ## Phase 2 (Track A) - Initial Preprocessing and Scaling Decision
 
@@ -847,7 +762,6 @@ FS-A selected as the primary feature space for Phase 3. FS-B retained for sensit
 
 *Refer - `notebooks/phase2_trackA_preprocessing.ipynb`*
 
-
 ## Phase 3 (Track A) - Methodological Execution: First Attempt and Revision
 
 **Date:** 2026-10-21 to 2026-10-22
@@ -894,7 +808,6 @@ The 30k subsample run is the **primary Phase 3 artefact** because LOF operates i
 
 *Refer - `notebooks/phase3_trackA_modelling_30k.ipynb`, `notebooks/phase3_trackA_modelling_full.ipynb`*
 
-
 ## Phase 4 (Track A) - Label-Informed Validation: Bug Discovery and Correction
 
 **Date:** 2026-10-22
@@ -939,7 +852,6 @@ Both 30k and 284k results retained as complementary evidence. The 30k run is the
 
 *Refer - `notebooks/phase4_trackA_validation_30k.ipynb`, `notebooks/phase4_trackA_validation_full.ipynb`*
 
-
 ## Phase 5 (Track A) - Diagnostic Analysis and Visualization
 
 **Date:** 2026-10-22 to 2026-10-23
@@ -977,7 +889,6 @@ Eight diagnostic figures produced for each of 30k and 284k runs (16 total), save
 Phase 5 closed. No additional visualisations or computations will be added unless Phase 7 gap analysis identifies a specific need.
 
 *Refer - `notebooks/phase5_trackA_diagnostics_30k.ipynb`, `notebooks/phase5_trackA_diagnostics_full.ipynb`*
-
 
 ## Phase 6 (Track A) - Cross-Method Consistency Analysis
 
@@ -1024,7 +935,6 @@ Phase 6 closed. No score fusion or ensemble construction attempted. Per framewor
 
 *Refer - `notebooks/phase6_trackA_consistency.ipynb`*
 
-
 ## Phase 6a (Track A) - 30k vs 284k Comparison
 
 **Date:** 2026-10-23
@@ -1050,7 +960,6 @@ To document the effect of the LOF Novelty Mode compute compromise by comparing t
 
 ### Decision
 The 30k run remains the **primary methodological artefact** for LOF characterization. The 284k run is the **scale-stress companion**. Both are reported; the LOF Novelty Mode limitation is documented in Phase 7.
-
 
 ## Current Status (as of 2026-10-23)
 
@@ -1164,25 +1073,17 @@ Phase 4 notebook, Phase 5 diagnostics/bootstrapping/plots, Phase 6 agreement ana
 
 The project was initially assigned by the university as an academic project, after which further interest in the problem domain led to its expansion into an unsupervised anomaly-detection study motivated by documented governance concerns in the Members of Parliament Local Area Development Scheme (MPLADS). Publicly available critiquesâ€”including Comptroller and Auditor General findings noting unsupported expenditure, poor monitoring, and suspected irregularitiesâ€”established a prima facie case for exploring data-driven anomaly detection as a supplementary audit tool.&nbsp;
 
-&nbsp;
-
 The initial formulation posited three objectives: (a) data preparation and preprocessing, (b) application of Isolation Forest and Local Outlier Factor with comparative evaluation, and (c) assessment of detection consistency, false-positive implications, and ethical considerations.
 
 # **2\. Data Source Selection â€” Rationale and Identified Limitations**
 
 Selection rationale: No publicly available MPLAD-specific transactional dataset of sufficient granularity, completeness, and volume was identified at the time of project commencement. The ULB (UniversitÃ© Libre de Bruxelles) Credit Card Fraud Detection dataset, hosted on Kaggle, was selected as a methodological proxy on the following grounds:
 
-&nbsp;
-
 * Extreme class imbalance (492 positive instances in 284,807 total; 0.172% positive rate), approximating the rarity expected in fund misutilization scenarios.  
 * Availability of binary labels enabling post-hoc, label-informed evaluation of unsupervised outputs.  
 * Sufficient volume to support meaningful parameter sweeps and comparative analysis.
 
-&nbsp;
-
 **Limitations identified at selection and reaffirmed during execution:**
-
-&nbsp;
 
 | LIMITATION | DETAIL |
 | :---- | :---- |
@@ -1192,15 +1093,11 @@ Selection rationale: No publicly available MPLAD-specific transactional dataset 
 | Structural mismatch in anomaly topology | Credit card fraud anomalies are point-level transactional outliers. MPLAD anomalies are expected to manifest as project-level patterns (e.g., clustered incomplete works, concentration of sanctions to specific contractors, electoral-cycle-driven expenditure spikes). The two anomaly topologies are not equivalent. |
 | Benchmark overuse | The ULB dataset is the single most widely used benchmark in credit card fraud detection literature, with numerous studies reporting near-perfect metrics. Results obtained on this dataset are well-characterized in the literature and carry limited incremental informational value. |
 
-&nbsp;
-
 Decision: The dataset was retained as a methodological proxy, but the project documentation was required to clearly state that no domain-valid conclusions regarding MPLAD fund utilization can be drawn from results obtained on this data.
 
 # **3\. Methodological Choices â€” Assumptions and Constraints**
 
 **Isolation Forest (iForest):**
-
-&nbsp;
 
 * Assumes anomalies are "few and different" and can be isolated with fewer random partitions than normal observations.  
 * Known sensitivity to the contamination parameter; mis-specification directly alters the anomaly set.  
@@ -1208,39 +1105,25 @@ Decision: The dataset was retained as a methodological proxy, but the project do
 * Stochastic by design; results may vary across runs, particularly with limited tree counts or small subsampling sizes.  
 * More efficient than density-based methods at higher dimensions and larger sample sizes.
 
-&nbsp;
-
 **Local Outlier Factor (LOF):**
-
-&nbsp;
 
 * Identifies anomalies based on local density deviation from neighbours.  
 * Sensitive to the neighbourhood parameter (k); different values can yield substantially different anomaly rankings.  
 * Relies on distance-based density estimation, which is known to face degradation in high-dimensional spaces due to distance concentration effects, though this is partially mitigated here by the prior PCA reduction to 28 components.  
 * Computationally more expensive than iForest at scale; does not scale as favourably with increasing observation count.
 
-&nbsp;
-
 **PCA Visualization:**
-
-&nbsp;
 
 * Applied for exploratory visualization of the detection output in reduced space.  
 * Noted tension: the dataset's features are already PCA-transformed; applying PCA again for visualization serves a different purpose (dimensionality reduction for display) than the original transformation (anonymization), and this distinction must be disambiguated to avoid conflation.
 
-&nbsp;
-
 **Evaluation approach:**
-
-&nbsp;
 
 * Label-informed evaluation (using the Class variable) is employed to assess detector outputs. This is explicitly characterized as semi-supervised evaluation of unsupervised methods, not as purely unsupervised validation. The project does not claim unsupervised evaluation.
 
 # **4\. Critical Reassessment â€” Points of Tension Identified**
 
 During the course of the project, the following structural tensions were identified between the project's stated domain motivation and its actual executable scope:
-
-&nbsp;
 
 * The proxy-dataâ€“domain-claim gap: The project title references MPLAD fund utilization, but no MPLAD data is used. Any reader or reviewer examining the methodology would encounter this dissonance immediately. Continuing without acknowledgment would constitute overclaiming.  
 * The preprocessingâ€“reality gap: Objective 1's emphasis on missing-value handling and categorical encoding, while sound as pipeline design, is not exercised by the chosen dataset. Presenting these as challenges addressed would be inaccurate.  
@@ -1251,8 +1134,6 @@ During the course of the project, the following structural tensions were identif
 # **5\. Decisions Taken**
 
 The following decisions were made in response to the identified tensions:
-
-&nbsp;
 
 | DECISION | RATIONALE |
 | :---- | :---- |
@@ -1268,18 +1149,12 @@ The following decisions were made in response to the identified tensions:
 
 **This study can support:**
 
-&nbsp;
-
 * Comparative characterization of Isolation Forest and LOF behaviour under extreme class imbalance on a standardized benchmark.  
 * Parameter sensitivity analysis (contamination rate, tree count, neighbourhood size) and its effect on detection consistency.  
 * A reproducible preprocessing and detection pipeline applicable to analogous imbalanced anomaly-detection tasks.  
 * Identification of minimum data conditions (interpretable features, temporal scope, domain-relevant anomaly topology) required before unsupervised methods could be responsibly applied to MPLAD fund utilization data.
 
-&nbsp;
-
 **This study cannot support:**
-
-&nbsp;
 
 * Any claim about anomaly patterns in MPLAD fund utilization.  
 * Any inference about the prevalence, nature, or distribution of irregularities in the MPLAD scheme.  
@@ -1289,8 +1164,6 @@ The following decisions were made in response to the identified tensions:
 # **7\. Sources Informing This Log**
 
 The following sources informed the identification of limitations and the framing of decisions documented above:
-
-&nbsp;
 
 * ULB Machine Learning Group. Credit Card Fraud Detection Dataset. Kaggle. â€” Dataset description, PCA transformation, feature anonymization, class distribution.  
 * Impact Cyber Trust. Credit Card Fraud Detection â€” Dataset Entry. â€” Feature descriptions (V1â€“V28 as PCA components; Time and Amount untransformed).  
@@ -1306,8 +1179,6 @@ The following sources informed the identification of limitations and the framing
 * Ideas for India. "Electoral Cycles and Incomplete Public Works Projects: An Analysis of the MPLAD Scheme." â€” Structural patterns in MPLAD project completion driven by electoral timing.  
 * Popova, I. (2025). Credit Card Fraud Detection (arXiv). â€” Identification of ULB dataset as the most widely used benchmark; discussion of class-imbalance handling approaches.  
 * Preprints.org. "A Systematic Review of Machine Learning in Credit Card Fraud Detection" (2025). â€” Review of 52 studies on the ULB benchmark; ensemble methods' performance; noted lack of temporal validation in most benchmark usage.
-
-&nbsp;
 
 ## Phase 1: Data Acquisition & Integrity Verification (Stream A)
 
@@ -1381,7 +1252,6 @@ A final adversarial test using only `PROPOSED_L` produced an AUC of **0.664** fo
 The remaining cross-state distribution shift, particularly in `PROPOSED_L`, will be addressed during Phase 2 through EDA, feature engineering, preprocessing and feature-space validation rather than by discarding the expanded dataset.
 *Refer - notebooks/phase1_verification_PMGSY.ipynb*
 
-
 ## Phase 2 Initiation: Extended EDA and Provisional Data-Handling Approach
 
 **Date:** 2026-09-19
@@ -1407,7 +1277,6 @@ No final preprocessing or feature-space decision is considered locked at the sta
 # **STREAM A EXECUTION TRAIL - Phases 2 through 6 (ULB Proxy Benchmark)**
 
 *This section documents the complete execution trail for Stream A, in chronological order, with all substantive decisions, identified tensions, bug discoveries, and methodology revisions. It is written to be auditable: a reviewer reading this section should be able to reconstruct why every design choice was made and what alternatives were rejected and why.*
-
 
 ## Phase 2 (Track A) - Initial Preprocessing and Scaling Decision
 
@@ -1460,7 +1329,6 @@ FS-A selected as the primary feature space for Phase 3. FS-B retained for sensit
 
 *Refer - `notebooks/phase2_trackA_preprocessing.ipynb`*
 
-
 ## Phase 3 (Track A) - Methodological Execution: First Attempt and Revision
 
 **Date:** 2026-10-21 to 2026-10-22
@@ -1507,7 +1375,6 @@ The 30k subsample run is the **primary Phase 3 artefact** because LOF operates i
 
 *Refer - `notebooks/phase3_trackA_modelling_30k.ipynb`, `notebooks/phase3_trackA_modelling_full.ipynb`*
 
-
 ## Phase 4 (Track A) - Label-Informed Validation: Bug Discovery and Correction
 
 **Date:** 2026-10-22
@@ -1552,7 +1419,6 @@ Both 30k and 284k results retained as complementary evidence. The 30k run is the
 
 *Refer - `notebooks/phase4_trackA_validation_30k.ipynb`, `notebooks/phase4_trackA_validation_full.ipynb`*
 
-
 ## Phase 5 (Track A) - Diagnostic Analysis and Visualization
 
 **Date:** 2026-10-22 to 2026-10-23
@@ -1590,7 +1456,6 @@ Eight diagnostic figures produced for each of 30k and 284k runs (16 total), save
 Phase 5 closed. No additional visualisations or computations will be added unless Phase 7 gap analysis identifies a specific need.
 
 *Refer - `notebooks/phase5_trackA_diagnostics_30k.ipynb`, `notebooks/phase5_trackA_diagnostics_full.ipynb`*
-
 
 ## Phase 6 (Track A) - Cross-Method Consistency Analysis
 
@@ -1637,7 +1502,6 @@ Phase 6 closed. No score fusion or ensemble construction attempted. Per framewor
 
 *Refer - `notebooks/phase6_trackA_consistency.ipynb`*
 
-
 ## Phase 6a (Track A) - 30k vs 284k Comparison
 
 **Date:** 2026-10-23
@@ -1663,7 +1527,6 @@ To document the effect of the LOF Novelty Mode compute compromise by comparing t
 
 ### Decision
 The 30k run remains the **primary methodological artefact** for LOF characterization. The 284k run is the **scale-stress companion**. Both are reported; the LOF Novelty Mode limitation is documented in Phase 7.
-
 
 ## Current Status (as of 2026-10-23)
 

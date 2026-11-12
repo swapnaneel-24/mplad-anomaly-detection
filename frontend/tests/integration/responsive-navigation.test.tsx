@@ -1,11 +1,12 @@
-// Integration test: desktop minimum-width handling.
+// Integration test: desktop minimum-width handling (PR-06A contract).
 //
-// PEIARS is desktop-only. At window.innerWidth >= 1280 the workspace
-// composition renders normally. Below 1280, the DesktopGate replaces the
-// composition area with a width-restriction message.
+// The minimum supported viewport width is exactly 1024 CSS pixels.
+// At >= 1024 the workspace composition renders normally. Below 1024,
+// the DesktopGate replaces the composition area.
 //
-// This test replaces the previous mobile-drawer test. There is no
-// hamburger, no drawer, no mobile navigation.
+// Tested widths: 1023 (gate), 1024 (minimum supported), 1280, 1366,
+// 1440, 1920 (all supported). There is no hamburger, no drawer, no
+// mobile navigation.
 
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,7 +27,7 @@ function setWindowWidth(width: number): void {
   window.dispatchEvent(new Event("resize"));
 }
 
-describe("desktop minimum-width handling", () => {
+describe("desktop minimum-width handling (PR-06A: 1024px contract)", () => {
   let originalFetch: typeof globalThis.fetch;
   let originalCookie: PropertyDescriptor | undefined;
   let originalInnerWidth: number;
@@ -49,17 +50,33 @@ describe("desktop minimum-width handling", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the workspace composition at 1440px (no gate)", async () => {
-    setWindowWidth(1440);
+  // --- Supported widths (no gate) ---
+
+  it("renders the workspace composition at 1920px", async () => {
+    setWindowWidth(1920);
     renderApp({ initialEntries: ["/overview"] });
     await screen.findByRole("heading", { name: "Study Overview", level: 1 });
-    // The Overview study title (rendered inside the composition) is visible.
     expect(await screen.findByText(/MPLAD Fund-Utilisation/i)).toBeInTheDocument();
-    // The gate message is NOT shown.
     expect(screen.queryByText(/Desktop window required/i)).toBeNull();
   });
 
-  it("renders the workspace composition at 1280px (minimum supported)", async () => {
+  it("renders the workspace composition at 1440px", async () => {
+    setWindowWidth(1440);
+    renderApp({ initialEntries: ["/overview"] });
+    await screen.findByRole("heading", { name: "Study Overview", level: 1 });
+    expect(await screen.findByText(/MPLAD Fund-Utilisation/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Desktop window required/i)).toBeNull();
+  });
+
+  it("renders the workspace composition at 1366px", async () => {
+    setWindowWidth(1366);
+    renderApp({ initialEntries: ["/overview"] });
+    await screen.findByRole("heading", { name: "Study Overview", level: 1 });
+    expect(await screen.findByText(/MPLAD Fund-Utilisation/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Desktop window required/i)).toBeNull();
+  });
+
+  it("renders the workspace composition at 1280px", async () => {
     setWindowWidth(1280);
     renderApp({ initialEntries: ["/overview"] });
     await screen.findByRole("heading", { name: "Study Overview", level: 1 });
@@ -67,21 +84,30 @@ describe("desktop minimum-width handling", () => {
     expect(screen.queryByText(/Desktop window required/i)).toBeNull();
   });
 
-  it("shows the DesktopGate below 1280px and hides the workspace composition", async () => {
+  it("renders the workspace composition at 1024px (PR-06A minimum)", async () => {
     setWindowWidth(1024);
     renderApp({ initialEntries: ["/overview"] });
-    // Wait for auth restore + the gate to appear.
+    await screen.findByRole("heading", { name: "Study Overview", level: 1 });
+    expect(await screen.findByText(/MPLAD Fund-Utilisation/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Desktop window required/i)).toBeNull();
+  });
+
+  // --- Unsupported width (gate) ---
+
+  it("shows the DesktopGate at 1023px and hides the workspace composition", async () => {
+    setWindowWidth(1023);
+    renderApp({ initialEntries: ["/overview"] });
     await waitFor(() => {
       expect(screen.getByText(/Desktop window required/i)).toBeInTheDocument();
     });
     // The workspace study title is NOT rendered (composition is replaced).
     expect(screen.queryByText(/MPLAD Fund-Utilisation/i)).toBeNull();
-    // The gate mentions the minimum width.
-    expect(screen.getByText(/1280 CSS pixels/i)).toBeInTheDocument();
+    // The gate mentions the minimum width (1024).
+    expect(screen.getByText(/1024 CSS pixels/i)).toBeInTheDocument();
   });
 
   it("does not render a hamburger button or mobile drawer at any width", async () => {
-    setWindowWidth(1024);
+    setWindowWidth(1023);
     renderApp({ initialEntries: ["/overview"] });
     await waitFor(() => {
       expect(screen.getByText(/Desktop window required/i)).toBeInTheDocument();
@@ -91,17 +117,14 @@ describe("desktop minimum-width handling", () => {
     expect(screen.queryByLabelText("Workspace navigation")).toBeNull();
   });
 
-  it("the identity bar and switcher remain visible below 1280px (user can still sign out)", async () => {
-    setWindowWidth(1024);
+  it("the identity bar and switcher remain visible below 1024px (user can still sign out)", async () => {
+    setWindowWidth(1023);
     renderApp({ initialEntries: ["/overview"] });
     await waitFor(() => {
       expect(screen.getByText(/Desktop window required/i)).toBeInTheDocument();
     });
-    // Identity bar: PEIARS mark visible.
     expect(screen.getByText("PEIARS")).toBeInTheDocument();
-    // Switcher: tabs visible.
     expect(screen.getByRole("tablist", { name: "Workspaces" })).toBeInTheDocument();
-    // Sign out button visible.
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 });

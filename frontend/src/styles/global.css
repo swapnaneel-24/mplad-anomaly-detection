@@ -387,7 +387,7 @@ code.mono,
   color: var(--color-text-faint);
 }
 
-/* Responsive: stack def-list on narrow desktop (but not below 1280 — the
+/* Responsive: stack def-list on narrow desktop (but not below 1024 — the
    desktop gate handles that). */
 @media (max-width: 1365px) {
   .def-list {

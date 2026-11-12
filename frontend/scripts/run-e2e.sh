@@ -11,8 +11,11 @@
 # All logs go to /tmp/e2e_run/. The script exits non-zero on any failure.
 set -euo pipefail
 
-REPO=/home/z/my-project/pr05b-work/repo
-FRONTEND=/home/z/my-project/pr05b-work/frontend-clean/frontend
+# Repository root = parent of this frontend/ directory. When running
+# the script from a copy that lives OUTSIDE the checkout, export
+# PEIARS_E2E_REPO=/path/to/checkout first.
+REPO="${PEIARS_E2E_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+FRONTEND="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND="$REPO/backend"
 E2E_DIR=/tmp/e2e_run
 rm -rf "$E2E_DIR"
@@ -73,7 +76,7 @@ PEIARS_DATABASE_REQUIRED=true \
 PEIARS_SESSION_SECRET='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' \
 PEIARS_SESSION_COOKIE_SECURE=false \
 PEIARS_DEMONSTRATION_SOURCES=true \
-PEIARS_CORS_ORIGINS='["http://127.0.0.1:5173"]' \
+PEIARS_CORS_ORIGINS='http://127.0.0.1:5173' \
   python3 scripts/serve.py --host 127.0.0.1 --port 8000 > "$E2E_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
 echo "[e2e] backend PID=$BACKEND_PID"

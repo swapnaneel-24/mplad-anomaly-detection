@@ -87,6 +87,12 @@ when a later PR introduces services that consume them; never commit `.env`.
 See `docs/architecture/workspace-conventions.md` for the engineering rules
 that later PRs follow.
 
+> **Current application development (PR-02+):** the canonical local
+> backend template is `backend/.env.example`, and the canonical
+> stage-by-stage startup guides are `docs/dev/LOCAL_STARTUP_WINDOWS.md`
+> and `docs/dev/LOCAL_STARTUP_POSIX.md` with the configuration reference
+> in `docs/dev/CONFIGURATION_INVENTORY.md`.
+
 ## Governing documents
 
 - `MPLAD_Application_SRS_v0.2.md` — Software Requirements Specification

@@ -152,3 +152,127 @@ export interface LogoutResponse {
 export interface CsrfTokenResponse {
   csrf_token: string;
 }
+
+// --- Synthetic demonstration records (PR-05B) ---------------------------
+
+export interface SyntheticRecordSummary {
+  record_ref: string;
+  title: string;
+  dataset_id: string;
+  snapshot_id: string;
+  synthetic: boolean;
+}
+
+export interface SyntheticRecordDetail {
+  record_ref: string;
+  title: string;
+  description: string;
+  evidence_summary: string;
+  administrative_context: string;
+  limitations: string;
+  dataset_id: string;
+  snapshot_id: string;
+  synthetic: boolean;
+}
+
+export interface SyntheticRecordListResponse {
+  items: SyntheticRecordSummary[];
+  total: number;
+  dataset_id: string;
+  snapshot_id: string;
+}
+
+// --- Review cases (PR-05B) ----------------------------------------------
+
+export type ReviewStatus =
+  | "not_reviewed"
+  | "under_review"
+  | "explained_deviation"
+  | "needs_source_verification"
+  | "escalated_for_examination";
+
+export type CaseEventType =
+  | "created"
+  | "note_added"
+  | "status_changed"
+  | "decision_recorded"
+  | "reopened";
+
+/** Alias matching the OpenAPI schema name (EventType). */
+export type EventType = CaseEventType;
+
+export interface CreateCaseRequest {
+  dataset_id: string;
+  snapshot_id: string;
+  record_ref: string;
+  title: string;
+  summary?: string | null;
+  /** Ignored by the server — actor is derived from the authenticated principal. */
+  created_by: string;
+}
+
+export interface CaseSummary {
+  id: string;
+  dataset_id: string;
+  snapshot_id: string;
+  record_ref: string;
+  status: ReviewStatus;
+  title: string;
+  summary?: string | null;
+  created_at: string;
+  updated_at: string;
+  version: number;
+  created_by: string;
+}
+
+export type CaseDetail = CaseSummary;
+
+export interface CaseListResponse {
+  items: CaseSummary[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AddNoteRequest {
+  note_text: string;
+  /** Ignored by the server — actor is derived from the authenticated principal. */
+  actor_ref: string;
+  expected_version: number;
+}
+
+export interface TransitionStatusRequest {
+  to_status: ReviewStatus;
+  reason: string;
+  /** Ignored by the server — actor is derived from the authenticated principal. */
+  actor_ref: string;
+  expected_version: number;
+}
+
+export interface RecordDecisionRequest {
+  outcome: ReviewStatus;
+  rationale: string;
+  /** Ignored by the server — actor is derived from the authenticated principal. */
+  actor_ref: string;
+  expected_version: number;
+}
+
+export interface CaseEventRecord {
+  id: string;
+  case_id: string;
+  event_type: CaseEventType;
+  event_at: string;
+  actor_ref: string;
+  previous_status?: ReviewStatus | null;
+  new_status?: ReviewStatus | null;
+  reason?: string | null;
+  event_payload?: Record<string, unknown> | null;
+  case_version: number;
+  event_seq: number;
+}
+
+export interface CaseHistoryResponse {
+  case_id: string;
+  items: CaseEventRecord[];
+  total: number;
+}

@@ -49,3 +49,5 @@ deploy/**/pgdata/
 *.log
 .DS_Store
 Thumbs.db
+
+.venv-backend/

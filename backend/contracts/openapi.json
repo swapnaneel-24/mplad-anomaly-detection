@@ -1,6 +1,386 @@
 {
   "components": {
     "schemas": {
+      "AddNoteRequest": {
+        "description": "Input contract for adding a reviewer note to a case.",
+        "properties": {
+          "actor_ref": {
+            "description": "Actor reference for the note author (≤128 chars).",
+            "title": "Actor Ref",
+            "type": "string"
+          },
+          "expected_version": {
+            "description": "The case version the caller read; used for optimistic concurrency.",
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "note_text": {
+            "description": "The note body (Unicode-safe; bounded length).",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Note Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "note_text",
+          "actor_ref",
+          "expected_version"
+        ],
+        "title": "AddNoteRequest",
+        "type": "object"
+      },
+      "CaseDetail": {
+        "description": "Full detail of a review case (single-case view).",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "record_ref": {
+            "title": "Record Ref",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "dataset_id",
+          "snapshot_id",
+          "record_ref",
+          "status",
+          "title",
+          "summary",
+          "created_at",
+          "updated_at",
+          "version",
+          "created_by"
+        ],
+        "title": "CaseDetail",
+        "type": "object"
+      },
+      "CaseEventRecord": {
+        "description": "One event in a case's append-only history.",
+        "properties": {
+          "actor_ref": {
+            "title": "Actor Ref",
+            "type": "string"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "case_version": {
+            "title": "Case Version",
+            "type": "integer"
+          },
+          "event_at": {
+            "format": "date-time",
+            "title": "Event At",
+            "type": "string"
+          },
+          "event_payload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Payload"
+          },
+          "event_seq": {
+            "description": "Database-generated monotonic sequence for deterministic ordering.",
+            "title": "Event Seq",
+            "type": "integer"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "new_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "id",
+          "case_id",
+          "event_type",
+          "event_at",
+          "actor_ref",
+          "previous_status",
+          "new_status",
+          "reason",
+          "event_payload",
+          "case_version",
+          "event_seq"
+        ],
+        "title": "CaseEventRecord",
+        "type": "object"
+      },
+      "CaseHistoryResponse": {
+        "description": "The append-only event history for a case, deterministically ordered.",
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CaseEventRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "case_id",
+          "items",
+          "total"
+        ],
+        "title": "CaseHistoryResponse",
+        "type": "object"
+      },
+      "CaseListResponse": {
+        "description": "Paginated list of review cases with a deterministic total order.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CaseSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "description": "Total number of matching cases (before pagination).",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "CaseListResponse",
+        "type": "object"
+      },
+      "CaseSummary": {
+        "description": "Summary of a review case (list view).",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "record_ref": {
+            "title": "Record Ref",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewStatus"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "dataset_id",
+          "snapshot_id",
+          "record_ref",
+          "status",
+          "title",
+          "summary",
+          "created_at",
+          "updated_at",
+          "version",
+          "created_by"
+        ],
+        "title": "CaseSummary",
+        "type": "object"
+      },
+      "CreateCaseRequest": {
+        "description": "Input contract for creating a review case.",
+        "properties": {
+          "created_by": {
+            "description": "Actor reference for the case creator (≤128 chars). Internal trusted context only.",
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_id": {
+            "description": "Opaque approved dataset identifier (lowercase kebab slug, ≤64 chars).",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "record_ref": {
+            "description": "Opaque stable reference to the reviewed record (≤256 chars; never a path).",
+            "title": "Record Ref",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "description": "Opaque exact snapshot identifier (lowercase kebab slug, ≤128 chars).",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional human-written investigation context.",
+            "title": "Summary"
+          },
+          "title": {
+            "description": "Concise case description.",
+            "maxLength": 240,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset_id",
+          "snapshot_id",
+          "record_ref",
+          "title",
+          "created_by"
+        ],
+        "title": "CreateCaseRequest",
+        "type": "object"
+      },
       "CsrfTokenResponse": {
         "description": "Bootstrap CSRF token for the future React client.\n\nThe same value is set in the readable CSRF cookie; the client must\necho it in the ``X-CSRF-Token`` header on every state-changing\nrequest. A CSRF token is not a credential.",
         "properties": {
@@ -60,6 +440,18 @@
         ],
         "title": "ErrorEnvelope",
         "type": "object"
+      },
+      "EventType": {
+        "description": "Controlled event-type vocabulary for the append-only ``case_events`` table.",
+        "enum": [
+          "created",
+          "note_added",
+          "status_changed",
+          "decision_recorded",
+          "reopened"
+        ],
+        "title": "EventType",
+        "type": "string"
       },
       "HealthLiveResponse": {
         "description": "Liveness: the API process can answer requests.",
@@ -250,6 +642,53 @@
         "title": "ReadinessResponse",
         "type": "object"
       },
+      "RecordDecisionRequest": {
+        "description": "Input contract for recording a structured decision.\n\nA decision is a status transition with an explicit outcome and a\nreview rationale. It is persisted as a ``decision_recorded`` event\n(and, when the outcome changes the status, a ``status_changed``\nevent in the same transaction).",
+        "properties": {
+          "actor_ref": {
+            "description": "Actor reference for the decision author (≤128 chars).",
+            "title": "Actor Ref",
+            "type": "string"
+          },
+          "expected_version": {
+            "description": "The case version the caller read; used for optimistic concurrency.",
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/ReviewStatus",
+            "description": "Decision outcome status (must be a legal transition from the current status)."
+          },
+          "rationale": {
+            "description": "Structured review rationale for the decision.",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome",
+          "rationale",
+          "actor_ref",
+          "expected_version"
+        ],
+        "title": "RecordDecisionRequest",
+        "type": "object"
+      },
+      "ReviewStatus": {
+        "description": "Controlled review-status vocabulary.\n\nA ``str`` enum so values survive JSON round-trips and SQLA string\ncolumns without custom serializers.",
+        "enum": [
+          "not_reviewed",
+          "under_review",
+          "explained_deviation",
+          "needs_source_verification",
+          "escalated_for_examination"
+        ],
+        "title": "ReviewStatus",
+        "type": "string"
+      },
       "Role": {
         "description": "Server-side application roles.",
         "enum": [
@@ -328,6 +767,171 @@
           "analysis_status"
         ],
         "title": "SourceSummary",
+        "type": "object"
+      },
+      "SyntheticRecordDetail": {
+        "description": "Full detail of one synthetic demonstration record.\n\nExplicitly fictional. No ML anomaly score is included. The evidence\nfields are illustrative descriptions, not measured results.",
+        "properties": {
+          "administrative_context": {
+            "title": "Administrative Context",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "description": {
+            "description": "Fictional description; NOT a research finding.",
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence_summary": {
+            "description": "Illustrative evidence description; not a measured result.",
+            "title": "Evidence Summary",
+            "type": "string"
+          },
+          "limitations": {
+            "description": "Explicit scientific limitations of the synthetic data.",
+            "title": "Limitations",
+            "type": "string"
+          },
+          "record_ref": {
+            "title": "Record Ref",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "synthetic": {
+            "default": true,
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_ref",
+          "title",
+          "description",
+          "evidence_summary",
+          "administrative_context",
+          "limitations",
+          "dataset_id",
+          "snapshot_id"
+        ],
+        "title": "SyntheticRecordDetail",
+        "type": "object"
+      },
+      "SyntheticRecordListResponse": {
+        "description": "List of synthetic demonstration records.",
+        "properties": {
+          "dataset_id": {
+            "description": "The synthetic dataset identifier.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SyntheticRecordSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "snapshot_id": {
+            "description": "The synthetic snapshot identifier.",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "dataset_id",
+          "snapshot_id"
+        ],
+        "title": "SyntheticRecordListResponse",
+        "type": "object"
+      },
+      "SyntheticRecordSummary": {
+        "description": "One synthetic demonstration record (list view).\n\nExplicitly fictional — NOT a research finding. The ``synthetic`` flag\nis always true; the ``label`` field carries the prominent\n``SYNTHETIC DEMONSTRATION RECORD`` warning.",
+        "properties": {
+          "dataset_id": {
+            "description": "Synthetic dataset identifier.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "record_ref": {
+            "description": "Stable opaque reference to the synthetic record.",
+            "title": "Record Ref",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "description": "Synthetic snapshot identifier.",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "synthetic": {
+            "default": true,
+            "description": "Always true for demonstration records.",
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "description": "Synthetic record title (always carries the SYNTHETIC warning).",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_ref",
+          "title",
+          "dataset_id",
+          "snapshot_id"
+        ],
+        "title": "SyntheticRecordSummary",
+        "type": "object"
+      },
+      "TransitionStatusRequest": {
+        "description": "Input contract for a status transition.",
+        "properties": {
+          "actor_ref": {
+            "description": "Actor reference for the transition author (≤128 chars).",
+            "title": "Actor Ref",
+            "type": "string"
+          },
+          "expected_version": {
+            "description": "The case version the caller read; used for optimistic concurrency.",
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "reason": {
+            "description": "Human-readable reason for the transition (required).",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/ReviewStatus",
+            "description": "Target status (must be a legal transition)."
+          }
+        },
+        "required": [
+          "to_status",
+          "reason",
+          "actor_ref",
+          "expected_version"
+        ],
+        "title": "TransitionStatusRequest",
         "type": "object"
       },
       "UserResponse": {
@@ -626,6 +1230,905 @@
         ]
       }
     },
+    "/api/v1/cases": {
+      "get": {
+        "description": "Paginated list of accessible review cases, deterministically ordered by created_at then id. Available to viewer, reviewer and admin.",
+        "operationId": "list_cases_api_v1_cases_get",
+        "parameters": [
+          {
+            "description": "Optional status filter.",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReviewStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional status filter.",
+              "title": "Status"
+            }
+          },
+          {
+            "description": "Page size (1–100).",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "description": "Page size (1–100).",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Page offset.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Page offset.",
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "List review cases",
+        "tags": [
+          "cases"
+        ]
+      },
+      "post": {
+        "description": "Creates a review case bound to a synthetic demonstration record. The actor is derived from the authenticated principal; client-supplied created_by is ignored. Requires reviewer or admin role.",
+        "operationId": "create_case_api_v1_cases_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCaseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Create a review case",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}": {
+      "get": {
+        "description": "Retrieves a single review case by its server-generated UUID. Available to viewer, reviewer and admin.",
+        "operationId": "get_case_api_v1_cases__case_id__get",
+        "parameters": [
+          {
+            "description": "Case UUID.",
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "description": "Case UUID.",
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Retrieve a review case",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/decisions": {
+      "post": {
+        "description": "Records a structured decision (outcome + rationale). When the outcome changes the status, a status_changed event is also written in the same transaction. The actor is derived from the authenticated principal. Requires reviewer or admin role.",
+        "operationId": "record_decision_api_v1_cases__case_id__decisions_post",
+        "parameters": [
+          {
+            "description": "Case UUID.",
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "description": "Case UUID.",
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Record a structured decision",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/history": {
+      "get": {
+        "description": "Returns the append-only event history for a case, deterministically ordered by case_version then event_seq. Available to viewer, reviewer and admin.",
+        "operationId": "get_case_history_api_v1_cases__case_id__history_get",
+        "parameters": [
+          {
+            "description": "Case UUID.",
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "description": "Case UUID.",
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseHistoryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Retrieve case event history",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/notes": {
+      "post": {
+        "description": "Appends a reviewer note as a note_added event and bumps the case version. The actor is derived from the authenticated principal. Requires reviewer or admin role.",
+        "operationId": "add_note_api_v1_cases__case_id__notes_post",
+        "parameters": [
+          {
+            "description": "Case UUID.",
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "description": "Case UUID.",
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Add a reviewer note",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/transitions": {
+      "post": {
+        "description": "Applies a legal status transition (PR-03 domain validator). The actor is derived from the authenticated principal. Requires reviewer or admin role.",
+        "operationId": "transition_status_api_v1_cases__case_id__transitions_post",
+        "parameters": [
+          {
+            "description": "Case UUID.",
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "description": "Case UUID.",
+              "title": "Case Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransitionStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad request."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Authentication required."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden (insufficient role or CSRF failure)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Case not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Optimistic concurrency conflict."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation error."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too many requests."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service not ready (database unavailable)."
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "summary": "Change review status",
+        "tags": [
+          "cases"
+        ]
+      }
+    },
     "/api/v1/health/live": {
       "get": {
         "description": "Proves the API process is answering requests. Performs no database, model, DVC or network access.",
@@ -809,6 +2312,101 @@
         "summary": "Get one approved source",
         "tags": [
           "sources"
+        ]
+      }
+    },
+    "/api/v1/synthetic/records": {
+      "get": {
+        "description": "Lists the deterministic synthetic demonstration records. Explicitly fictional — NOT research findings. Only available when the demonstration_sources flag is enabled.",
+        "operationId": "list_synthetic_records_api_v1_synthetic_records_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyntheticRecordListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Synthetic source not enabled."
+          }
+        },
+        "summary": "List synthetic demonstration records",
+        "tags": [
+          "synthetic"
+        ]
+      }
+    },
+    "/api/v1/synthetic/records/{record_ref}": {
+      "get": {
+        "description": "Fetches one synthetic demonstration record by its stable record_ref. Explicitly fictional — NOT a research finding.",
+        "operationId": "get_synthetic_record_api_v1_synthetic_records__record_ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_ref",
+            "required": true,
+            "schema": {
+              "title": "Record Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyntheticRecordDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Synthetic record not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Synthetic source not enabled."
+          }
+        },
+        "summary": "Get one synthetic demonstration record",
+        "tags": [
+          "synthetic"
         ]
       }
     }

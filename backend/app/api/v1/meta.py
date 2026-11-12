@@ -17,7 +17,7 @@ from app.contracts.common import MetaResponse
 
 router = APIRouter(tags=["metadata"])
 
-#: Implemented features (PR-02 + PR-03 + PR-04 scope).
+#: Implemented features (PR-02 + PR-03 + PR-04 + PR-05A + PR-05B scope).
 _IMPLEMENTED_FEATURES: dict[str, str] = {
     "health_endpoints": "implemented",
     "metadata_endpoint": "implemented",
@@ -26,7 +26,7 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "cors_configuration": "implemented",
     "source_registry_interface": "implemented",
     "openapi_contract_export": "implemented",
-    # PR-03: persistence foundation implemented; no public CRUD endpoints yet.
+    # PR-03: persistence foundation implemented.
     "review_case_persistence": "implemented",
     "append_only_case_history": "implemented",
     "optimistic_concurrency": "implemented",
@@ -39,10 +39,12 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "csrf_protection": "implemented",
     "login_throttling": "implemented",
     "authenticated_actor_identity": "implemented",
+    # PR-05B: authenticated case API + synthetic demonstration source.
+    "public_case_api": "implemented",
+    "synthetic_demonstration_source": "implemented",
+    "investigation_workflow": "implemented",
     # Still planned
-    "public_case_api": "planned",
     "user_management_api": "planned",
-    "case_management": "planned",
     "research_evidence_access": "planned",
     "record_lookup": "planned",
     "pmgsy_data_observatory": "planned",
@@ -50,17 +52,19 @@ _IMPLEMENTED_FEATURES: dict[str, str] = {
     "deployment": "planned",
 }
 
-#: Availability of major application subsystems (PR-04 state).
+#: Availability of major application subsystems (PR-05B state).
 _SUBSYSTEM_STATES: dict[str, str] = {
     "api": "available",
     "source_registry": "available",
-    # PR-03: persistence layer implemented (internal repository/service only).
+    # PR-03: persistence layer implemented.
     "review_case_persistence": "available",
     "database": "available",
-    # PR-04: authentication implemented (login/logout/me/csrf endpoints).
+    # PR-04: authentication implemented.
     "authentication": "available",
+    # PR-05B: public case API implemented.
+    "public_case_api": "available",
+    "synthetic_demonstration_source": "available",
     # Still not integrated
-    "public_case_api": "not_integrated",
     "research_evidence_service": "not_integrated",
 }
 

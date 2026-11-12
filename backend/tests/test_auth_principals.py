@@ -156,20 +156,31 @@ class TestUntrustedPrincipalRejection:
     def test_client_payload_actor_cannot_reach_service(
         self, auth_client, user_factory
     ):
-        """No HTTP surface accepts actor_ref: case routes do not exist, and
-        the auth contract has no actor field."""
-        user_factory("alice", PASSWORD, role="reviewer")
+        """PR-05B: the case API exists, but a client-supplied ``created_by``
+        is ignored — the server overwrites it with the authenticated
+        principal's user UUID. The created case's ``created_by`` field
+        must NOT equal the attacker-forged value.
+        """
+        user = user_factory("alice", PASSWORD, role="reviewer")
         login(auth_client, "alice", PASSWORD)
         csrf = auth_client.get("/api/v1/auth/csrf").json()["csrf_token"]
         response = auth_client.post(
             "/api/v1/cases",
             json={
-                "dataset_id": "ulb-benchmark",
-                "snapshot_id": "snap-001",
-                "record_ref": "row-1",
-                "title": "x",
+                "dataset_id": "synthetic-demonstration",
+                "snapshot_id": "synthetic-v1",
+                "record_ref": "synth-001",
+                "title": "forged-actor-test",
                 "created_by": "attacker-forged-actor",
             },
             headers={"X-CSRF-Token": csrf},
         )
-        assert response.status_code == 404  # route does not exist
+        assert response.status_code == 201, response.text
+        body = response.json()
+        # The server-derived created_by must be the principal's user UUID,
+        # NOT the client-supplied "attacker-forged-actor".
+        assert body["created_by"] == user.id
+        assert body["created_by"] != "attacker-forged-actor"
+        # The dataset_id / snapshot_id are also authoritative (synthetic).
+        assert body["dataset_id"] == "synthetic-demonstration"
+        assert body["snapshot_id"] == "synthetic-v1"

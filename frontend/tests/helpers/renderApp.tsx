@@ -155,13 +155,17 @@ export function authenticatedRoutes(user: TestUser = REVIEWER_USER): FetchRoute[
           auth_session_restore: "implemented",
           auth_throttle: "implemented",
           auth_roles: "implemented",
+          public_case_api: "implemented",
+          synthetic_demonstration_source: "implemented",
+          investigation_workflow: "implemented",
           research_evidence: "planned",
-          case_management: "planned",
         },
         subsystems: {
-          source_registry: "empty",
-          research_evidence: "not_integrated",
-          case_management: "not_integrated",
+          source_registry: "available",
+          authentication: "available",
+          public_case_api: "available",
+          synthetic_demonstration_source: "available",
+          research_evidence_service: "not_integrated",
         },
       },
     },
@@ -171,9 +175,49 @@ export function authenticatedRoutes(user: TestUser = REVIEWER_USER): FetchRoute[
       body: { sources: [], count: 0 },
     },
     {
+      urlContains: "/synthetic/records",
+      method: "GET",
+      status: 200,
+      body: SYNTHETIC_RECORDS_LIST,
+    },
+    // Note: the detail route /synthetic/records/{record_ref} is matched
+    // separately because the list route above uses urlContains which is a
+    // substring match. Tests that need the detail route must add it
+    // explicitly with the full path.
+    {
+      urlContains: "/cases",
+      method: "GET",
+      status: 200,
+      body: { items: [], total: 0, limit: 50, offset: 0 },
+    },
+    {
       urlContains: "/auth/me",
       status: 200,
       body: user,
     },
   ];
 }
+
+/** A fixed synthetic-records list for tests. */
+export const SYNTHETIC_RECORDS_LIST = {
+  items: [
+    { record_ref: "synth-001", title: "SYNTHETIC DEMONSTRATION RECORD", dataset_id: "synthetic-demonstration", snapshot_id: "synthetic-v1", synthetic: true },
+    { record_ref: "synth-002", title: "SYNTHETIC DEMONSTRATION RECORD", dataset_id: "synthetic-demonstration", snapshot_id: "synthetic-v1", synthetic: true },
+  ],
+  total: 2,
+  dataset_id: "synthetic-demonstration",
+  snapshot_id: "synthetic-v1",
+};
+
+/** A fixed synthetic-record detail for tests. */
+export const SYNTHETIC_RECORD_DETAIL = {
+  record_ref: "synth-001",
+  title: "SYNTHETIC DEMONSTRATION RECORD — NOT A RESEARCH FINDING",
+  description: "Fictional administrative record.",
+  evidence_summary: "Synthetic evidence.",
+  administrative_context: "Synthetic context.",
+  limitations: "Synthetic; no ML score claimed.",
+  dataset_id: "synthetic-demonstration",
+  snapshot_id: "synthetic-v1",
+  synthetic: true,
+};

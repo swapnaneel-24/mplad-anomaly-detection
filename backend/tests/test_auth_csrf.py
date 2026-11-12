@@ -158,15 +158,33 @@ class TestNoBypass:
         response = client.post("/api/v1/nonexistent", json={})
         assert response.status_code == 404
 
-    def test_no_public_case_mutation_routes(self, auth_client, user_factory):
-        """Review-case mutation routes remain absent (denied by nonexistence)."""
+    def test_case_mutation_routes_require_csrf(self, auth_client, user_factory):
+        """PR-05B case mutation routes exist and enforce CSRF.
+
+        Without a valid X-CSRF-Token header, every state-changing case
+        endpoint must reject with 403 CSRF_TOKEN_INVALID (not 404, not
+        201). This replaces the PR-03 assertion that the routes did not
+        exist.
+        """
         user_factory("alice", PASSWORD, role="reviewer")
         login(auth_client, "alice", PASSWORD)
-        csrf = get_csrf_token(auth_client)
-        for path in (
-            "/api/v1/cases",
-            "/api/v1/cases/00000000-0000-0000-0000-000000000000/notes",
-            "/api/v1/cases/00000000-0000-0000-0000-000000000000/decisions",
+        # Do NOT fetch / set the CSRF header — the request must be rejected.
+        for path, body in (
+            ("/api/v1/cases", {
+                "dataset_id": "synthetic-demonstration",
+                "snapshot_id": "synthetic-v1",
+                "record_ref": "synth-001",
+                "title": "t",
+                "created_by": "alice",
+            }),
+            ("/api/v1/cases/00000000-0000-0000-0000-000000000000/notes", {
+                "note_text": "x", "actor_ref": "alice", "expected_version": 1,
+            }),
+            ("/api/v1/cases/00000000-0000-0000-0000-000000000000/decisions", {
+                "outcome": "explained_deviation", "rationale": "x",
+                "actor_ref": "alice", "expected_version": 1,
+            }),
         ):
-            response = auth_client.post(path, json={}, headers={"X-CSRF-Token": csrf})
-            assert response.status_code == 404, path
+            response = auth_client.post(path, json=body)
+            assert response.status_code == 403, path
+            assert response.json()["error"]["code"] == "CSRF_TOKEN_INVALID"

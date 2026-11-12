@@ -59,10 +59,13 @@ class TestMeta:
         assert features["csrf_protection"] == "implemented"
         assert features["login_throttling"] == "implemented"
         assert features["authenticated_actor_identity"] == "implemented"
+        # PR-05B added implemented case API + synthetic source.
+        assert features["public_case_api"] == "implemented"
+        assert features["synthetic_demonstration_source"] == "implemented"
+        assert features["investigation_workflow"] == "implemented"
         # Still planned.
-        assert features["public_case_api"] == "planned"
         assert features["user_management_api"] == "planned"
-        assert features["case_management"] == "planned"
+        assert features["research_evidence_access"] == "planned"
         assert set(features.values()) <= {"implemented", "planned"}
 
     def test_subsystems_report_availability(self, client):
@@ -74,8 +77,10 @@ class TestMeta:
         assert subsystems["database"] == "available"
         # PR-04: authentication is available.
         assert subsystems["authentication"] == "available"
+        # PR-05B: public case API + synthetic source are available.
+        assert subsystems["public_case_api"] == "available"
+        assert subsystems["synthetic_demonstration_source"] == "available"
         # Not yet integrated.
-        assert subsystems["public_case_api"] == "not_integrated"
         assert subsystems["research_evidence_service"] == "not_integrated"
 
     def test_meta_contains_no_secrets_paths_or_hostnames(self, client):

@@ -24,6 +24,15 @@ EXPECTED_PATHS = {
     "/api/v1/auth/logout",
     "/api/v1/auth/me",
     "/api/v1/auth/csrf",
+    # PR-05B: synthetic demonstration records + authenticated case API.
+    "/api/v1/synthetic/records",
+    "/api/v1/synthetic/records/{record_ref}",
+    "/api/v1/cases",
+    "/api/v1/cases/{case_id}",
+    "/api/v1/cases/{case_id}/decisions",
+    "/api/v1/cases/{case_id}/history",
+    "/api/v1/cases/{case_id}/notes",
+    "/api/v1/cases/{case_id}/transitions",
 }
 
 
@@ -45,8 +54,17 @@ class TestOpenApiDeterminism:
 
     def test_schema_has_no_timestamps_or_random_ids(self):
         text = _serialize(create_app(settings=canonical_settings()).openapi())
-        for marker in ("timestamp", "generated_at", "uuid", "random"):
-            assert marker not in text.lower()
+        # The schema must not embed runtime timestamps or per-process
+        # random identifiers. The word "uuid" may appear in stable
+        # descriptions (e.g. "Case UUID.") — we check for actual UUID
+        # values and timestamp patterns instead.
+        import re
+
+        assert "timestamp" not in text.lower()
+        assert "generated_at" not in text.lower()
+        assert "random" not in text.lower()
+        # No concrete UUID values (only the descriptive word "UUID").
+        assert not re.search(r'"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"', text)
 
 
 class TestOpenApiContract:

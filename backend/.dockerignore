@@ -1,0 +1,40 @@
+# PEIARS backend build-context .dockerignore (PR-06B).
+#
+# Applied to the `backend/` build context used by compose.yaml's `backend`
+# and `migrate` services. Keeps the context small and guarantees no local
+# state reaches the daemon.
+
+# --- Local secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Local databases and virtual environments ---
+.pgdata/
+.venv/
+venv/
+*-backup/
+*.db
+*.db-journal
+
+# --- Python caches and test artifacts (the runtime image is NOT a test image) ---
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+tests/
+
+# --- The committed OpenAPI snapshot IS copied (contracts/) but no tooling
+#     that regenerates it at runtime. contracts/openapi.json is included. ---
+contracts/*.bak
+
+# --- IDE / OS junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

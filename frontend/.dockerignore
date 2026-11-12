@@ -1,0 +1,38 @@
+# PEIARS frontend build-context .dockerignore (PR-06B).
+#
+# Applied to the `frontend/` build context used by compose.yaml's `frontend`
+# service. The production image must contain only the built static bundle +
+# nginx config; no source-tree dev cruft, no test databases, no secrets.
+
+# --- Local secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Node modules and build outputs (regenerated inside the build stage) ---
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# --- Test artifacts (not part of the production runtime image) ---
+tests/
+playwright/
+screenshots/
+TEST_REPORT.md
+DESIGN_SYSTEM.md
+SCREEN_DESIGN_NOTES.md
+
+# --- Databases / virtualenvs / backups (never relevant here, but excluded
+#     for defense in depth per the universal policy) ---
+.pgdata/
+.venv/
+venv/
+*-backup/
+*.db
+
+# --- IDE / OS junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

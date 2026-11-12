@@ -1,0 +1,69 @@
+# PEIARS repository-root .dockerignore (PR-06B).
+#
+# Applied when the Docker build context is the repository root. The Compose
+# stack uses per-service contexts (backend/, frontend/) with their own
+# .dockerignore files; this root file covers any root-context build and
+# documents the universal exclusion policy.
+#
+# Universal policy (PR-06B baseline constraint #1): local workstation
+# databases, virtual environments, secrets, test caches and research datasets
+# are NEVER sent to the Docker daemon.
+
+# --- Local secrets (never in image layers) ---
+.env
+.env.*
+!.env.example
+.env.compose
+.env.compose.*
+
+# --- Local databases and virtual environments ---
+.pgdata/
+.pgdata-*/
+.venv/
+.venv-*/
+venv/
+*-backup/
+*.db
+*.db-journal
+deploy/pgdata/
+
+# --- Python caches ---
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Frontend build outputs and caches ---
+node_modules/
+**/node_modules/
+frontend/dist/
+*.tsbuildinfo
+.vite/
+screenshots/
+
+# --- Research datasets and large artifacts (frozen, never in app images) ---
+data/
+results/
+notebooks/
+*.zip
+*.pkl
+*.csv
+
+# --- IDE / OS junk ---
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- PEIARS delivery artifacts (not part of the application) ---
+pr06b-work/
+download/
+scratch/
+tool-results/

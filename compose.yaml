@@ -1,0 +1,177 @@
+# PEIARS local Compose stack (PR-06B).
+#
+# Three long-running services (db, backend, frontend) and one one-shot
+# migration service (`migrate`, profile-gated so it is never auto-started by
+# `docker compose up` — migrations are an explicit, reviewed step per
+# PR-03 §12 and the PR-06A final correction).
+#
+# Single browser-visible origin: only the `frontend` service publishes a host
+# port (default 8080). The backend is reachable only on the private Compose
+# network; PostgreSQL is not published at all. The frontend nginx proxies
+# /api/ to http://backend:8000 with full header preservation (see
+# frontend/nginx/default.conf).
+#
+# Local-development security context: PEIARS_ENVIRONMENT=development and
+# PEIARS_SESSION_COOKIE_SECURE=false so HttpOnly session cookies replay over
+# HTTP loopback. Production configuration (PEIARS_ENVIRONMENT=production) is
+# still rejected by the Settings model validator if SESSION_COOKIE_SECURE is
+# false — see backend/app/core/config.py.
+#
+# Variable substitution file: `.env.compose` (NOT the app's repo-root `.env`).
+# Pass it explicitly: `docker compose --env-file .env.compose ...`. See
+# .env.compose.example for the safe template. Required secrets
+# (POSTGRES_PASSWORD, PEIARS_SESSION_SECRET) use the `:?` substitution form,
+# so a missing secret fails compose config validation with a clear message
+# instead of silently starting with empty credentials.
+
+name: peiars
+
+services:
+  # --- PostgreSQL 16 (dedicated database service) ---------------------------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-peiars_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.compose (see .env.compose.example)}
+      POSTGRES_DB: ${POSTGRES_DB:-peiars_review}
+    volumes:
+      - peiars_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # pg_isready is provided by the postgres image. $$ escapes Compose
+      # substitution so the shell inside the container expands the env vars.
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - peiars-net
+    # No published port by default. To debug from the host, uncomment:
+    # ports:
+    #   - "${PEIARS_DB_DEBUG_PORT:-5433}:5432"
+    # The db service is on peiars-net; migrate and backend (also on
+    # peiars-net) resolve it as `db`. Without an explicit networks entry a
+    # service joins the default network and CANNOT reach `db`.
+
+  # --- One-shot Alembic migration service ----------------------------------
+  # Same image as `backend`. Profile-gated so `docker compose up` does NOT
+  # run it. Invoke explicitly:
+  #   docker compose --env-file .env.compose run --rm migrate
+  # Depends on db being healthy. Exits nonzero on migration failure (so a
+  # failed migration is never silently treated as success). Never modifies
+  # already-applied migrations in an incompatible way — `alembic upgrade head`
+  # is idempotent for an already-head database.
+  migrate:
+    image: peiars-backend
+    build:
+      context: ./backend
+    profiles:
+      - migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Same connection string the backend uses. migrations/env.py reads
+      # PEIARS_DATABASE_URL from the environment first, then the (absent)
+      # repo-root .env, then the alembic.ini placeholder.
+      PEIARS_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-peiars_app}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-peiars_review}
+      # Explicitly mark the database required so a missing URL would fail
+      # closed (defense in depth — the URL is constructed above, so this is
+      # belt-and-suspenders).
+      PEIARS_DATABASE_REQUIRED: "true"
+    working_dir: /app
+    command: ["alembic", "upgrade", "head"]
+    networks:
+      - peiars-net
+
+  # --- FastAPI backend ------------------------------------------------------
+  backend:
+    image: peiars-backend
+    build:
+      context: ./backend
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+      # NOTE: migrate is intentionally NOT a dependency. Migrations are an
+      # explicit operator step (see docs/dev/DOCKER_COMPOSE_GUIDE.md). The
+      # backend must NOT auto-migrate at startup. If the database is reachable
+      # but unmigrated, /api/v1/health/ready reports 503 with the `migrations`
+      # check unavailable (CONT-05) until the operator runs the migrate step.
+    environment:
+      PEIARS_ENVIRONMENT: ${PEIARS_ENVIRONMENT:-development}
+      PEIARS_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-peiars_app}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-peiars_review}
+      PEIARS_DATABASE_REQUIRED: "true"
+      # Required signing secret for CSRF tokens. The `:?` form fails compose
+      # config if unset/empty; the Settings validator additionally rejects
+      # placeholder markers (e.g. CHANGE_ME) at startup (CONT-02/CONT-03).
+      PEIARS_SESSION_SECRET: ${PEIARS_SESSION_SECRET:?Generate a 64-char hex secret; see .env.compose.example}
+      # Local HTTP stack: cookies must replay over http://localhost. Production
+      # (PEIARS_ENVIRONMENT=production) with this value false is rejected by
+      # the Settings model_validator.
+      PEIARS_SESSION_COOKIE_SECURE: ${PEIARS_SESSION_COOKIE_SECURE:-false}
+      PEIARS_DEMONSTRATION_SOURCES: ${PEIARS_DEMONSTRATION_SOURCES:-true}
+      # Browser-visible origin through the nginx proxy. Must match the host
+      # port published by `frontend` and the host you use in the browser.
+      PEIARS_CORS_ORIGINS: ${PEIARS_CORS_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
+      PEIARS_API_ROOT_PATH: /api/v1
+      PEIARS_API_HOST: "0.0.0.0"
+      PEIARS_API_PORT: "8000"
+      # Optional build provenance; left unset in the local stack (the app
+      # never fabricates a SHA). A CI deployment may set this to the commit.
+      # PEIARS_GIT_COMMIT_SHA: ""
+    # No published port: the browser reaches the API through the frontend
+    # nginx proxy only. To debug the backend directly, uncomment:
+    # ports:
+    #   - "${PEIARS_BACKEND_DEBUG_PORT:-8000}:8000"
+    networks:
+      - peiars-net
+
+  # --- Frontend (nginx static serve + /api reverse proxy) ------------------
+  frontend:
+    image: peiars-frontend
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    init: true
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      # The single browser-visible origin. Override the host port via
+      # PEIARS_FRONTEND_PORT in .env.compose if 8080 is taken.
+      - "${PEIARS_FRONTEND_PORT:-8080}:80"
+    networks:
+      - peiars-net
+
+volumes:
+  # Persistent review-case storage. Survives `docker compose down` and image
+  # rebuilds. Removed only by `docker compose down -v` (a DESTRUCTIVE command
+  # documented in docs/dev/CONTAINER_TROUBLESHOOTING.md).
+  #
+  # NO fixed `name:` is set: the volume is project-scoped
+  # (`<project>_peiars_pgdata`), so each Compose project (developer stack,
+  # second project, or a uniquely-named CI project) gets its own isolated
+  # database volume. This preserves data across `down`/`stop`/rebuilds within
+  # one project and lets `down -v` remove ONLY the selected project's volume.
+  #
+  # Migration note for existing installations that created the original
+  # global `peiars_pgdata` volume (PR-06B first delivery): after applying
+  # this correction, `docker compose up` creates a NEW project-scoped volume
+  # (`peiars_peiars_pgdata` for the default `peiars` project) and the database
+  # starts empty. To preserve existing data, copy the old volume once:
+  #   docker run --rm -v peiars_pgdata:/from -v peiars_peiars_pgdata:/to \
+  #     alpine sh -c 'cp -a /from/. /to/'
+  # then `docker volume rm peiars_pgdata` to retire the global name. This is a
+  # one-time manual step; no automatic data migration or deletion is performed.
+  peiars_pgdata:
+
+networks:
+  # Private bridge network. backend and frontend resolve each other by
+  # service name (backend, db). No host-network mode, no privileged
+  # containers, no Docker socket mounts.
+  peiars-net:
+    driver: bridge

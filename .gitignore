@@ -23,6 +23,7 @@ results/stream a/phase 4/FULL_phase4_evaluation_dataset.csv
 .env
 .env.*
 !.env.example
+!.env.compose.example
 
 # --- Python caches and virtual environments ---
 __pycache__/
@@ -45,9 +46,14 @@ frontend/dist/
 deploy/pgdata/
 deploy/**/pgdata/
 
+# --- PR-06B: Docker Compose local stack ---
+# .env.compose holds real Compose secrets (POSTGRES_PASSWORD,
+# PEIARS_SESSION_SECRET) and is NEVER committed. The .example template is
+# safe (placeholders only) and IS tracked.
+.env.compose
+.env.compose.*
+
 # --- Logs and OS junk ---
 *.log
 .DS_Store
 Thumbs.db
-
-.venv-backend/

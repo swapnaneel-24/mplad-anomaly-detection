@@ -224,6 +224,6 @@ class TestState4RequiredAndHealthy:
             db_session_factory.kw["bind"], db_session_factory
         )
         probes = maybe_build_postgres_readiness_probe(db_settings, db)
-        assert len(probes) == 1
-        assert probes[0].name == "postgresql"
-        assert probes[0].check() is True
+        # PR-06A final correction §5: connectivity + read-only schema state.
+        assert [p.name for p in probes] == ["postgresql", "migrations"]
+        assert all(p.check() is True for p in probes)

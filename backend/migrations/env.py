@@ -3,7 +3,11 @@
 The migration URL is resolved from (in priority order):
 
 1. the ``PEIARS_DATABASE_URL`` environment variable;
-2. the ``sqlalchemy.url`` key in ``alembic.ini`` (placeholder).
+2. the ``PEIARS_DATABASE_URL`` key in the repository-root ``.env`` file
+   (the same single local-configuration file that ``backend/scripts/serve.py``
+   loads — one documented procedure for every backend process, with no
+   manual export steps; see ``docs/dev/CONFIGURATION_INVENTORY.md``);
+3. the ``sqlalchemy.url`` key in ``alembic.ini`` (placeholder).
 
 Real credentials are never committed: they come from the uncommitted
 ``.env`` file or the deployment environment. Migrations never run
@@ -13,18 +17,27 @@ reviewed operation.
 The URL is passed directly to ``create_engine`` rather than through
 ``config.set_main_option`` to avoid configparser interpolation issues
 with URL-encoded characters (e.g. ``%2F`` in socket paths).
+
+The ``.env`` file is parsed with ``dotenv_values`` — which reads the
+file WITHOUT mutating ``os.environ`` — so explicitly exported
+environment variables keep their documented precedence over the file
+and the surrounding process environment is left untouched.
 """
 
 from __future__ import annotations
 
 import os
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from sqlalchemy import create_engine, pool
 
 from app.db.base import Base
 from app.db.models import CaseEvent, ReviewCase  # noqa: F401 — ensure models are imported
+
+#: Repository root: <repo>/backend/migrations/env.py -> parents[2].
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 config = context.config
 
@@ -36,10 +49,37 @@ config = context.config
 # manual `alembic` CLI usage but is not applied during programmatic
 # migration calls (command.upgrade / command.downgrade).
 
-# Resolve the database URL from the environment, falling back to the
-# alembic.ini placeholder.
-_migration_url = os.environ.get("PEIARS_DATABASE_URL") or config.get_main_option(
-    "sqlalchemy.url"
+
+def _local_env_database_url() -> str | None:
+    """Return ``PEIARS_DATABASE_URL`` from the repository-root ``.env``.
+
+    Uses ``dotenv_values`` (parse without mutating ``os.environ``) so the
+    documented precedence is preserved: an explicitly exported
+    environment variable always wins over the file. If ``python-dotenv``
+    is not installed this raises :class:`RuntimeError` with an actionable
+    message — a missing required local-boot dependency is never silently
+    ignored.
+    """
+    try:
+        from dotenv import dotenv_values
+    except ImportError as exc:  # pragma: no cover — simulated in tests
+        raise RuntimeError(
+            "python-dotenv is required to resolve the migration database URL "
+            "from the repository-root .env file. It is declared in "
+            "backend/requirements.txt — install the backend dependencies "
+            "with: pip install -r requirements.txt (or requirements-lock.txt "
+            "for the exact transitive freeze)."
+        ) from exc
+    value = dotenv_values(_REPO_ROOT / ".env").get("PEIARS_DATABASE_URL")
+    return value or None
+
+
+# Resolve the database URL: explicit environment variable first, then the
+# repository-root .env, then the alembic.ini placeholder.
+_migration_url = (
+    os.environ.get("PEIARS_DATABASE_URL")
+    or _local_env_database_url()
+    or config.get_main_option("sqlalchemy.url")
 )
 
 target_metadata = Base.metadata

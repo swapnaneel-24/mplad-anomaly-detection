@@ -18,4 +18,4 @@
 
 /* The composition area scrolls internally per-panel; the shell never
    scrolls vertically. Horizontal scroll is suppressed at supported
-   desktop widths; below 1280px the DesktopGate replaces the Outlet. */
+   desktop widths; below 1024px the DesktopGate replaces the Outlet. */

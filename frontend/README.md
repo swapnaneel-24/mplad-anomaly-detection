@@ -23,7 +23,8 @@ vertical stack of horizontal bands:
 4. **Workspace composition** (flexible) — purpose-specific multi-panel grid per workspace.
 5. **Provenance footer** (24px) — API status + version + git commit + request ID on error.
 
-**Desktop-only.** The minimum supported viewport width is 1280 CSS pixels.
+**Desktop-only.** The minimum supported viewport width is 1024 CSS pixels
+(PR-06A normalized minimum; earlier revisions said 1280).
 Below that, a `DesktopGate` panel replaces the composition area with a
 restrained width-restriction message. There is no mobile layout, no
 hamburger, no drawer.
@@ -39,25 +40,32 @@ template):
 
 ## Quick start
 
-```bash
-# 1. Install dependencies (Node 22 LTS or 24 LTS).
-cd frontend
-npm install
+> **Canonical startup guides (PR-06A):** `docs/dev/LOCAL_STARTUP_WINDOWS.md`
+> and `docs/dev/LOCAL_STARTUP_POSIX.md` walk a fresh checkout through
+> backend configuration (repository-root `.env`), migrations, user
+> provisioning, and both dev servers stage by stage. The summary below is
+> the short form.
 
-# 2. Start the backend (PR-04) on :8000. See backend/README.md for the
-#    full env-var list. Minimal local-HTTP development:
+```bash
+# 1. Install dependencies (Node 22 LTS or 24 LTS). npm ci works on a
+#    fresh checkout (no node_modules needed) as long as the committed
+#    package-lock.json is valid.
+cd frontend
+npm ci
+
+# 2. Configure the backend (PR-04+) on :8000 — copy backend/.env.example
+#    to the repository-root .env and fill it in (database URL, a real
+#    PEIARS_SESSION_SECRET, cookie secure=false for local HTTP). See
+#    docs/dev/CONFIGURATION_INVENTORY.md for every variable; serve.py
+#    and alembic both read the same .env file.
 cd ../backend
-PEIARS_DATABASE_URL=postgresql+psycopg://... \
-PEIARS_DATABASE_REQUIRED=true \
-PEIARS_SESSION_SECRET=$(openssl rand -hex 32) \
-PEIARS_SESSION_COOKIE_SECURE=false \
-PEIARS_CORS_ORIGINS='["http://127.0.0.1:5173"]' \
-  python scripts/serve.py
+alembic upgrade head
+python scripts/serve.py
 
 # 3. Start the Vite dev server on :5173.
 cd ../frontend
 npm run dev
-# Open http://127.0.0.1:5173/  (use a desktop browser ≥ 1280px wide)
+# Open http://127.0.0.1:5173/  (use a desktop browser ≥ 1024 CSS px wide)
 ```
 
 The Vite dev server proxies `/api/*` to `http://127.0.0.1:8000` (see
@@ -106,7 +114,7 @@ src/
     WorkspaceSwitcher.tsx     # Horizontal tab list (WAI-ARIA tabs)
     ContextStrip.tsx          # Workspace H1 + breadcrumb
     ProvenanceFooter.tsx      # API status + version + git commit
-    DesktopGate.tsx           # Width-restriction panel (< 1280px)
+    DesktopGate.tsx           # Width-restriction panel (< 1024px)
     workspaces.ts             # Canonical workspace metadata
   pages/
     LoginPage.tsx             # CSRF bootstrap + login form (unchanged)
@@ -164,11 +172,14 @@ and Vite, runs the tests, and tears everything down.
 bash scripts/run-e2e.sh
 ```
 
-See `TEST_REPORT.md` for the latest E2E results and screenshots.
+See `TEST_REPORT.md` for the PR-05A-era E2E report and screenshots
+(historical record, not updated per delivery); current verification
+results are documented in the latest delivery report (PR-06A correction:
+18 E2E tests passed).
 
 ## Known limitations
 
-- **Desktop-only.** No mobile layout. Below 1280px the DesktopGate replaces the composition.
+- **Desktop-only.** No mobile layout. Below 1024px the DesktopGate replaces the composition.
 - **Backend CORS allows GET/OPTIONS only.** The dev Vite proxy sidesteps; production assumes same-origin (PR-06+).
 - **No public case API yet.** Investigation Workspace shows honest deferred panels. Case CRUD arrives in PR-05B.
 - **No research-evidence service yet.** Anomaly Analysis shows a deferred canvas. Phase 3–6 figures are not exposed through the API.

@@ -51,9 +51,25 @@ class TestReadinessConfiguredHealthy:
     def test_db_probe_reports_ready(self, db_settings, db_session_factory):
         db = DatabaseSessionFactory(db_session_factory.kw["bind"], db_session_factory)
         probes = maybe_build_postgres_readiness_probe(db_settings, db)
-        assert len(probes) == 1
-        assert probes[0].name == "postgresql"
-        assert probes[0].check() is True
+        # PR-06A final correction §5: two probes — connectivity (SELECT 1)
+        # and read-only schema state (alembic_version == committed head).
+        assert [p.name for p in probes] == ["postgresql", "migrations"]
+        assert all(p.check() is True for p in probes)
+
+    def test_migrations_probe_matches_committed_head(self, db_session_factory):
+        """The schema-state probe compares against the committed head.
+
+        The migrated test database sits at head, and the committed
+        migrations directory's head must be exactly that revision.
+        """
+        from sqlalchemy import text
+
+        from app.services.db_readiness import _committed_head_revision
+
+        db = DatabaseSessionFactory(db_session_factory.kw["bind"], db_session_factory)
+        with db.engine.connect() as conn:
+            applied = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+        assert _committed_head_revision() == applied
 
     def test_ready_endpoint_200_with_db(self, db_client):
         response = db_client.get("/api/v1/health/ready")
@@ -62,6 +78,7 @@ class TestReadinessConfiguredHealthy:
         assert body["status"] == "ready"
         check_names = [c["name"] for c in body["checks"]]
         assert "postgresql" in check_names
+        assert "migrations" in check_names
 
     def test_live_still_200_with_db(self, db_client):
         response = db_client.get("/api/v1/health/live")
@@ -89,8 +106,10 @@ class TestReadinessConfiguredUnavailable:
         bad_engine = create_engine(bad_url, pool_pre_ping=True)
         db = DatabaseSessionFactory(bad_engine, create_session_factory(bad_engine))
         probes = maybe_build_postgres_readiness_probe(settings, db)
-        assert len(probes) == 1
-        assert probes[0].check() is False
+        # Both probes fail when the server rejects the connection: the
+        # schema-state probe cannot run without connectivity either.
+        assert [p.name for p in probes] == ["postgresql", "migrations"]
+        assert all(p.check() is False for p in probes)
 
     def test_ready_endpoint_503_when_db_unavailable(self, db_url):
         bad_url = self._bad_url(db_url)

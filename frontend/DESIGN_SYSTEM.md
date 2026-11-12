@@ -227,8 +227,8 @@ layout, no hamburger, no drawer, no collapsed icon rail.
 
 | Viewport width | Behaviour |
 |---|---|
-| `< 1280px` | **Unsupported.** A full-viewport gate panel replaces the application: "This analytical workbench requires a desktop-sized window (at least 1280 CSS pixels wide). Widen your browser window or use a desktop monitor." The gate is restrained (editorial serif heading, muted body text, no illustration). |
-| `1280–1365px` | Minimum supported. Workspace compositions use their compact grid variants (narrower rails, tighter gutters). No horizontal scrolling. |
+| `< 1024px` | **Unsupported.** A full-viewport gate panel replaces the application: "This analytical workbench requires a desktop-sized window (at least 1024 CSS pixels wide). Widen your browser window or use a desktop monitor." The gate is restrained (editorial serif heading, muted body text, no illustration). |
+| `1024–1365px` | Minimum supported (PR-06A normalized minimum; earlier revisions said 1280). Workspace compositions use their compact grid variants (narrower rails, tighter gutters). No horizontal scrolling. |
 | `1366–1439px` | Target (1366×768 laptop). Full multi-panel compositions. |
 | `1440–1919px` | Target (1440×900 laptop). Full multi-panel compositions. |
 | `≥ 1920px` | Target (1920×1080 desktop). Full multi-panel compositions; the central canvas in Analysis expands to use the extra width. |
@@ -240,9 +240,10 @@ than overflow.
 
 ### 5.4 Desktop-minimum-width gate
 
-A `<DesktopGate>` component wraps the authenticated application. It listens
-to `window.matchMedia("(min-width: 1280px)")`. When the query does not
-match, it renders the gate panel instead of `<AppShell>`. The gate:
+A `<DesktopGate>` component wraps the authenticated application. It checks
+the window width against the exported `DESKTOP_MIN_WIDTH` constant (1024,
+the PR-06A normalized minimum) on resize. When the width is below the
+minimum, it renders the gate panel instead of `<AppShell>`. The gate:
 
 * Does **not** hide the workspace switcher or identity bar (the user is
   still authenticated); it hides the **workspace composition** area and

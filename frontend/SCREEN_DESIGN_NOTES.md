@@ -381,14 +381,15 @@ audit trail.
 
 ## 9. Desktop-minimum-width gate
 
-When `window.innerWidth < 1280`, the workspace composition area is
+When `window.innerWidth < 1024` (the PR-06A normalized minimum; earlier
+revisions said 1280), the workspace composition area is
 replaced by a centered gate panel:
 
 ```
 Desktop window required
 
 PEIARS is an analytical workbench that requires a desktop-sized window.
-Widen your browser window to at least 1280 CSS pixels, or use a desktop
+Widen your browser window to at least 1024 CSS pixels, or use a desktop
 monitor.
 
 Current width: <N>px

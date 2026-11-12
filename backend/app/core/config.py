@@ -16,11 +16,12 @@ Security notes:
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 from pydantic import model_validator
 
 from app import APP_NAME, __version__
@@ -36,6 +37,43 @@ DEFAULT_CORS_ORIGINS: tuple[str, ...] = (
 
 EnvironmentName = Literal["development", "test", "production"]
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+
+#: A browser origin as it appears in the ``Origin`` header: an http/https
+#: scheme, a host (DNS name, IPv4, or a bracketed IPv6 literal) and an
+#: optional port. No path, query, wildcard or embedded JSON syntax —
+#: CORS origins are compared by exact string match, so anything else
+#: could never match a real browser origin anyway.
+_CORS_ORIGIN_PATTERN = re.compile(
+    r"^https?://"
+    r"(?:[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?"
+    r"|\[[0-9A-Fa-f:.]+\])"
+    r"(?::[0-9]{1,5})?$"
+)
+
+#: Placeholder markers that must never be accepted as a real signing
+#: secret (PR-06A correction). A value containing one of these markers is
+#: a template placeholder copied from an example file — possibly padded
+#: past the minimum length — not a generated secret. Activating
+#: authentication with it would let anyone who can read the repository
+#: forge CSRF tokens. The check is case-insensitive.
+_FORBIDDEN_SECRET_MARKERS: tuple[str, ...] = (
+    "change_me",
+    "changeme",
+    "replace_me",
+    "placeholder",
+    "generate_a_random",
+    "generate_a_unique",
+    "generate_your_own",
+    "your_secret",
+    "your_own_secret",
+    "example_secret",
+    "sample_secret",
+    "dummy_secret",
+    "secret_here",
+    "not_a_real_secret",
+    "do_not_use",
+    "todo_generate",
+)
 
 
 class Settings(BaseSettings):
@@ -64,8 +102,16 @@ class Settings(BaseSettings):
 
     # --- Cross-origin resource sharing ----------------------------------------
     #: Explicit allowed origins only. Wildcard origins are never combined
-    #: with credentials.
-    cors_origins: list[str] = Field(default_factory=lambda: list(DEFAULT_CORS_ORIGINS))
+    #: with credentials. The single documented representation is a
+    #: comma-separated string (see ``backend/.env.example``); ``NoDecode``
+    #: keeps pydantic-settings from JSON-decoding the raw environment /
+    #: ``.env`` value before the validator below can parse it (with the
+    #: library's default complex-field decoding, a comma-separated value
+    #: raises an opaque ``SettingsError`` before any field validator
+    #: runs, and a JSON array never reaches the validator as a string).
+    cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: list(DEFAULT_CORS_ORIGINS)
+    )
 
     # --- Build provenance -----------------------------------------------------
     #: Supplied by the deployment environment only; never fabricated.
@@ -146,11 +192,37 @@ class Settings(BaseSettings):
     @field_validator("session_secret", mode="after")
     @classmethod
     def _validate_session_secret(cls, value: str | None) -> str | None:
-        """Require at least 32 characters of secret material when set."""
-        if value is not None and len(value) < 32:
+        """Require real secret material when a signing secret is configured.
+
+        Two independent checks (PR-06A correction — neither may be weakened):
+
+        1. At least 32 characters, so short guesses are rejected.
+        2. No template-placeholder markers. This catches values copied
+           unchanged from ``.env.example`` even when they are long enough
+           to satisfy the length check (e.g. the former 46-character
+           ``CHANGE_ME_GENERATE_A_RANDOM_64_CHAR_HEX_STRING`` placeholder,
+           which passed the length check and would have activated
+           authentication with a publicly known signing secret).
+        """
+        if value is None:
+            return None
+        if len(value) < 32:
             raise ValueError(
                 "session_secret must be at least 32 characters when configured; "
                 "generate a unique random value (e.g. `openssl rand -hex 32`)."
+            )
+        lowered = value.lower()
+        matched = next(
+            (marker for marker in _FORBIDDEN_SECRET_MARKERS if marker in lowered),
+            None,
+        )
+        if matched is not None:
+            raise ValueError(
+                "session_secret contains the placeholder marker "
+                f"{matched!r}; it cannot be used to sign CSRF tokens. "
+                "Generate a unique random value instead — see the commands in "
+                "backend/.env.example or docs/dev/LOCAL_STARTUP_WINDOWS.md "
+                "(Stage 4)."
             )
         return value
 
@@ -165,11 +237,54 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _parse_cors_origins(cls, value: object) -> object:
-        """Accept a comma-separated string (as used in ``.env`` files)."""
+        """Parse the documented comma-separated allowed-origin list.
+
+        The one documented representation (``backend/.env.example`` and
+        ``docs/dev/CONFIGURATION_INVENTORY.md``) is a comma-separated
+        string of origins. ``NoDecode`` on the field guarantees the raw
+        string reaches this validator from both the environment-variable
+        source and the ``.env``-file source. Anything that is not a valid
+        origin fails with an actionable message instead of silently
+        producing unusable allow-list entries — in particular:
+
+        * the wildcard ``*`` is prohibited (credentials are always
+          enabled, so the allow-list must stay explicit);
+        * JSON-array syntax (``["http://a.example", ...]``) is rejected —
+          it is NOT the documented representation;
+        * values with a path, query, or embedded quotes/brackets are
+          rejected as never-matchable origins.
+
+        An explicitly empty value is accepted and produces an empty
+        allow-list: no CORS middleware is installed and the API allows no
+        cross-origin browser access (fail-safe, never fail-open).
+        """
         if isinstance(value, str):
             parts = [origin.strip() for origin in value.split(",")]
-            return [origin for origin in parts if origin]
-        return value
+            parsed = [origin for origin in parts if origin]
+        elif isinstance(value, (list, tuple)):
+            parsed = [origin.strip() if isinstance(origin, str) else str(origin) for origin in value]
+        else:
+            raise ValueError(
+                "cors_origins must be a comma-separated string of allowed "
+                f"origins (received {type(value).__name__}); e.g. "
+                "PEIARS_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173"
+            )
+        for origin in parsed:
+            if origin == "*":
+                raise ValueError(
+                    "cors_origins must not contain the wildcard '*' — "
+                    "credentials are enabled, so the allow-list must be "
+                    "explicit."
+                )
+            if not _CORS_ORIGIN_PATTERN.match(origin):
+                raise ValueError(
+                    f"cors_origins entry {origin!r} is not a valid browser "
+                    "origin (expected scheme://host[:port], e.g. "
+                    "http://localhost:5173). The documented representation "
+                    "is a plain comma-separated list — JSON-array syntax is "
+                    "not supported."
+                )
+        return parsed
 
     @field_validator("git_commit_sha", mode="before")
     @classmethod

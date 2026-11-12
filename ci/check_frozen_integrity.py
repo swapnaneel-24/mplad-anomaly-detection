@@ -36,11 +36,10 @@ MANIFEST_PATH = REPO_ROOT / "ci" / "frozen_research_manifest.json"
 
 
 def sha256(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(65536), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    data = path.read_bytes()
+    if b"\x00" not in data:
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def main() -> int:

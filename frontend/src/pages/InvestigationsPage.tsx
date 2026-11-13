@@ -463,6 +463,12 @@ export function InvestigationsPage(): JSX.Element {
 
   const handleReloadAfterConflict = useCallback(async () => {
     if (!caseDetail) return;
+    // PR-07A D1: capture the selection generation at handler entry. Every
+    // other async read path on this page is guarded by selectionGenRef;
+    // the conflict-recovery path must be too — a recovery response that
+    // settles after the user selected a different case must not overwrite
+    // the new selection's detail/history or clear its loading state.
+    const currentGen = selectionGenRef.current;
     setMutationError(null);
     setConflictVersion(null);
     setLoadingDetail(true);
@@ -471,12 +477,16 @@ export function InvestigationsPage(): JSX.Element {
         getCase(caseDetail.id),
         getCaseHistory(caseDetail.id),
       ]);
+      if (selectionGenRef.current !== currentGen) return; // stale selection
       setCaseDetail(detail);
       setHistory(hist);
     } catch (err) {
+      if (selectionGenRef.current !== currentGen) return; // stale selection
       setDetailError(err instanceof ApiError ? err : null);
     } finally {
-      setLoadingDetail(false);
+      if (selectionGenRef.current === currentGen) {
+        setLoadingDetail(false);
+      }
     }
   }, [caseDetail]);
 

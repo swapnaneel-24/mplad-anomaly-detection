@@ -54,6 +54,8 @@ def create_engine_from_settings(
             "create_engine_from_settings called without a configured database_url. "
             "The database engine must not be created when PostgreSQL is not configured."
         )
+    if "connect_timeout" not in settings.database_url and "connect_args" not in engine_kwargs:
+        engine_kwargs["connect_args"] = {"connect_timeout": 3}
     return create_engine(
         settings.database_url,
         echo=echo,

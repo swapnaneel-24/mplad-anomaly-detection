@@ -5,7 +5,7 @@
 // - Enter/Space activates the focused tab.
 // - No mobile drawer / hamburger / Escape-to-close behavior.
 
-import { cleanup, screen, within } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,8 +52,8 @@ describe("keyboard interaction (horizontal switcher)", () => {
   it("Arrow Right moves focus to the next tab and Enter activates it", async () => {
     const user = userEvent.setup();
     renderApp({ initialEntries: ["/overview"] });
-    await screen.findByRole("heading", { name: "Study Overview", level: 1 });
-
+    const heading = await screen.findByRole("heading", { name: "Study Overview", level: 1 });
+    await waitFor(() => expect(heading).toHaveFocus());
     const switcher = screen.getByRole("tablist", { name: "Workspaces" });
     const overviewTab = within(switcher).getByRole("tab", { name: /Overview/ });
     overviewTab.focus();
@@ -72,8 +72,8 @@ describe("keyboard interaction (horizontal switcher)", () => {
   it("Arrow Left wraps to the last tab from the first tab", async () => {
     const user = userEvent.setup();
     renderApp({ initialEntries: ["/overview"] });
-    await screen.findByRole("heading", { name: "Study Overview", level: 1 });
-
+    const heading = await screen.findByRole("heading", { name: "Study Overview", level: 1 });
+    await waitFor(() => expect(heading).toHaveFocus());
     const switcher = screen.getByRole("tablist", { name: "Workspaces" });
     const overviewTab = within(switcher).getByRole("tab", { name: /Overview/ });
     overviewTab.focus();

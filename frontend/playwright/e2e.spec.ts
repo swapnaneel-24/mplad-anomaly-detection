@@ -544,4 +544,93 @@ test.describe("PEIARS PR-05B investigation workflow", () => {
       await ctx.close();
     }
   });
+
+  // PR-07B RC-05: one continuous, authenticated, same-case browser workflow.
+  // Unlike tests #1-#9 (which cover individual steps with fresh logins
+  // between them), this test runs the full investigation lifecycle in a
+  // single browser page with one authenticated session: login → select
+  // record → create case → add note → transition → decision → verify
+  // history → refresh (same session) → verify persistence → logout →
+  // re-login → verify case still available. The case title is unique to
+  // avoid collision with the "E2E investigation case" created by test #3.
+  test("19. RC-05 integrated workflow: full authenticated lifecycle in one session", async ({ page, context }) => {
+    const uniqueTitle = `RC-05 integrated ${Date.now()}`;
+
+    // --- Step 1: log in once ---
+    await page.goto("/login");
+    await page.getByLabel("Username").fill(REVIEWER_USERNAME);
+    await page.getByLabel("Password").fill(REVIEWER_PASSWORD);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/overview/);
+
+    // --- Step 2: navigate to Investigations ---
+    await page.getByRole("tab", { name: /Investigations/ }).click();
+    await expect(page.getByRole("heading", { name: "Investigation Workspace", level: 1 })).toBeVisible();
+    await expect(page.getByText("synth-001")).toBeVisible({ timeout: 10_000 });
+
+    // --- Step 3: select a synthetic record ---
+    await page.getByLabel("Record and case index").getByText("synth-001").click();
+    await expect(page.getByText(/SYNTHETIC DEMONSTRATION RECORD — NOT A RESEARCH FINDING/i)).toBeVisible();
+
+    // --- Step 4: create a review case ---
+    await page.getByLabel("Title").fill(uniqueTitle);
+    await page.getByRole("button", { name: "Create case" }).click();
+    await expect(page.getByLabel("Record and case index").getByText(uniqueTitle)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Case ID")).toBeVisible();
+
+    // --- Step 5: add a note ---
+    await expect(page.getByLabel("Note")).toBeVisible({ timeout: 10_000 });
+    await page.getByLabel("Note").fill("RC-05 integrated workflow note");
+    await page.getByRole("button", { name: "Add note" }).click();
+    await expect(page.getByRole("heading", { name: "Add note (v2)" })).toBeVisible({ timeout: 5_000 });
+
+    // --- Step 6: transition to under_review ---
+    await expect(page.getByLabel("Reason")).toBeVisible({ timeout: 10_000 });
+    await page.getByLabel("Reason").fill("RC-05 integrated transition");
+    await page.getByRole("button", { name: "Apply transition" }).click();
+    await expect(page.getByLabel("Evidence examination").getByText("Under review")).toBeVisible({ timeout: 5_000 });
+
+    // --- Step 7: record a decision ---
+    await expect(page.getByLabel("Rationale")).toBeVisible({ timeout: 10_000 });
+    await page.getByLabel("Rationale").fill("RC-05 integrated decision rationale");
+    await page.getByRole("button", { name: "Record decision" }).click();
+    await expect(page.getByLabel("Evidence examination").getByText("Explained deviation")).toBeVisible({ timeout: 5_000 });
+
+    // --- Step 8: verify event history shows all events in order ---
+    const historyPanel = page.getByLabel("Review and history");
+    await expect(historyPanel.getByText("Case created")).toBeVisible();
+    await expect(historyPanel.getByText("Note added")).toBeVisible();
+    expect(await historyPanel.getByText("Status changed").count()).toBeGreaterThanOrEqual(1);
+    await expect(historyPanel.getByText("Decision recorded")).toBeVisible();
+
+    // --- Step 9: refresh the browser (same session) ---
+    await page.reload();
+    await expect(page).toHaveURL(/\/investigations/);
+    await expect(page.getByLabel("Record and case index").getByText(uniqueTitle)).toBeVisible();
+    // The session cookie persisted across the reload.
+    const cookies = await context.cookies();
+    expect(cookies.some((c) => c.name === "peiars_session")).toBeTruthy();
+
+    // --- Step 10: log out ---
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await expect(page).toHaveURL(/\/login/);
+    // Protected access is rejected after logout.
+    await page.goto("/investigations");
+    await expect(page).toHaveURL(/\/login/);
+
+    // --- Step 11: log back in ---
+    await page.getByLabel("Username").fill(REVIEWER_USERNAME);
+    await page.getByLabel("Password").fill(REVIEWER_PASSWORD);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByRole("tab", { name: /Investigations/ }).click();
+
+    // --- Step 12: verify the case remains available ---
+    await expect(page.getByLabel("Record and case index").getByText(uniqueTitle)).toBeVisible({ timeout: 10_000 });
+    // Re-open the case and verify its persisted state.
+    await page.getByLabel("Record and case index").getByText(uniqueTitle).click();
+    await expect(page.getByLabel("Evidence examination").getByText("Explained deviation")).toBeVisible({ timeout: 10_000 });
+    // The history still shows all events.
+    await expect(historyPanel.getByText("Case created")).toBeVisible();
+    await expect(historyPanel.getByText("Decision recorded")).toBeVisible();
+  });
 });

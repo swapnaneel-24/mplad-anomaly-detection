@@ -276,3 +276,56 @@ export interface CaseHistoryResponse {
   items: CaseEventRecord[];
   total: number;
 }
+
+// --- Research (PR-08: read-only frozen scientific results) --------------
+
+export interface ResearchSourceSummary {
+  source_id: string;
+  dataset_id: string;
+  research_family: string;
+  model_methods: string[];
+  result_type: string;
+  result_granularity: string;
+  availability: string;
+}
+
+export interface ResearchSourceListResponse {
+  items: ResearchSourceSummary[];
+  count: number;
+}
+
+export interface ResearchSourceDetail extends ResearchSourceSummary {
+  artifact_path: string;
+  artifact_sha256: string;
+  digest_algorithm: string;
+  canonicalization: string;
+  experimental_context: Record<string, unknown>;
+  limitations: string[];
+}
+
+export interface ResearchResultItem {
+  metric_name: string;
+  value: number | string;
+  value_type: "int" | "float" | "str";
+  description: string;
+}
+
+export interface ResearchProvenance {
+  artifact_path: string;
+  artifact_sha256: string;
+  digest_algorithm: string;
+  canonicalization: string;
+}
+
+export interface ResearchResultsResponse {
+  source_id: string;
+  dataset_id: string;
+  model_methods: string[];
+  results: ResearchResultItem[];
+  interpretation_principles: string[];
+  exploratory_caveat: string;
+  provenance: ResearchProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}

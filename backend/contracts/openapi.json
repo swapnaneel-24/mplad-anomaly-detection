@@ -677,6 +677,365 @@
         "title": "RecordDecisionRequest",
         "type": "object"
       },
+      "ResearchProvenance": {
+        "description": "Provenance of a precomputed research result (artifact + digest).",
+        "properties": {
+          "artifact_path": {
+            "description": "Repository-relative path to the frozen artifact.",
+            "title": "Artifact Path",
+            "type": "string"
+          },
+          "artifact_sha256": {
+            "description": "SHA-256 digest of the frozen artifact bytes.",
+            "title": "Artifact Sha256",
+            "type": "string"
+          },
+          "canonicalization": {
+            "description": "Byte canonicalization applied before hashing. 'frozen-checker-compatible' matches ci/check_frozen_integrity.py.",
+            "enum": [
+              "raw-bytes",
+              "frozen-checker-compatible"
+            ],
+            "title": "Canonicalization",
+            "type": "string"
+          },
+          "digest_algorithm": {
+            "const": "sha-256",
+            "description": "Digest algorithm.",
+            "title": "Digest Algorithm",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_path",
+          "artifact_sha256",
+          "digest_algorithm",
+          "canonicalization"
+        ],
+        "title": "ResearchProvenance",
+        "type": "object"
+      },
+      "ResearchResultItem": {
+        "description": "One precomputed aggregate reference value with its description.\n\n``value_type`` records the primitive type of ``value`` so a consumer\ncan parse the value without guessing; it is one of ``\"int\"``,\n``\"float\"`` or ``\"str\"``.",
+        "properties": {
+          "description": {
+            "description": "Human-readable description of the metric.",
+            "title": "Description",
+            "type": "string"
+          },
+          "metric_name": {
+            "description": "Stable metric identifier.",
+            "title": "Metric Name",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The precomputed value (an int, a float or a str).",
+            "title": "Value"
+          },
+          "value_type": {
+            "description": "Primitive type of ``value``: int, float or str.",
+            "enum": [
+              "int",
+              "float",
+              "str"
+            ],
+            "title": "Value Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric_name",
+          "value",
+          "value_type",
+          "description"
+        ],
+        "title": "ResearchResultItem",
+        "type": "object"
+      },
+      "ResearchResultsResponse": {
+        "description": "Precomputed research results with full provenance.\n\nEvery field except ``results`` is metadata / provenance. The\n``results`` list carries the 18 frozen aggregate reference values from\nthe ULB credit-card fraud benchmark experiment (Stream A, Phase 6).",
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "exploratory_caveat": {
+            "description": "Post-hoc selection caveat reused verbatim from Phase 5A.",
+            "title": "Exploratory Caveat",
+            "type": "string"
+          },
+          "interpretation_principles": {
+            "description": "Frozen interpretation principles every consumer must respect.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Interpretation Principles",
+            "type": "array"
+          },
+          "is_live_prediction": {
+            "const": false,
+            "default": false,
+            "description": "Always false: this endpoint never produces a live prediction.",
+            "title": "Is Live Prediction",
+            "type": "boolean"
+          },
+          "is_precomputed": {
+            "const": true,
+            "default": true,
+            "description": "Always true: results are precomputed and frozen, never recomputed on request.",
+            "title": "Is Precomputed",
+            "type": "boolean"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_methods": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Methods",
+            "type": "array"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/ResearchProvenance"
+          },
+          "results": {
+            "description": "The precomputed aggregate reference values.",
+            "items": {
+              "$ref": "#/components/schemas/ResearchResultItem"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "model_methods",
+          "results",
+          "interpretation_principles",
+          "exploratory_caveat",
+          "provenance",
+          "limitations"
+        ],
+        "title": "ResearchResultsResponse",
+        "type": "object"
+      },
+      "ResearchSourceDetail": {
+        "description": "Full metadata for one read-only research source, with provenance.\n\nExtends :class:`ResearchSourceSummary` with the frozen-artifact\nprovenance and the experimental context the results were produced\nunder (frozen, never recomputed).",
+        "properties": {
+          "artifact_path": {
+            "description": "Repository-relative path to the frozen artifact (never absolute).",
+            "title": "Artifact Path",
+            "type": "string"
+          },
+          "artifact_sha256": {
+            "description": "SHA-256 digest of the frozen artifact bytes.",
+            "title": "Artifact Sha256",
+            "type": "string"
+          },
+          "availability": {
+            "description": "Whether the source is currently servable. 'registered' means the source is approved but not yet verified at runtime; 'available' means verified and servable; 'unavailable' means the artifact is missing or failed integrity verification.",
+            "enum": [
+              "available",
+              "unavailable",
+              "registered"
+            ],
+            "title": "Availability",
+            "type": "string"
+          },
+          "canonicalization": {
+            "description": "How the artifact bytes were canonicalized before hashing. 'frozen-checker-compatible' matches ci/check_frozen_integrity.py (CRLF→LF for text files, raw for binary).",
+            "enum": [
+              "raw-bytes",
+              "frozen-checker-compatible"
+            ],
+            "title": "Canonicalization",
+            "type": "string"
+          },
+          "dataset_id": {
+            "description": "Frozen dataset the reported results pertain to.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "digest_algorithm": {
+            "const": "sha-256",
+            "description": "Digest algorithm used for provenance.",
+            "title": "Digest Algorithm",
+            "type": "string"
+          },
+          "experimental_context": {
+            "additionalProperties": true,
+            "description": "Frozen experimental parameters the results were produced under (sample size, label count, threshold rule, run ids, detector grids).",
+            "title": "Experimental Context",
+            "type": "object"
+          },
+          "limitations": {
+            "description": "Scientific limitations that apply to every result from this source.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_methods": {
+            "description": "Detector methods whose aggregate results are reported.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Methods",
+            "type": "array"
+          },
+          "research_family": {
+            "description": "Research stream or family the source belongs to.",
+            "title": "Research Family",
+            "type": "string"
+          },
+          "result_granularity": {
+            "description": "Aggregation level of the reported results.",
+            "title": "Result Granularity",
+            "type": "string"
+          },
+          "result_type": {
+            "description": "Kind of result exposed by this source.",
+            "title": "Result Type",
+            "type": "string"
+          },
+          "source_id": {
+            "description": "Opaque research-source identifier (never a filesystem path).",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "supporting_artifacts": {
+            "description": "Supporting frozen artifacts consumed by the adapter (path, SHA-256, role). Each artifact's digest is verified against the trusted frozen manifest before its bytes are parsed.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Supporting Artifacts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "research_family",
+          "model_methods",
+          "result_type",
+          "result_granularity",
+          "availability",
+          "artifact_path",
+          "artifact_sha256",
+          "digest_algorithm",
+          "canonicalization",
+          "experimental_context",
+          "limitations"
+        ],
+        "title": "ResearchSourceDetail",
+        "type": "object"
+      },
+      "ResearchSourceListResponse": {
+        "description": "List of approved read-only research sources.",
+        "properties": {
+          "count": {
+            "description": "Number of items in ``items``.",
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "description": "Approved research sources in deterministic order.",
+            "items": {
+              "$ref": "#/components/schemas/ResearchSourceSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "ResearchSourceListResponse",
+        "type": "object"
+      },
+      "ResearchSourceSummary": {
+        "description": "Public summary of one approved read-only research source.\n\nCarries no provenance or experimental detail: it is the list-view\ndescriptor. Use the detail endpoint for artifact provenance and the\nfrozen experimental context.",
+        "properties": {
+          "availability": {
+            "description": "Whether the source is currently servable. 'registered' means the source is approved but not yet verified at runtime; 'available' means verified and servable; 'unavailable' means the artifact is missing or failed integrity verification.",
+            "enum": [
+              "available",
+              "unavailable",
+              "registered"
+            ],
+            "title": "Availability",
+            "type": "string"
+          },
+          "dataset_id": {
+            "description": "Frozen dataset the reported results pertain to.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "model_methods": {
+            "description": "Detector methods whose aggregate results are reported.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Methods",
+            "type": "array"
+          },
+          "research_family": {
+            "description": "Research stream or family the source belongs to.",
+            "title": "Research Family",
+            "type": "string"
+          },
+          "result_granularity": {
+            "description": "Aggregation level of the reported results.",
+            "title": "Result Granularity",
+            "type": "string"
+          },
+          "result_type": {
+            "description": "Kind of result exposed by this source.",
+            "title": "Result Type",
+            "type": "string"
+          },
+          "source_id": {
+            "description": "Opaque research-source identifier (never a filesystem path).",
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "research_family",
+          "model_methods",
+          "result_type",
+          "result_granularity",
+          "availability"
+        ],
+        "title": "ResearchSourceSummary",
+        "type": "object"
+      },
       "ReviewStatus": {
         "description": "Controlled review-status vocabulary.\n\nA ``str`` enum so values survive JSON round-trips and SQLA string\ncolumns without custom serializers.",
         "enum": [
@@ -2202,6 +2561,178 @@
         "summary": "Application metadata",
         "tags": [
           "metadata"
+        ]
+      }
+    },
+    "/api/v1/research/sources": {
+      "get": {
+        "description": "Lists the approved, read-only research sources. Every served value is a precomputed, frozen, manifest-verified aggregate reference value; this endpoint never fits a model, recomputes a threshold or produces a live prediction. Publicly readable (GET-only, non-sensitive precomputed reference values per FR-03 / ADR-007).",
+        "operationId": "list_research_sources_api_v1_research_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchSourceListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source not found."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source unavailable or integrity failure."
+          }
+        },
+        "summary": "List approved research sources",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/sources/{source_id}": {
+      "get": {
+        "description": "Fetches the full metadata for one approved read-only research source, including the frozen-artifact provenance (path, SHA-256, digest algorithm, canonicalization) and the frozen experimental context. Unknown identifiers return SOURCE_NOT_FOUND. Available to viewer, reviewer and admin.",
+        "operationId": "get_research_source_api_v1_research_sources__source_id__get",
+        "parameters": [
+          {
+            "description": "Opaque research-source identifier.",
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "description": "Opaque research-source identifier.",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchSourceDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source unavailable or integrity failure."
+          }
+        },
+        "summary": "Get one research source's metadata",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/sources/{source_id}/results": {
+      "get": {
+        "description": "Fetches the precomputed aggregate reference values for one approved read-only research source, with full provenance, the frozen interpretation principles, the exploratory-selection caveat and the scientific limitations. The response always carries is_precomputed=true and is_live_prediction=false. Unknown identifiers return SOURCE_NOT_FOUND. Available to viewer, reviewer and admin.",
+        "operationId": "get_research_results_api_v1_research_sources__source_id__results_get",
+        "parameters": [
+          {
+            "description": "Opaque research-source identifier.",
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "description": "Opaque research-source identifier.",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchResultsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Research source unavailable or integrity failure."
+          }
+        },
+        "summary": "Get precomputed research results",
+        "tags": [
+          "research"
         ]
       }
     },

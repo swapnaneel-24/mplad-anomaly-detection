@@ -193,6 +193,123 @@ export interface RecordDecisionRequest {
   rationale: string;
 };
 
+/** Provenance of a precomputed research result (artifact + digest). */
+export interface ResearchProvenance {
+  /** Repository-relative path to the frozen artifact. */
+  artifact_path: string;
+  /** SHA-256 digest of the frozen artifact bytes. */
+  artifact_sha256: string;
+  /** Byte canonicalization applied before hashing. 'frozen-checker-compatible' matches ci/check_frozen_integrity.py. */
+  canonicalization: "raw-bytes" | "frozen-checker-compatible";
+  /** Digest algorithm. */
+  digest_algorithm: "sha-256";
+};
+
+/** One precomputed aggregate reference value with its description.
+
+``value_type`` records the primitive type of ``value`` so a consumer
+can parse the value without guessing; it is one of ``"int"``,
+``"float"`` or ``"str"``. */
+export interface ResearchResultItem {
+  /** Human-readable description of the metric. */
+  description: string;
+  /** Stable metric identifier. */
+  metric_name: string;
+  /** The precomputed value (an int, a float or a str). */
+  value: number | number | string;
+  /** Primitive type of ``value``: int, float or str. */
+  value_type: "int" | "float" | "str";
+};
+
+/** Precomputed research results with full provenance.
+
+Every field except ``results`` is metadata / provenance. The
+``results`` list carries the 18 frozen aggregate reference values from
+the ULB credit-card fraud benchmark experiment (Stream A, Phase 6). */
+export interface ResearchResultsResponse {
+  dataset_id: string;
+  /** Post-hoc selection caveat reused verbatim from Phase 5A. */
+  exploratory_caveat: string;
+  /** Frozen interpretation principles every consumer must respect. */
+  interpretation_principles: Array<string>;
+  /** Always false: this endpoint never produces a live prediction. */
+  is_live_prediction?: boolean;
+  /** Always true: results are precomputed and frozen, never recomputed on request. */
+  is_precomputed?: true;
+  limitations: Array<string>;
+  model_methods: Array<string>;
+  provenance: ResearchProvenance;
+  /** The precomputed aggregate reference values. */
+  results: Array<ResearchResultItem>;
+  source_id: string;
+};
+
+/** Full metadata for one read-only research source, with provenance.
+
+Extends :class:`ResearchSourceSummary` with the frozen-artifact
+provenance and the experimental context the results were produced
+under (frozen, never recomputed). */
+export interface ResearchSourceDetail {
+  /** Repository-relative path to the frozen artifact (never absolute). */
+  artifact_path: string;
+  /** SHA-256 digest of the frozen artifact bytes. */
+  artifact_sha256: string;
+  /** Whether the source is currently servable. 'registered' means the source is approved but not yet verified at runtime; 'available' means verified and servable; 'unavailable' means the artifact is missing or failed integrity verification. */
+  availability: "available" | "unavailable" | "registered";
+  /** How the artifact bytes were canonicalized before hashing. 'frozen-checker-compatible' matches ci/check_frozen_integrity.py (CRLF→LF for text files, raw for binary). */
+  canonicalization: "raw-bytes" | "frozen-checker-compatible";
+  /** Frozen dataset the reported results pertain to. */
+  dataset_id: string;
+  /** Digest algorithm used for provenance. */
+  digest_algorithm: "sha-256";
+  /** Frozen experimental parameters the results were produced under (sample size, label count, threshold rule, run ids, detector grids). */
+  experimental_context: Record<string, never>;
+  /** Scientific limitations that apply to every result from this source. */
+  limitations: Array<string>;
+  /** Detector methods whose aggregate results are reported. */
+  model_methods: Array<string>;
+  /** Research stream or family the source belongs to. */
+  research_family: string;
+  /** Aggregation level of the reported results. */
+  result_granularity: string;
+  /** Kind of result exposed by this source. */
+  result_type: string;
+  /** Opaque research-source identifier (never a filesystem path). */
+  source_id: string;
+  /** Supporting frozen artifacts consumed by the adapter (path, SHA-256, role). Each artifact's digest is verified against the trusted frozen manifest before its bytes are parsed. */
+  supporting_artifacts?: Array<Record<string, never>>;
+};
+
+/** List of approved read-only research sources. */
+export interface ResearchSourceListResponse {
+  /** Number of items in ``items``. */
+  count: number;
+  /** Approved research sources in deterministic order. */
+  items: Array<ResearchSourceSummary>;
+};
+
+/** Public summary of one approved read-only research source.
+
+Carries no provenance or experimental detail: it is the list-view
+descriptor. Use the detail endpoint for artifact provenance and the
+frozen experimental context. */
+export interface ResearchSourceSummary {
+  /** Whether the source is currently servable. 'registered' means the source is approved but not yet verified at runtime; 'available' means verified and servable; 'unavailable' means the artifact is missing or failed integrity verification. */
+  availability: "available" | "unavailable" | "registered";
+  /** Frozen dataset the reported results pertain to. */
+  dataset_id: string;
+  /** Detector methods whose aggregate results are reported. */
+  model_methods: Array<string>;
+  /** Research stream or family the source belongs to. */
+  research_family: string;
+  /** Aggregation level of the reported results. */
+  result_granularity: string;
+  /** Kind of result exposed by this source. */
+  result_type: string;
+  /** Opaque research-source identifier (never a filesystem path). */
+  source_id: string;
+};
+
 /** Controlled review-status vocabulary.
 
 A ``str`` enum so values survive JSON round-trips and SQLA string

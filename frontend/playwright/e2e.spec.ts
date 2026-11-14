@@ -633,4 +633,64 @@ test.describe("PEIARS PR-05B investigation workflow", () => {
     await expect(historyPanel.getByText("Case created")).toBeVisible();
     await expect(historyPanel.getByText("Decision recorded")).toBeVisible();
   });
+
+  // PR-08: Research workspace with real backend integration. Verifies the
+  // precomputed research results are fetched from the backend research
+  // adapter and displayed with correct provenance, scientific labels, and
+  // limitations. Uses the real pgserver + uvicorn backend (not a mock).
+  test("20. PR-08 research workspace displays precomputed results with provenance", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel("Username").fill(REVIEWER_USERNAME);
+    await page.getByLabel("Password").fill(REVIEWER_PASSWORD);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    // Wait for the Overview page to load before switching tabs.
+    await expect(page).toHaveURL(/\/overview/);
+
+    // Navigate to the Research workspace.
+    await page.getByRole("tab", { name: /Research/ }).click();
+    await expect(page.getByRole("heading", { name: "Research & Provenance", level: 1 })).toBeVisible();
+
+    // The "Precomputed Research Results" section heading appears.
+    await expect(page.getByRole("heading", { name: "Precomputed Research Results" })).toBeVisible({ timeout: 10_000 });
+
+    // The results table is populated with precomputed values from the
+    // frozen phase6.py artifact (real backend integration, not a mock).
+    // Use scoped locators to avoid matching unrelated text elsewhere on
+    // the page (e.g. "47" in the context strip's test count).
+    await expect(page.getByText("sample_size")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("fraud_label_count")).toBeVisible();
+    await expect(page.getByText("spearman_if003_lof004")).toBeVisible();
+    // Verify the value cells are present (scoped to the table body).
+    const resultsTable = page.locator("table.data-table").first();
+    await expect(resultsTable.getByRole("cell", { name: "30000" })).toBeVisible();
+    await expect(resultsTable.getByRole("cell", { name: "47" })).toBeVisible();
+    await expect(resultsTable.getByRole("cell", { name: "0.3666" })).toBeVisible();
+
+    // The "not live predictions" caution is visible.
+    await expect(page.getByText(/not live predictions/i)).toBeVisible();
+
+    // The provenance (artifact path) is displayed. Use .first() because
+    // the artifact path also appears in the frozen-artifacts table in
+    // the sidebar — the first match is in the research results section.
+    await expect(page.getByText("src/mplad/stream_a/phase6.py").first()).toBeVisible();
+
+    // The interpretation principles heading is visible.
+    await expect(page.getByRole("heading", { name: "Interpretation principles" })).toBeVisible();
+
+    // The "anomaly flag is not proof of fraud" principle is visible.
+    // Use .first() because the same text appears in both the sidebar
+    // "Scientific cautions" section and the research results
+    // "Interpretation principles" section.
+    await expect(page.getByText(/anomaly flag is not proof of fraud/i).first()).toBeVisible();
+
+    // The exploratory caveat is visible.
+    await expect(page.getByText(/Exploratory analysis/i).first()).toBeVisible();
+
+    // No horizontal overflow at 1440px.
+    const metrics = await page.evaluate(() => ({
+      docScrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    }));
+    expect(metrics.docScrollWidth).toBeLessThanOrEqual(metrics.innerWidth);
+  });
 });

@@ -17,6 +17,9 @@ import type {
   MetaResponse,
   ReadinessResponse,
   RecordDecisionRequest,
+  ResearchResultsResponse,
+  ResearchSourceDetail,
+  ResearchSourceListResponse,
   ReviewStatus,
   SourceListResponse,
   SourceSummary,
@@ -217,4 +220,33 @@ export function recordCaseDecision(
     signal,
     timeoutMs: DEFAULT_TIMEOUT_MS,
   });
+}
+
+// --- Research (PR-08: read-only frozen scientific results) --------------
+
+export function getResearchSources(signal?: AbortSignal): Promise<ResearchSourceListResponse> {
+  return request<ResearchSourceListResponse>("/research/sources", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getResearchSource(
+  sourceId: string,
+  signal?: AbortSignal,
+): Promise<ResearchSourceDetail> {
+  return request<ResearchSourceDetail>(
+    `/research/sources/${encodeURIComponent(sourceId)}`,
+    { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
+}
+
+export function getResearchResults(
+  sourceId: string,
+  signal?: AbortSignal,
+): Promise<ResearchResultsResponse> {
+  return request<ResearchResultsResponse>(
+    `/research/sources/${encodeURIComponent(sourceId)}/results`,
+    { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
 }

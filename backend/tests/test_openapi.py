@@ -33,6 +33,10 @@ EXPECTED_PATHS = {
     "/api/v1/cases/{case_id}/history",
     "/api/v1/cases/{case_id}/notes",
     "/api/v1/cases/{case_id}/transitions",
+    # PR-08: read-only research-results adapter (GET only).
+    "/api/v1/research/sources",
+    "/api/v1/research/sources/{source_id}",
+    "/api/v1/research/sources/{source_id}/results",
 }
 
 

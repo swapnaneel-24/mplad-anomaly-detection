@@ -2,39 +2,58 @@
 // Per SCREEN_DESIGN_NOTES.md §8. Two-column grid:
 //   left (1fr):   methodological sections (Phase 3–6) + reproducibility
 //   right (320px): artifact index + limitations + cautions (sticky)
+//
+// PR-08: extended with a read-only "Precomputed Research Results" section
+// that fetches frozen scientific reference values from the backend
+// research adapter (/api/v1/research/*). The results are aggregate-level
+// experiment metrics from the ULB credit-card fraud benchmark, served
+// read-only with full provenance. No live predictions, no model execution.
 
 import { useEffect, useState } from "react";
-import { getMeta } from "@/api/endpoints";
+import { getMeta, getResearchSources, getResearchResults } from "@/api/endpoints";
 import { ApiError } from "@/api/client";
-import type { MetaResponse } from "@/api/contracts";
+import type { MetaResponse, ResearchSourceSummary, ResearchResultsResponse } from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
 import "@/pages/ResearchPage.css";
 
+// All 28 frozen research artifacts with their verified SHA-256 prefixes.
+// These MUST match ci/frozen_research_manifest.json exactly. A backend
+// test (test_research_adapter.py::test_artifact_digest_matches_frozen_manifest)
+// verifies that the adapter serves the same digest as the manifest; the
+// displayed prefix here is the first 16 hex chars of that digest.
 const FROZEN_ARTIFACTS: { path: string; sha256: string }[] = [
+  { path: "docs/MPLAD_Project_Inference_and_decision.docx", sha256: "6312c4ed505c27ed" },
   { path: "docs/MPLAD_framework_pipeline.md", sha256: "7d5ad8dabe038c0a" },
-  { path: "docs/PHASE3_MIGRATION_GUIDE.md", sha256: "2faf31f099539192" },
+  { path: "docs/PHASE3_MIGRATION_GUIDE.md", sha256: "fea14011746b32f0" },
   { path: "docs/Phase-0.md", sha256: "3f00ce99a8a5e6e6" },
-  { path: "docs/feature_space_manifest.md", sha256: "7606b973c402b53a" },
-  { path: "docs/phase4_contract.md", sha256: "791e3b7fd26b886b" },
-  { path: "docs/phase5_figure_catalog.md", sha256: "153aa65dfec29777" },
-  { path: "docs/phase6_contract.md", sha256: "d1f17d7d0bd2d3ff" },
-  { path: "docs/phase7_synthesis.md", sha256: "1030bb312a11b927" },
-  { path: "docs/provenance_log.md", sha256: "65557c160cfbdddf" },
-  { path: "src/mplad/__init__.py", sha256: "c607b4112c5bfb37" },
-  { path: "src/mplad/stream_a/phase3.py", sha256: "c32a335fb2c61e39" },
-  { path: "src/mplad/stream_a/phase4.py", sha256: "81cf5c9e357afde6" },
-  { path: "src/mplad/stream_a/phase5_analysis.py", sha256: "9fcfd316f13b9fca" },
-  { path: "src/mplad/stream_a/phase5_plots.py", sha256: "c036994420584c4c" },
-  { path: "src/mplad/stream_a/phase6.py", sha256: "e487bb5b6944dbdc" },
-  { path: "tests/test_phase3.py", sha256: "56a0e461ca931a4f" },
-  { path: "tests/test_phase4.py", sha256: "94e2018957a131cb" },
-  { path: "tests/test_phase5_analysis.py", sha256: "469681ef14b7b564" },
-  { path: "tests/test_phase5_plots.py", sha256: "69259b12485d87c0" },
-  { path: "tests/test_phase6.py", sha256: "d669b180229ce7cb" },
+  { path: "docs/feature_space_manifest.md", sha256: "bf2ee307ef06a293" },
+  { path: "docs/phase4_contract.md", sha256: "3c8034b698d3fed4" },
+  { path: "docs/phase5_figure_catalog.md", sha256: "fe24df9d93935f5d" },
+  { path: "docs/phase6_contract.md", sha256: "00cc73bcff13b782" },
+  { path: "docs/phase7_synthesis.md", sha256: "7436d5ddbfb01994" },
+  { path: "docs/provenance_log.md", sha256: "7945c96a1a9af9f6" },
+  { path: "src/mplad/__init__.py", sha256: "a9d13b604cb35c72" },
+  { path: "src/mplad/common/__init__.py", sha256: "cabb07d57f320de3" },
+  { path: "src/mplad/common/config.py", sha256: "3e61e4052cdc1fec" },
+  { path: "src/mplad/common/io.py", sha256: "243dc5b8e1e2b5bf" },
+  { path: "src/mplad/common/manifest.py", sha256: "b8bbf9f920267c37" },
+  { path: "src/mplad/common/validation.py", sha256: "417a5ae6589112b8" },
+  { path: "src/mplad/stream_a/__init__.py", sha256: "7c37a2bc6fab8498" },
+  { path: "src/mplad/stream_a/phase3.py", sha256: "4ce2d229ff588915" },
+  { path: "src/mplad/stream_a/phase4.py", sha256: "fcae730cfe15edb1" },
+  { path: "src/mplad/stream_a/phase5.py", sha256: "e3b0c44298fc1c14" },
+  { path: "src/mplad/stream_a/phase5_analysis.py", sha256: "8048479c7825bc21" },
+  { path: "src/mplad/stream_a/phase5_plots.py", sha256: "473384ae124eec9c" },
+  { path: "src/mplad/stream_a/phase6.py", sha256: "2a9e7d7973c48e13" },
+  { path: "tests/test_phase3.py", sha256: "c9bc1113c6ddfd90" },
+  { path: "tests/test_phase4.py", sha256: "c093b676dff651db" },
+  { path: "tests/test_phase5_analysis.py", sha256: "70b2e7a7764e3071" },
+  { path: "tests/test_phase5_plots.py", sha256: "a8950526da6347a7" },
+  { path: "tests/test_phase6.py", sha256: "f5e9288404f77b42" },
 ];
 
-const BACKEND_TEST_COUNT = 445;
+const BACKEND_TEST_COUNT = 592;
 
 const METHODOLOGY_PHASES: { phase: string; title: string; summary: string; docRef: string }[] = [
   {
@@ -71,6 +90,10 @@ export function ResearchPage(): JSX.Element {
   const [meta, setMeta] = useState<MetaResponse | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(true);
+  const [researchSources, setResearchSources] = useState<ResearchSourceSummary[] | null>(null);
+  const [researchResults, setResearchResults] = useState<ResearchResultsResponse | null>(null);
+  const [researchError, setResearchError] = useState<ApiError | null>(null);
+  const [researchLoading, setResearchLoading] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -85,6 +108,29 @@ export function ResearchPage(): JSX.Element {
         setError(err instanceof ApiError ? err : null);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
+
+  // PR-08: fetch research sources and results on mount.
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      setResearchLoading(true);
+      setResearchError(null);
+      try {
+        const sourcesResp = await getResearchSources(controller.signal);
+        setResearchSources(sourcesResp.items);
+        if (sourcesResp.items.length > 0 && sourcesResp.items[0]) {
+          const results = await getResearchResults(sourcesResp.items[0].source_id, controller.signal);
+          setResearchResults(results);
+        }
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setResearchError(err instanceof ApiError ? err : null);
+      } finally {
+        if (!controller.signal.aborted) setResearchLoading(false);
       }
     })();
     return () => controller.abort();
@@ -133,6 +179,89 @@ export function ResearchPage(): JSX.Element {
             <dt className="def-list__term">Git commit</dt>
             <dd className="def-list__def mono">{meta?.git_commit_sha ?? "not supplied"}</dd>
           </dl>
+
+          {/* PR-08: Precomputed Research Results */}
+          <h2 className="section-h2">Precomputed Research Results</h2>
+          <p className="editorial">
+            These are <strong>precomputed aggregate reference values</strong> from
+            the ULB credit-card fraud benchmark experiment (Stream A). They were
+            computed offline by the frozen research pipeline and are served
+            read-only through the backend research adapter.{" "}
+            <strong>These are not live predictions.</strong> An anomalous
+            observation is <strong>not proof of fraud</strong>.
+          </p>
+          {researchLoading && (
+            <Loading label="Loading research results…" />
+          )}
+          {researchError && !researchResults && (
+            <ErrorPanel error={researchError} onRetry={() => window.location.reload()} />
+          )}
+          {researchResults && (
+            <div className="research-page__results">
+              <div className="research-page__source-meta">
+                <dl className="def-list">
+                  <dt className="def-list__term">Dataset</dt>
+                  <dd className="def-list__def">{researchResults.dataset_id}</dd>
+                  <dt className="def-list__term">Models</dt>
+                  <dd className="def-list__def">{researchResults.model_methods.join(", ")}</dd>
+                  <dt className="def-list__term">Source artifact</dt>
+                  <dd className="def-list__def mono">{researchResults.provenance.artifact_path}</dd>
+                  <dt className="def-list__term">Artifact SHA-256</dt>
+                  <dd className="def-list__def mono">{researchResults.provenance.artifact_sha256.slice(0, 16)}…</dd>
+                  <dt className="def-list__term">Precomputed</dt>
+                  <dd className="def-list__def">{researchResults.is_precomputed ? "Yes" : "No"}</dd>
+                  <dt className="def-list__term">Live prediction</dt>
+                  <dd className="def-list__def">{researchResults.is_live_prediction ? "Yes" : "No"}</dd>
+                </dl>
+              </div>
+
+              <p className="table-caption">
+                Table: Frozen reference values from the canonical experiment
+                (30,000-row sample, 47 fraud labels, bottom-1% threshold).
+              </p>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Metric</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {researchResults.results.map((r) => (
+                    <tr key={r.metric_name}>
+                      <td className="mono">{r.metric_name}</td>
+                      <td className="mono">{String(r.value)}</td>
+                      <td>{r.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="research-page__caveats">
+                <h3 className="section-h3">Interpretation principles</h3>
+                <ul className="list-clean">
+                  {researchResults.interpretation_principles.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+                <p className="editorial-muted research-page__caveat">
+                  {researchResults.exploratory_caveat}
+                </p>
+                <h3 className="section-h3">Limitations</h3>
+                <ul className="list-clean">
+                  {researchResults.limitations.map((l, i) => (
+                    <li key={i}>{l}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+          {researchSources && researchSources.length === 0 && !researchError && (
+            <p className="editorial-muted">
+              No eligible research sources are currently available.
+            </p>
+          )}
         </section>
 
         <aside className="research-page__sidebar" aria-label="Artifacts, limitations, cautions">
@@ -161,11 +290,11 @@ export function ResearchPage(): JSX.Element {
           <section className="research-page__sidebar-section">
             <h3 className="section-h3">Limitations</h3>
             <ul className="list-clean">
-              <li>No live dataset integration. The source registry is empty.</li>
-              <li>No public case API. Review-case reading and writing are deferred to PR-05B.</li>
-              <li>No research-evidence service. Phase 3–6 figures are not yet exposed through the API.</li>
-              <li>No deployment automation. Docker Compose and CI/CD are deferred to PR-06.</li>
-              <li>No administrator-management UI. The bootstrap CLI is the only provisioning path.</li>
+              <li>No live dataset integration. Precomputed results are served read-only from frozen artifacts.</li>
+              <li>No live model inference. Isolation Forest, LOF and PCA are not executed at runtime.</li>
+              <li>No automatic research-to-case linking. Scientific results and review cases remain separate.</li>
+              <li>No deployment automation for research artifacts in containers. See PR07B_COMPOSE_RUNBOOK.md.</li>
+              <li>ULB benchmark results must not be assumed to transfer to MPLAD transactions.</li>
             </ul>
           </section>
 

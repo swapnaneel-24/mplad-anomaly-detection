@@ -8,11 +8,35 @@
 // research adapter (/api/v1/research/*). The results are aggregate-level
 // experiment metrics from the ULB credit-card fraud benchmark, served
 // read-only with full provenance. No live predictions, no model execution.
+//
+// PR-09: extended with a "Canonical Benchmark" section that lists the ten
+// authentic IF/LOF runs (IF_001..IF_005, LOF_001..LOF_005) from the
+// verified catalog, allows selecting one run, shows its exact frozen
+// configuration with provenance, shows saved Phase 4 metrics only when the
+// admitted DVC payload is available, and offers a canonical row_id lookup
+// into the admitted evaluation dataset. Unavailable capabilities render an
+// explicit unavailable state (never a synthetic fallback).
 
 import { useEffect, useState } from "react";
-import { getMeta, getResearchSources, getResearchResults } from "@/api/endpoints";
+import {
+  getMeta,
+  getResearchSources,
+  getResearchResults,
+  getBenchmarkExperiments,
+  getBenchmarkExperiment,
+  getBenchmarkMetrics,
+  getBenchmarkRecord,
+} from "@/api/endpoints";
 import { ApiError } from "@/api/client";
-import type { MetaResponse, ResearchSourceSummary, ResearchResultsResponse } from "@/api/contracts";
+import type {
+  MetaResponse,
+  ResearchSourceSummary,
+  ResearchResultsResponse,
+  BenchmarkCatalogResponse,
+  BenchmarkExperimentDetail,
+  BenchmarkMetricsResponse,
+  BenchmarkRecordResponse,
+} from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
 import "@/pages/ResearchPage.css";
@@ -95,6 +119,21 @@ export function ResearchPage(): JSX.Element {
   const [researchError, setResearchError] = useState<ApiError | null>(null);
   const [researchLoading, setResearchLoading] = useState(false);
 
+  // PR-09: canonical benchmark state.
+  const [benchmarkCatalog, setBenchmarkCatalog] = useState<BenchmarkCatalogResponse | null>(null);
+  const [benchmarkError, setBenchmarkError] = useState<ApiError | null>(null);
+  const [benchmarkLoading, setBenchmarkLoading] = useState(false);
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const [experimentDetail, setExperimentDetail] = useState<BenchmarkExperimentDetail | null>(null);
+  const [experimentError, setExperimentError] = useState<ApiError | null>(null);
+  const [metrics, setMetrics] = useState<BenchmarkMetricsResponse | null>(null);
+  const [metricsError, setMetricsError] = useState<ApiError | null>(null);
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [recordInput, setRecordInput] = useState("");
+  const [record, setRecord] = useState<BenchmarkRecordResponse | null>(null);
+  const [recordError, setRecordError] = useState<ApiError | null>(null);
+  const [recordLoading, setRecordLoading] = useState(false);
+
   useEffect(() => {
     const controller = new AbortController();
     (async () => {
@@ -135,6 +174,68 @@ export function ResearchPage(): JSX.Element {
     })();
     return () => controller.abort();
   }, []);
+
+  // PR-09: fetch the benchmark catalog on mount (Layer A; works without
+  // DVC payloads). Saved metrics are fetched only when the catalog reports
+  // the metrics capability as available.
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      setBenchmarkLoading(true);
+      setBenchmarkError(null);
+      try {
+        const catalog = await getBenchmarkExperiments(controller.signal);
+        setBenchmarkCatalog(catalog);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setBenchmarkError(err instanceof ApiError ? err : null);
+      } finally {
+        if (!controller.signal.aborted) setBenchmarkLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
+
+  // PR-09: fetch the selected experiment's detail.
+  useEffect(() => {
+    if (!selectedRunId) return;
+    const controller = new AbortController();
+    (async () => {
+      setExperimentError(null);
+      setExperimentDetail(null);
+      setRecord(null);
+      setRecordError(null);
+      try {
+        const detail = await getBenchmarkExperiment(selectedRunId, controller.signal);
+        setExperimentDetail(detail);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setExperimentError(err instanceof ApiError ? err : null);
+      }
+    })();
+    return () => controller.abort();
+  }, [selectedRunId]);
+
+  // PR-09: fetch saved metrics once when the capability is available.
+  useEffect(() => {
+    const available = benchmarkCatalog?.capabilities?.metrics?.available;
+    if (!available) return;
+    const controller = new AbortController();
+    (async () => {
+      setMetricsLoading(true);
+      setMetricsError(null);
+      try {
+        const resp = await getBenchmarkMetrics(controller.signal);
+        setMetrics(resp);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setMetricsError(err instanceof ApiError ? err : null);
+      } finally {
+        if (!controller.signal.aborted) setMetricsLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, [benchmarkCatalog?.capabilities?.metrics?.available]);
 
   if (loading && !meta) {
     return <div className="research-page workspace-composition" aria-busy="true"><Loading label="Loading metadata…" /></div>;
@@ -261,6 +362,263 @@ export function ResearchPage(): JSX.Element {
             <p className="editorial-muted">
               No eligible research sources are currently available.
             </p>
+          )}
+
+          {/* PR-09: Canonical Benchmark (ten IF/LOF runs) */}
+          <h2 className="section-h2">Canonical Benchmark — Ten IF/LOF Runs</h2>
+          <p className="editorial">
+            The canonical Stream A benchmark comprises ten unsupervised runs:
+            five Isolation Forest and five Local Outlier Factor
+            configurations, fitted offline on a 30,000-row ULB credit-card
+            sample (47 fraud labels, bottom-1% saved flags). Parameters are
+            frozen experiment inputs served from the manifest-verified
+            configuration; nothing below is recomputed at request time.{" "}
+            <strong>Saved metrics and record lookup require the DVC-backed
+            evidence payloads; when they are not provisioned the catalog
+            still shows the verified configuration.</strong>
+          </p>
+          {benchmarkLoading && <Loading label="Loading benchmark catalog…" />}
+          {benchmarkError && (
+            <ErrorPanel error={benchmarkError} onRetry={() => window.location.reload()} />
+          )}
+          {benchmarkCatalog && (
+            <div className="research-page__benchmark">
+              <div
+                className="research-page__benchmark-run-tabs"
+                role="tablist"
+                aria-label="Canonical benchmark runs"
+              >
+                {benchmarkCatalog.experiments.map((e) => (
+                  <button
+                    key={e.run_id}
+                    type="button"
+                    role="tab"
+                    aria-selected={selectedRunId === e.run_id}
+                    className="research-page__benchmark-run-tab"
+                    onClick={() => setSelectedRunId(e.run_id)}
+                  >
+                    {e.run_id}
+                  </button>
+                ))}
+              </div>
+
+              {!selectedRunId && (
+                <p className="editorial-muted">
+                  Select a run to inspect its frozen configuration and
+                  provenance.
+                </p>
+              )}
+              {experimentError && (
+                <ErrorPanel error={experimentError} onRetry={() => setSelectedRunId(selectedRunId)} />
+              )}
+              {experimentDetail && (
+                <div className="research-page__benchmark-detail">
+                  <h3 className="section-h3">
+                    {experimentDetail.run_id} — {experimentDetail.algorithm}
+                  </h3>
+                  <dl className="def-list">
+                    <dt className="def-list__term">Parameters (frozen)</dt>
+                    <dd className="def-list__def mono">
+                      {Object.entries(experimentDetail.parameters)
+                        .map(([k, v]) => `${k}=${String(v)}`)
+                        .join(", ")}
+                    </dd>
+                    <dt className="def-list__term">Fixed pipeline settings</dt>
+                    <dd className="def-list__def mono">
+                      {Object.keys(experimentDetail.fixed_pipeline_settings).length > 0
+                        ? Object.entries(experimentDetail.fixed_pipeline_settings)
+                            .map(([k, v]) => `${k}=${String(v)}`)
+                            .join(", ")
+                        : "—"}
+                    </dd>
+                    <dt className="def-list__term">Parameter source</dt>
+                    <dd className="def-list__def mono">
+                      {experimentDetail.parameter_source.path} (SHA-256{" "}
+                      {experimentDetail.parameter_source.sha256.slice(0, 16)}…)
+                    </dd>
+                    <dt className="def-list__term">Dataset scope</dt>
+                    <dd className="def-list__def">
+                      30,000-row sample, {String(experimentDetail.dataset_scope.sample.fraud_count)} fraud labels,{" "}
+                      {experimentDetail.dataset_scope.threshold_rule}
+                    </dd>
+                    <dt className="def-list__term">Score direction</dt>
+                    <dd className="def-list__def">
+                      {String(experimentDetail.dataset_scope.score_orientation.native_score ?? "")}{" "}
+                      anomaly_score = −native_score (higher = more anomalous).
+                    </dd>
+                    <dt className="def-list__term">Run status</dt>
+                    <dd className="def-list__def">
+                      Fitted offline by the frozen pipeline; no refitting at request time.
+                    </dd>
+                  </dl>
+
+                  <h4 className="section-h3">Saved metrics (Phase 4 evaluation)</h4>
+                  {metricsLoading && <Loading label="Loading saved metrics…" />}
+                  {metricsError && (
+                    <div className="research-page__benchmark-unavailable">
+                      <p className="editorial-muted">
+                        Saved metrics are currently unavailable
+                        {metricsError.details && typeof metricsError.details.reason === "string"
+                          ? ` (reason: ${metricsError.details.reason})`
+                          : ""}.
+                        The verified configuration above remains available.
+                      </p>
+                    </div>
+                  )}
+                  {!metrics && !metricsError && !metricsLoading && (
+                    <div className="research-page__benchmark-unavailable">
+                      <p className="editorial-muted">
+                        The DVC-backed metrics payload has not been
+                        provisioned in this deployment, so saved metrics are
+                        not shown. This is a deliberate unavailable state —
+                        no synthetic or substitute values are displayed.
+                      </p>
+                    </div>
+                  )}
+                  {metrics && (
+                    <>
+                      <p className="table-caption">
+                        Table: saved Phase 4 metrics per run (exact stored
+                        values; ranking metrics use anomaly_score, threshold
+                        metrics use saved bottom-1% flags; denominators are
+                        listed below the table).
+                      </p>
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Run</th>
+                            <th scope="col">AP</th>
+                            <th scope="col">ROC-AUC</th>
+                            <th scope="col">P@1%</th>
+                            <th scope="col">R@1%</th>
+                            <th scope="col">F1@1%</th>
+                            <th scope="col">TP / FP</th>
+                            <th scope="col">Flags</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {metrics.metrics.map((m) => (
+                            <tr
+                              key={m.run_id}
+                              className={m.run_id === selectedRunId ? "is-selected" : undefined}
+                            >
+                              <td className="mono">{m.run_id}</td>
+                              <td className="mono">{m.average_precision.toFixed(4)}</td>
+                              <td className="mono">{m.roc_auc.toFixed(4)}</td>
+                              <td className="mono">{m.precision_at_1pct.toFixed(4)}</td>
+                              <td className="mono">{m.recall_at_1pct.toFixed(4)}</td>
+                              <td className="mono">{m.f1_at_1pct.toFixed(4)}</td>
+                              <td className="mono">{m.tp} / {m.fp}</td>
+                              <td className="mono">{m.flagged_count}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="research-page__metric-defs">
+                        {metrics.metric_definitions
+                          .map((d) => `${d.metric_name}: ${d.definition} (denominator: ${d.denominator})`)
+                          .join(" · ")}
+                      </p>
+                    </>
+                  )}
+
+                  <h4 className="section-h3">Canonical record lookup (by row_id)</h4>
+                  {experimentDetail.row_lookup_available ? (
+                    <form
+                      className="research-page__record-lookup"
+                      onSubmit={(ev) => {
+                        ev.preventDefault();
+                        const parsed = Number.parseInt(recordInput, 10);
+                        if (!Number.isInteger(parsed) || parsed < 0) {
+                          setRecord(null);
+                          setRecordError(null);
+                          return;
+                        }
+                        const controller = new AbortController();
+                        (async () => {
+                          setRecordLoading(true);
+                          setRecordError(null);
+                          try {
+                            const resp = await getBenchmarkRecord(selectedRunId!, parsed, controller.signal);
+                            setRecord(resp);
+                          } catch (err) {
+                            if (err instanceof ApiError && err.aborted) return;
+                            setRecord(null);
+                            setRecordError(err instanceof ApiError ? err : null);
+                          } finally {
+                            setRecordLoading(false);
+                          }
+                        })();
+                      }}
+                    >
+                      <div className="research-page__record-form">
+                        <label className="def-list__term" htmlFor="benchmark-row-id">
+                          ULB row_id
+                        </label>
+                        <input
+                          id="benchmark-row-id"
+                          className="research-page__record-input"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={recordInput}
+                          onChange={(ev) => setRecordInput(ev.target.value)}
+                          placeholder="e.g. 12345"
+                        />
+                        <button type="submit">Look up</button>
+                      </div>
+                      {recordLoading && <Loading label="Looking up record…" />}
+                      {recordError && <ErrorPanel error={recordError} onRetry={() => setRecordInput(recordInput)} />}
+                      {record && (
+                        <table className="data-table">
+                          <caption className="table-caption">
+                            Saved record for {record.run_id} / row_id {record.row_id}
+                          </caption>
+                          <thead>
+                            <tr>
+                              <th scope="col">Field</th>
+                              <th scope="col">Value</th>
+                              <th scope="col">Meaning</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="mono">Class</td>
+                              <td className="mono">{record.label.Class}</td>
+                              <td>Ground-truth evaluation label (not the detector flag)</td>
+                            </tr>
+                            <tr>
+                              <td className="mono">native_score</td>
+                              <td className="mono">{record.scores.native_score.toFixed(6)}</td>
+                              <td>{record.scores.native_definition}</td>
+                            </tr>
+                            <tr>
+                              <td className="mono">anomaly_score</td>
+                              <td className="mono">{record.scores.anomaly_score.toFixed(6)}</td>
+                              <td>{record.scores.anomaly_definition}</td>
+                            </tr>
+                            <tr>
+                              <td className="mono">flag</td>
+                              <td className="mono">{record.flag.value}</td>
+                              <td>{record.flag.provenance}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      )}
+                    </form>
+                  ) : (
+                    <div className="research-page__benchmark-unavailable">
+                      <p className="editorial-muted">
+                        The DVC-backed evaluation dataset has not been
+                        provisioned in this deployment, so the canonical
+                        record lookup is unavailable. No substitute or
+                        synthetic records are shown.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </section>
 

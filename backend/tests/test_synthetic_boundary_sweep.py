@@ -261,6 +261,12 @@ class TestDisabledSourceExposureSweep:
             "/api/v1/auth/me",
             "/api/v1/auth/csrf",
             "/api/v1/research/sources",
+            # PR-09: canonical benchmark catalog + metrics (Layer A always
+            # serves; Layer B reports the sanitized unavailable state when
+            # the DVC payload is absent — neither carries synthetic
+            # demonstration content).
+            "/api/v1/research/benchmark/experiments",
+            "/api/v1/research/benchmark/metrics",
         ]
         # OpenAPI-driven completeness: sweep every documented non-
         # parameterized GET path. Parameterized GETs are covered by the
@@ -325,6 +331,10 @@ class TestDisabledSourceExposureSweep:
         # NOT a synthetic demonstration source — it is always available
         # regardless of the demonstration_sources flag.
         research_source_id = "phase6-reference-values"
+        # PR-09: canonical benchmark run/record identifiers (fixed
+        # allowlist; not synthetic demonstration content).
+        benchmark_run_id = "IF_001"
+        benchmark_row_id = 101
 
         # OpenAPI-driven completeness: every parameterized GET path in
         # the contract is probed.
@@ -342,6 +352,8 @@ class TestDisabledSourceExposureSweep:
             f"/api/v1/synthetic/records/{record_ref}",
             f"/api/v1/research/sources/{research_source_id}",
             f"/api/v1/research/sources/{research_source_id}/results",
+            f"/api/v1/research/benchmark/experiments/{benchmark_run_id}",
+            f"/api/v1/research/benchmark/experiments/{benchmark_run_id}/records/{benchmark_row_id}",
         }
         # All parameterized GET paths documented in the OpenAPI contract
         # must be covered by the probe (substituting the persisted
@@ -353,6 +365,11 @@ class TestDisabledSourceExposureSweep:
             .replace(source_id, "{source_id}")
             .replace(record_ref, "{record_ref}")
             .replace(research_source_id, "{source_id}")
+            .replace(f"/records/{benchmark_row_id}", "/records/{row_id}")
+            .replace(
+                f"/benchmark/experiments/{benchmark_run_id}",
+                "/benchmark/experiments/{run_id}",
+            )
             for path in probe_paths
         }
         assert documented_param_gets <= documented_param_templates, (

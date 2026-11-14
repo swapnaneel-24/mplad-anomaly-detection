@@ -31,6 +31,518 @@
         "title": "AddNoteRequest",
         "type": "object"
       },
+      "ArtifactProvenance": {
+        "description": "Identity of one consumed frozen artifact.",
+        "properties": {
+          "canonicalization": {
+            "description": "Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest).",
+            "title": "Canonicalization",
+            "type": "string"
+          },
+          "digest_algorithm": {
+            "const": "sha-256",
+            "description": "Digest algorithm used for provenance.",
+            "title": "Digest Algorithm",
+            "type": "string"
+          },
+          "path": {
+            "description": "Repository-relative path to the frozen artifact (never absolute).",
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "description": "SHA-256 digest of the artifact bytes.",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "digest_algorithm",
+          "canonicalization"
+        ],
+        "title": "ArtifactProvenance",
+        "type": "object"
+      },
+      "BenchmarkCatalogResponse": {
+        "description": "The verified ten-run benchmark catalog with capability availability.",
+        "properties": {
+          "capabilities": {
+            "additionalProperties": true,
+            "description": "Per-capability availability of the DVC-backed evidence layers ('metrics', 'row_level'): available / reason (artifact_missing or integrity_failed) / detail. The catalog itself is always served from Git-verified metadata.",
+            "title": "Capabilities",
+            "type": "object"
+          },
+          "count": {
+            "description": "Number of experiments (always 10).",
+            "title": "Count",
+            "type": "integer"
+          },
+          "dataset_id": {
+            "description": "Frozen benchmark dataset identity.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "experiments": {
+            "description": "The ten canonical runs in frozen config order.",
+            "items": {
+              "$ref": "#/components/schemas/BenchmarkExperimentSummary"
+            },
+            "title": "Experiments",
+            "type": "array"
+          },
+          "limitations": {
+            "description": "Scientific limitations that apply to every run.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "source_id": {
+            "description": "Fixed benchmark source identifier.",
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "experiments",
+          "count",
+          "capabilities",
+          "limitations"
+        ],
+        "title": "BenchmarkCatalogResponse",
+        "type": "object"
+      },
+      "BenchmarkExperimentDetail": {
+        "description": "Full descriptor of one canonical benchmark run.",
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "IsolationForest",
+              "LOF"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "dataset_scope": {
+            "$ref": "#/components/schemas/DatasetScope"
+          },
+          "fixed_pipeline_settings": {
+            "additionalProperties": true,
+            "description": "Fixed detector settings recorded alongside the run grid (e.g. LOF ball_tree/leaf_size); documented, frozen.",
+            "title": "Fixed Pipeline Settings",
+            "type": "object"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "metrics_available": {
+            "title": "Metrics Available",
+            "type": "boolean"
+          },
+          "model_status": {
+            "const": "fitted_offline_frozen",
+            "title": "Model Status",
+            "type": "string"
+          },
+          "parameter_source": {
+            "$ref": "#/components/schemas/ParameterSourceProvenance"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "title": "Parameters",
+            "type": "object"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ArtifactProvenance"
+            },
+            "description": "Provenance chain: config (parameters), run metadata (dataset scope) and commit manifest (identity).",
+            "title": "Provenance",
+            "type": "object"
+          },
+          "row_lookup_available": {
+            "title": "Row Lookup Available",
+            "type": "boolean"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "algorithm",
+          "parameters",
+          "fixed_pipeline_settings",
+          "parameter_source",
+          "dataset_id",
+          "model_status",
+          "metrics_available",
+          "row_lookup_available",
+          "dataset_scope",
+          "provenance",
+          "limitations"
+        ],
+        "title": "BenchmarkExperimentDetail",
+        "type": "object"
+      },
+      "BenchmarkExperimentSummary": {
+        "description": "One canonical benchmark run in the list view.",
+        "properties": {
+          "algorithm": {
+            "description": "Detector algorithm of the run.",
+            "enum": [
+              "IsolationForest",
+              "LOF"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "dataset_id": {
+            "description": "Frozen benchmark dataset identity.",
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "metrics_available": {
+            "description": "Whether the verified saved metrics for this run are currently servable (requires the admitted DVC payload to be present and checksum-verified).",
+            "title": "Metrics Available",
+            "type": "boolean"
+          },
+          "model_status": {
+            "const": "fitted_offline_frozen",
+            "description": "Run status: the detector was fitted offline by the frozen pipeline; nothing is fitted or refitted at request time.",
+            "title": "Model Status",
+            "type": "string"
+          },
+          "parameter_source": {
+            "$ref": "#/components/schemas/ParameterSourceProvenance",
+            "description": "Provenance of the parameter configuration."
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "description": "Exact source-backed parameter configuration of the run, extracted verbatim from the frozen config module.",
+            "title": "Parameters",
+            "type": "object"
+          },
+          "row_lookup_available": {
+            "description": "Whether the canonical row-level lookup is currently servable (requires the admitted DVC payload to be present and checksum-verified).",
+            "title": "Row Lookup Available",
+            "type": "boolean"
+          },
+          "run_id": {
+            "description": "Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005).",
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "algorithm",
+          "parameters",
+          "parameter_source",
+          "dataset_id",
+          "model_status",
+          "metrics_available",
+          "row_lookup_available"
+        ],
+        "title": "BenchmarkExperimentSummary",
+        "type": "object"
+      },
+      "BenchmarkMetricDefinition": {
+        "description": "Definition and denominator semantics of one saved metric.",
+        "properties": {
+          "definition": {
+            "description": "How the metric was computed by the frozen pipeline.",
+            "title": "Definition",
+            "type": "string"
+          },
+          "denominator": {
+            "description": "The population or count the metric is defined over (sample, flagged set, or label count).",
+            "title": "Denominator",
+            "type": "string"
+          },
+          "metric_name": {
+            "description": "Stable metric identifier.",
+            "title": "Metric Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric_name",
+          "definition",
+          "denominator"
+        ],
+        "title": "BenchmarkMetricDefinition",
+        "type": "object"
+      },
+      "BenchmarkMetricsResponse": {
+        "description": "Verified saved metrics for the canonical ten-run benchmark.",
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "is_live_prediction": {
+            "const": false,
+            "default": false,
+            "description": "Always false: this endpoint never produces a live prediction.",
+            "title": "Is Live Prediction",
+            "type": "boolean"
+          },
+          "is_precomputed": {
+            "const": true,
+            "default": true,
+            "description": "Always true: values are precomputed and frozen.",
+            "title": "Is Precomputed",
+            "type": "boolean"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "metric_definitions": {
+            "description": "Definitions and denominator semantics that must be shown alongside the values.",
+            "items": {
+              "$ref": "#/components/schemas/BenchmarkMetricDefinition"
+            },
+            "title": "Metric Definitions",
+            "type": "array"
+          },
+          "metrics": {
+            "description": "One row per canonical run, in frozen metadata order.",
+            "items": {
+              "$ref": "#/components/schemas/BenchmarkRunMetrics"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "description": "Payload identity: repository-relative path, verified md5 and the verification statement.",
+            "title": "Provenance",
+            "type": "object"
+          },
+          "sample": {
+            "additionalProperties": true,
+            "title": "Sample",
+            "type": "object"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "sample",
+          "metrics",
+          "metric_definitions",
+          "provenance",
+          "limitations"
+        ],
+        "title": "BenchmarkMetricsResponse",
+        "type": "object"
+      },
+      "BenchmarkRecordResponse": {
+        "description": "One canonical record, resolved by exact saved row_id.",
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "flag": {
+            "$ref": "#/components/schemas/RecordFlagBlock"
+          },
+          "is_live_prediction": {
+            "const": false,
+            "default": false,
+            "title": "Is Live Prediction",
+            "type": "boolean"
+          },
+          "is_precomputed": {
+            "const": true,
+            "default": true,
+            "title": "Is Precomputed",
+            "type": "boolean"
+          },
+          "label": {
+            "$ref": "#/components/schemas/RecordLabelBlock"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "title": "Provenance",
+            "type": "object"
+          },
+          "row_id": {
+            "description": "Canonical ULB row identifier (join key).",
+            "title": "Row Id",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "sample": {
+            "additionalProperties": true,
+            "title": "Sample",
+            "type": "object"
+          },
+          "score_orientation": {
+            "additionalProperties": true,
+            "title": "Score Orientation",
+            "type": "object"
+          },
+          "scores": {
+            "$ref": "#/components/schemas/RecordScoreBlock"
+          }
+        },
+        "required": [
+          "run_id",
+          "row_id",
+          "label",
+          "scores",
+          "flag",
+          "dataset_id",
+          "sample",
+          "score_orientation",
+          "provenance",
+          "limitations"
+        ],
+        "title": "BenchmarkRecordResponse",
+        "type": "object"
+      },
+      "BenchmarkRunMetrics": {
+        "description": "Saved Phase 4 metrics of one canonical run, exactly as admitted.",
+        "properties": {
+          "average_precision": {
+            "title": "Average Precision",
+            "type": "number"
+          },
+          "f1_at_1pct": {
+            "title": "F1 At 1Pct",
+            "type": "number"
+          },
+          "flagged_count": {
+            "title": "Flagged Count",
+            "type": "integer"
+          },
+          "flagged_proportion": {
+            "title": "Flagged Proportion",
+            "type": "number"
+          },
+          "fn": {
+            "title": "Fn",
+            "type": "integer"
+          },
+          "fp": {
+            "title": "Fp",
+            "type": "integer"
+          },
+          "fraud_count": {
+            "title": "Fraud Count",
+            "type": "integer"
+          },
+          "fraud_prevalence": {
+            "title": "Fraud Prevalence",
+            "type": "number"
+          },
+          "model": {
+            "description": "Model name recorded in the saved metrics row.",
+            "title": "Model",
+            "type": "string"
+          },
+          "precision_at_1pct": {
+            "title": "Precision At 1Pct",
+            "type": "number"
+          },
+          "recall_at_1pct": {
+            "title": "Recall At 1Pct",
+            "type": "number"
+          },
+          "roc_auc": {
+            "title": "Roc Auc",
+            "type": "number"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "runtime_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recorded Phase 3 runtime of the run in seconds, when present in the admitted artifact.",
+            "title": "Runtime Seconds"
+          },
+          "sample_size": {
+            "title": "Sample Size",
+            "type": "integer"
+          },
+          "threshold_rule": {
+            "title": "Threshold Rule",
+            "type": "string"
+          },
+          "tn": {
+            "title": "Tn",
+            "type": "integer"
+          },
+          "tp": {
+            "title": "Tp",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "model",
+          "average_precision",
+          "roc_auc",
+          "precision_at_1pct",
+          "recall_at_1pct",
+          "f1_at_1pct",
+          "tn",
+          "fp",
+          "fn",
+          "tp",
+          "sample_size",
+          "fraud_count",
+          "fraud_prevalence",
+          "flagged_count",
+          "flagged_proportion",
+          "runtime_seconds",
+          "threshold_rule"
+        ],
+        "title": "BenchmarkRunMetrics",
+        "type": "object"
+      },
       "CaseDetail": {
         "description": "Full detail of a review case (single-case view).",
         "properties": {
@@ -396,6 +908,68 @@
         "title": "CsrfTokenResponse",
         "type": "object"
       },
+      "DatasetScope": {
+        "description": "Frozen dataset and experiment context of the canonical benchmark.",
+        "properties": {
+          "environment": {
+            "additionalProperties": true,
+            "description": "Recorded execution environment of the frozen Phase 4 evaluation (reported as recorded; never re-executed).",
+            "title": "Environment",
+            "type": "object"
+          },
+          "model_fitting": {
+            "additionalProperties": true,
+            "description": "Frozen statement that Phase 4 fitted zero models (evaluation only).",
+            "title": "Model Fitting",
+            "type": "object"
+          },
+          "registry_summary": {
+            "additionalProperties": true,
+            "description": "Full-population registry context (284,807 observations, 492 positive labels) — recorded context, never mixed into sample metrics.",
+            "title": "Registry Summary",
+            "type": "object"
+          },
+          "sample": {
+            "additionalProperties": true,
+            "description": "Canonical sample facts: sample_size, fraud_count, fraud_prevalence (30,000 rows / 47 labels on the canonical run).",
+            "title": "Sample",
+            "type": "object"
+          },
+          "sample_seed": {
+            "description": "Frozen sampling seed of the 30k draw (42).",
+            "title": "Sample Seed",
+            "type": "integer"
+          },
+          "score_orientation": {
+            "additionalProperties": true,
+            "description": "Frozen score-orientation contract: native lower = more anomalous; anomaly_score = -native_score; ranking metrics use anomaly_score; threshold metrics use saved flags.",
+            "title": "Score Orientation",
+            "type": "object"
+          },
+          "threshold_percentile": {
+            "description": "Frozen threshold percentile (1.0).",
+            "title": "Threshold Percentile",
+            "type": "number"
+          },
+          "threshold_rule": {
+            "description": "Frozen post-hoc flagging rule (bottom 1% of native scores).",
+            "title": "Threshold Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sample",
+          "registry_summary",
+          "threshold_rule",
+          "threshold_percentile",
+          "sample_seed",
+          "score_orientation",
+          "environment",
+          "model_fitting"
+        ],
+        "title": "DatasetScope",
+        "type": "object"
+      },
       "ErrorBody": {
         "description": "Machine-readable error payload (sanitized; no tracebacks).",
         "properties": {
@@ -597,6 +1171,46 @@
         "title": "MetaResponse",
         "type": "object"
       },
+      "ParameterSourceProvenance": {
+        "description": "Provenance of a run's parameter configuration.",
+        "properties": {
+          "canonicalization": {
+            "description": "Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest).",
+            "title": "Canonicalization",
+            "type": "string"
+          },
+          "digest_algorithm": {
+            "const": "sha-256",
+            "description": "Digest algorithm used for provenance.",
+            "title": "Digest Algorithm",
+            "type": "string"
+          },
+          "note": {
+            "description": "Statement of how the parameters were obtained (frozen source; no framework defaults inferred).",
+            "title": "Note",
+            "type": "string"
+          },
+          "path": {
+            "description": "Repository-relative path to the frozen artifact (never absolute).",
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "description": "SHA-256 digest of the artifact bytes.",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "digest_algorithm",
+          "canonicalization",
+          "note"
+        ],
+        "title": "ParameterSourceProvenance",
+        "type": "object"
+      },
       "ReadinessCheck": {
         "description": "One configured dependency check (name and status only; no details).",
         "properties": {
@@ -675,6 +1289,79 @@
           "expected_version"
         ],
         "title": "RecordDecisionRequest",
+        "type": "object"
+      },
+      "RecordFlagBlock": {
+        "description": "Saved detector flag of a canonical record.",
+        "properties": {
+          "provenance": {
+            "description": "Provenance of the flag: saved Phase 3 output; never recomputed.",
+            "title": "Provenance",
+            "type": "string"
+          },
+          "value": {
+            "description": "Saved Phase 3 bottom-1% flag (0/1).",
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "provenance"
+        ],
+        "title": "RecordFlagBlock",
+        "type": "object"
+      },
+      "RecordLabelBlock": {
+        "description": "Ground-truth label of a canonical record.",
+        "properties": {
+          "Class": {
+            "description": "Ground-truth evaluation label (0/1).",
+            "title": "Class",
+            "type": "integer"
+          },
+          "provenance": {
+            "description": "Provenance of the label: ground-truth ULB evaluation label joined on row_id; distinct from the detector flag.",
+            "title": "Provenance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Class",
+          "provenance"
+        ],
+        "title": "RecordLabelBlock",
+        "type": "object"
+      },
+      "RecordScoreBlock": {
+        "description": "Saved scores of a canonical record.",
+        "properties": {
+          "anomaly_definition": {
+            "title": "Anomaly Definition",
+            "type": "string"
+          },
+          "anomaly_score": {
+            "description": "Saved oriented score -native_score (higher = more anomalous).",
+            "title": "Anomaly Score",
+            "type": "number"
+          },
+          "native_definition": {
+            "title": "Native Definition",
+            "type": "string"
+          },
+          "native_score": {
+            "description": "Phase 3 native estimator score (lower = more anomalous).",
+            "title": "Native Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "native_score",
+          "anomaly_score",
+          "native_definition",
+          "anomaly_definition"
+        ],
+        "title": "RecordScoreBlock",
         "type": "object"
       },
       "ResearchProvenance": {
@@ -2561,6 +3248,233 @@
         "summary": "Application metadata",
         "tags": [
           "metadata"
+        ]
+      }
+    },
+    "/api/v1/research/benchmark/experiments": {
+      "get": {
+        "description": "Lists the ten canonical Stream A Isolation Forest / Local Outlier Factor runs (IF_001..IF_005, LOF_001..LOF_005) with their exact source-backed parameter configurations and per-capability availability of the DVC-backed evidence layers. The catalog itself is served entirely from Git-tracked, manifest-verified metadata and works on a clean checkout without DVC payloads. Publicly readable (GET-only, read-only per FR-03 / ADR-007).",
+        "operationId": "list_benchmark_experiments_api_v1_research_benchmark_experiments_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkCatalogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unknown benchmark run or record."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Benchmark payload unavailable or integrity failure."
+          }
+        },
+        "summary": "List the canonical benchmark experiments",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/benchmark/experiments/{run_id}": {
+      "get": {
+        "description": "Fetches one canonical run's exact parameter configuration with its verified provenance, the fixed pipeline settings, the frozen dataset scope (30,000-row sample, 47 fraud labels, bottom-1% threshold, score orientation) and the full provenance chain (config module, Phase 4 run metadata, commit manifest). Unknown run identifiers return SOURCE_NOT_FOUND. Publicly readable.",
+        "operationId": "get_benchmark_experiment_api_v1_research_benchmark_experiments__run_id__get",
+        "parameters": [
+          {
+            "description": "Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005).",
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "description": "Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005).",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkExperimentDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unknown benchmark run or record."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Benchmark payload unavailable or integrity failure."
+          }
+        },
+        "summary": "Get one benchmark experiment's full descriptor",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/benchmark/experiments/{run_id}/records/{row_id}": {
+      "get": {
+        "description": "Returns one saved record of the selected canonical run, resolved by the exact saved ULB row_id (never by physical row order). The response distinguishes the ground-truth Class label from the detector flag, and the native estimator score from the oriented anomaly_score. No rank, top-k threshold or prediction is computed. Requires the DVC-backed evaluation dataset; when absent the route returns 503 SERVICE_NOT_READY with reason artifact_missing. Unknown run or row identifiers return SOURCE_NOT_FOUND. Publicly readable.",
+        "operationId": "get_benchmark_record_api_v1_research_benchmark_experiments__run_id__records__row_id__get",
+        "parameters": [
+          {
+            "description": "Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005).",
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "description": "Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005).",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Canonical ULB row identifier; the record is resolved by the exact saved row_id, never by physical row order.",
+            "in": "path",
+            "name": "row_id",
+            "required": true,
+            "schema": {
+              "description": "Canonical ULB row identifier; the record is resolved by the exact saved row_id, never by physical row order.",
+              "maximum": 2147483647,
+              "minimum": 0,
+              "title": "Row Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkRecordResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unknown benchmark run or record."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Benchmark payload unavailable or integrity failure."
+          }
+        },
+        "summary": "Look up one canonical record by row_id",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/benchmark/metrics": {
+      "get": {
+        "description": "Fetches the saved Phase 4 evaluation metrics for all ten canonical runs, exactly as stored in the admitted DVC-backed artifact and only after its md5/size verification against the Git-tracked DVC pointer. Every metric travels with its definition and denominator semantics. Requires the DVC payload to be present; when it is absent the route returns 503 SERVICE_NOT_READY with reason artifact_missing (the configuration catalog remains available). Publicly readable.",
+        "operationId": "get_benchmark_metrics_api_v1_research_benchmark_metrics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkMetricsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unknown benchmark run or record."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Benchmark payload unavailable or integrity failure."
+          }
+        },
+        "summary": "Get the verified saved benchmark metrics",
+        "tags": [
+          "research"
         ]
       }
     },

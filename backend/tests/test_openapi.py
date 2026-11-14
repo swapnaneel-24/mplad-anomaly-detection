@@ -37,6 +37,11 @@ EXPECTED_PATHS = {
     "/api/v1/research/sources",
     "/api/v1/research/sources/{source_id}",
     "/api/v1/research/sources/{source_id}/results",
+    # PR-09: canonical ten-run IF/LOF benchmark (GET only).
+    "/api/v1/research/benchmark/experiments",
+    "/api/v1/research/benchmark/experiments/{run_id}",
+    "/api/v1/research/benchmark/metrics",
+    "/api/v1/research/benchmark/experiments/{run_id}/records/{row_id}",
 }
 
 

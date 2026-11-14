@@ -6,6 +6,10 @@
 
 import type {
   AddNoteRequest,
+  BenchmarkCatalogResponse,
+  BenchmarkExperimentDetail,
+  BenchmarkMetricsResponse,
+  BenchmarkRecordResponse,
   CaseDetail,
   CaseHistoryResponse,
   CaseListResponse,
@@ -247,6 +251,47 @@ export function getResearchResults(
 ): Promise<ResearchResultsResponse> {
   return request<ResearchResultsResponse>(
     `/research/sources/${encodeURIComponent(sourceId)}/results`,
+    { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
+}
+
+// --- Benchmark (PR-09: canonical ten-run IF/LOF benchmark) --------------
+
+export function getBenchmarkExperiments(
+  signal?: AbortSignal,
+): Promise<BenchmarkCatalogResponse> {
+  return request<BenchmarkCatalogResponse>("/research/benchmark/experiments", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getBenchmarkExperiment(
+  runId: string,
+  signal?: AbortSignal,
+): Promise<BenchmarkExperimentDetail> {
+  return request<BenchmarkExperimentDetail>(
+    `/research/benchmark/experiments/${encodeURIComponent(runId)}`,
+    { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
+}
+
+export function getBenchmarkMetrics(
+  signal?: AbortSignal,
+): Promise<BenchmarkMetricsResponse> {
+  return request<BenchmarkMetricsResponse>("/research/benchmark/metrics", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getBenchmarkRecord(
+  runId: string,
+  rowId: number,
+  signal?: AbortSignal,
+): Promise<BenchmarkRecordResponse> {
+  return request<BenchmarkRecordResponse>(
+    `/research/benchmark/experiments/${encodeURIComponent(runId)}/records/${rowId}`,
     { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
   );
 }

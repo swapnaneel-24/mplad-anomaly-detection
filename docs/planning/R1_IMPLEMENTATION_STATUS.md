@@ -25,7 +25,7 @@ This ledger is subordinate to the SRS, ADRs, and implementation backlog. It does
 |---|---|---|
 | M0 — Governance and sign-off | Operational baseline established; formal sign-off unresolved | Record accepted decisions and outstanding approvals |
 | M1 — Walking skeleton | Completed as reported, PR-01 through PR-07 | React/FastAPI/PostgreSQL workflow, fixture-based case journey, auth boundary, Compose and CI |
-| M2 — Verified research integration | In progress | PR-08 merged; PR-09 next; subsequent M2 work remains |
+| M2 — Verified research integration | In progress | PR-08 merged; PR-09 implemented & locally verified on `pr-09-canonical-benchmark` (pending PR #4 CI & merge review); PR-10–12 remain |
 | M3 — PMGSY observatory and review | Not started under this roadmap | Approved source admission, record explorer, real-source case flow and export |
 | M4 — R1 deployment and hardening | Not started under this roadmap | AT-01–12, public HTTPS release and security/reproducibility gates |
 | M5a/M5b/M5c — R2 enhancements | Deferred | Separate gated and independently versioned experiments |

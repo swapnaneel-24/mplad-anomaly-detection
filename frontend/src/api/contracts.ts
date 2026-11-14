@@ -329,3 +329,153 @@ export interface ResearchResultsResponse {
   is_precomputed: true;
   is_live_prediction: false;
 }
+
+// --- Benchmark (PR-09: canonical ten-run IF/LOF benchmark) --------------
+
+/** Identity of one consumed frozen artifact. */
+export interface ArtifactProvenance {
+  path: string;
+  sha256: string;
+  digest_algorithm: "sha-256";
+  canonicalization: string;
+}
+
+/** Provenance of a run's parameter configuration. */
+export interface ParameterSourceProvenance extends ArtifactProvenance {
+  note: string;
+}
+
+/** One canonical benchmark run in the list view. */
+export interface BenchmarkExperimentSummary {
+  run_id: string;
+  algorithm: "IsolationForest" | "LOF";
+  parameters: Record<string, unknown>;
+  parameter_source: ParameterSourceProvenance;
+  dataset_id: string;
+  model_status: "fitted_offline_frozen";
+  metrics_available: boolean;
+  row_lookup_available: boolean;
+}
+
+/** Per-capability availability of a DVC-backed evidence layer. */
+export interface BenchmarkCapabilityStatus {
+  available: boolean;
+  reason: "artifact_missing" | "integrity_failed" | null;
+  detail: string | null;
+}
+
+/** The verified ten-run benchmark catalog. */
+export interface BenchmarkCatalogResponse {
+  source_id: string;
+  dataset_id: string;
+  experiments: BenchmarkExperimentSummary[];
+  count: number;
+  capabilities: Record<string, BenchmarkCapabilityStatus>;
+  limitations: string[];
+}
+
+/** Frozen dataset and experiment context of the canonical benchmark. */
+export interface DatasetScope {
+  sample: Record<string, unknown>;
+  registry_summary: Record<string, unknown>;
+  threshold_rule: string;
+  threshold_percentile: number;
+  sample_seed: number;
+  score_orientation: Record<string, unknown>;
+  environment: Record<string, unknown>;
+  model_fitting: Record<string, unknown>;
+}
+
+/** Full descriptor of one canonical benchmark run. */
+export interface BenchmarkExperimentDetail {
+  run_id: string;
+  algorithm: "IsolationForest" | "LOF";
+  parameters: Record<string, unknown>;
+  fixed_pipeline_settings: Record<string, unknown>;
+  parameter_source: ParameterSourceProvenance;
+  dataset_id: string;
+  model_status: "fitted_offline_frozen";
+  metrics_available: boolean;
+  row_lookup_available: boolean;
+  dataset_scope: DatasetScope;
+  provenance: Record<string, ArtifactProvenance>;
+  limitations: string[];
+}
+
+/** Definition and denominator semantics of one saved metric. */
+export interface BenchmarkMetricDefinition {
+  metric_name: string;
+  definition: string;
+  denominator: string;
+}
+
+/** Saved Phase 4 metrics of one canonical run, exactly as admitted. */
+export interface BenchmarkRunMetrics {
+  run_id: string;
+  model: string;
+  average_precision: number;
+  roc_auc: number;
+  precision_at_1pct: number;
+  recall_at_1pct: number;
+  f1_at_1pct: number;
+  tn: number;
+  fp: number;
+  fn: number;
+  tp: number;
+  sample_size: number;
+  fraud_count: number;
+  fraud_prevalence: number;
+  flagged_count: number;
+  flagged_proportion: number;
+  runtime_seconds: number | null;
+  threshold_rule: string;
+}
+
+/** Verified saved metrics for the canonical ten-run benchmark. */
+export interface BenchmarkMetricsResponse {
+  source_id: string;
+  dataset_id: string;
+  sample: Record<string, unknown>;
+  metrics: BenchmarkRunMetrics[];
+  metric_definitions: BenchmarkMetricDefinition[];
+  provenance: Record<string, unknown>;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+/** Ground-truth label block of a canonical record. */
+export interface RecordLabelBlock {
+  Class: number;
+  provenance: string;
+}
+
+/** Saved scores of a canonical record. */
+export interface RecordScoreBlock {
+  native_score: number;
+  anomaly_score: number;
+  native_definition: string;
+  anomaly_definition: string;
+}
+
+/** Saved detector flag of a canonical record. */
+export interface RecordFlagBlock {
+  value: number;
+  provenance: string;
+}
+
+/** One canonical record, resolved by exact saved row_id. */
+export interface BenchmarkRecordResponse {
+  run_id: string;
+  row_id: number;
+  label: RecordLabelBlock;
+  scores: RecordScoreBlock;
+  flag: RecordFlagBlock;
+  dataset_id: string;
+  sample: Record<string, unknown>;
+  score_orientation: Record<string, unknown>;
+  provenance: Record<string, unknown>;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}

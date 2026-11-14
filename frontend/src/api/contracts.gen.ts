@@ -17,6 +17,141 @@ export interface AddNoteRequest {
   note_text: string;
 };
 
+/** Identity of one consumed frozen artifact. */
+export interface ArtifactProvenance {
+  /** Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest). */
+  canonicalization: string;
+  /** Digest algorithm used for provenance. */
+  digest_algorithm: "sha-256";
+  /** Repository-relative path to the frozen artifact (never absolute). */
+  path: string;
+  /** SHA-256 digest of the artifact bytes. */
+  sha256: string;
+};
+
+/** The verified ten-run benchmark catalog with capability availability. */
+export interface BenchmarkCatalogResponse {
+  /** Per-capability availability of the DVC-backed evidence layers ('metrics', 'row_level'): available / reason (artifact_missing or integrity_failed) / detail. The catalog itself is always served from Git-verified metadata. */
+  capabilities: Record<string, never>;
+  /** Number of experiments (always 10). */
+  count: number;
+  /** Frozen benchmark dataset identity. */
+  dataset_id: string;
+  /** The ten canonical runs in frozen config order. */
+  experiments: Array<BenchmarkExperimentSummary>;
+  /** Scientific limitations that apply to every run. */
+  limitations: Array<string>;
+  /** Fixed benchmark source identifier. */
+  source_id: string;
+};
+
+/** Full descriptor of one canonical benchmark run. */
+export interface BenchmarkExperimentDetail {
+  algorithm: "IsolationForest" | "LOF";
+  dataset_id: string;
+  dataset_scope: DatasetScope;
+  /** Fixed detector settings recorded alongside the run grid (e.g. LOF ball_tree/leaf_size); documented, frozen. */
+  fixed_pipeline_settings: Record<string, never>;
+  limitations: Array<string>;
+  metrics_available: boolean;
+  model_status: "fitted_offline_frozen";
+  parameter_source: ParameterSourceProvenance;
+  parameters: Record<string, never>;
+  /** Provenance chain: config (parameters), run metadata (dataset scope) and commit manifest (identity). */
+  provenance: Record<string, never>;
+  row_lookup_available: boolean;
+  run_id: string;
+};
+
+/** One canonical benchmark run in the list view. */
+export interface BenchmarkExperimentSummary {
+  /** Detector algorithm of the run. */
+  algorithm: "IsolationForest" | "LOF";
+  /** Frozen benchmark dataset identity. */
+  dataset_id: string;
+  /** Whether the verified saved metrics for this run are currently servable (requires the admitted DVC payload to be present and checksum-verified). */
+  metrics_available: boolean;
+  /** Run status: the detector was fitted offline by the frozen pipeline; nothing is fitted or refitted at request time. */
+  model_status: "fitted_offline_frozen";
+  /** Provenance of the parameter configuration. */
+  parameter_source: ParameterSourceProvenance;
+  /** Exact source-backed parameter configuration of the run, extracted verbatim from the frozen config module. */
+  parameters: Record<string, never>;
+  /** Whether the canonical row-level lookup is currently servable (requires the admitted DVC payload to be present and checksum-verified). */
+  row_lookup_available: boolean;
+  /** Canonical run identifier (IF_001..IF_005, LOF_001..LOF_005). */
+  run_id: string;
+};
+
+/** Definition and denominator semantics of one saved metric. */
+export interface BenchmarkMetricDefinition {
+  /** How the metric was computed by the frozen pipeline. */
+  definition: string;
+  /** The population or count the metric is defined over (sample, flagged set, or label count). */
+  denominator: string;
+  /** Stable metric identifier. */
+  metric_name: string;
+};
+
+/** Verified saved metrics for the canonical ten-run benchmark. */
+export interface BenchmarkMetricsResponse {
+  dataset_id: string;
+  /** Always false: this endpoint never produces a live prediction. */
+  is_live_prediction?: boolean;
+  /** Always true: values are precomputed and frozen. */
+  is_precomputed?: true;
+  limitations: Array<string>;
+  /** Definitions and denominator semantics that must be shown alongside the values. */
+  metric_definitions: Array<BenchmarkMetricDefinition>;
+  /** One row per canonical run, in frozen metadata order. */
+  metrics: Array<BenchmarkRunMetrics>;
+  /** Payload identity: repository-relative path, verified md5 and the verification statement. */
+  provenance: Record<string, never>;
+  sample: Record<string, never>;
+  source_id: string;
+};
+
+/** One canonical record, resolved by exact saved row_id. */
+export interface BenchmarkRecordResponse {
+  dataset_id: string;
+  flag: RecordFlagBlock;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  label: RecordLabelBlock;
+  limitations: Array<string>;
+  provenance: Record<string, never>;
+  /** Canonical ULB row identifier (join key). */
+  row_id: number;
+  run_id: string;
+  sample: Record<string, never>;
+  score_orientation: Record<string, never>;
+  scores: RecordScoreBlock;
+};
+
+/** Saved Phase 4 metrics of one canonical run, exactly as admitted. */
+export interface BenchmarkRunMetrics {
+  average_precision: number;
+  f1_at_1pct: number;
+  flagged_count: number;
+  flagged_proportion: number;
+  fn: number;
+  fp: number;
+  fraud_count: number;
+  fraud_prevalence: number;
+  /** Model name recorded in the saved metrics row. */
+  model: string;
+  precision_at_1pct: number;
+  recall_at_1pct: number;
+  roc_auc: number;
+  run_id: string;
+  /** Recorded Phase 3 runtime of the run in seconds, when present in the admitted artifact. */
+  runtime_seconds: number | unknown;
+  sample_size: number;
+  threshold_rule: string;
+  tn: number;
+  tp: number;
+};
+
 /** Full detail of a review case (single-case view). */
 export interface CaseDetail {
   created_at: string;
@@ -105,6 +240,26 @@ export interface CsrfTokenResponse {
   csrf_token: string;
 };
 
+/** Frozen dataset and experiment context of the canonical benchmark. */
+export interface DatasetScope {
+  /** Recorded execution environment of the frozen Phase 4 evaluation (reported as recorded; never re-executed). */
+  environment: Record<string, never>;
+  /** Frozen statement that Phase 4 fitted zero models (evaluation only). */
+  model_fitting: Record<string, never>;
+  /** Full-population registry context (284,807 observations, 492 positive labels) — recorded context, never mixed into sample metrics. */
+  registry_summary: Record<string, never>;
+  /** Canonical sample facts: sample_size, fraud_count, fraud_prevalence (30,000 rows / 47 labels on the canonical run). */
+  sample: Record<string, never>;
+  /** Frozen sampling seed of the 30k draw (42). */
+  sample_seed: number;
+  /** Frozen score-orientation contract: native lower = more anomalous; anomaly_score = -native_score; ranking metrics use anomaly_score; threshold metrics use saved flags. */
+  score_orientation: Record<string, never>;
+  /** Frozen threshold percentile (1.0). */
+  threshold_percentile: number;
+  /** Frozen post-hoc flagging rule (bottom 1% of native scores). */
+  threshold_rule: string;
+};
+
 /** Machine-readable error payload (sanitized; no tracebacks). */
 export interface ErrorBody {
   /** Stable machine-readable error code. */
@@ -164,6 +319,20 @@ export interface MetaResponse {
   subsystems: Record<string, never>;
 };
 
+/** Provenance of a run's parameter configuration. */
+export interface ParameterSourceProvenance {
+  /** Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest). */
+  canonicalization: string;
+  /** Digest algorithm used for provenance. */
+  digest_algorithm: "sha-256";
+  /** Statement of how the parameters were obtained (frozen source; no framework defaults inferred). */
+  note: string;
+  /** Repository-relative path to the frozen artifact (never absolute). */
+  path: string;
+  /** SHA-256 digest of the artifact bytes. */
+  sha256: string;
+};
+
 /** One configured dependency check (name and status only; no details). */
 export interface ReadinessCheck {
   name: string;
@@ -191,6 +360,32 @@ export interface RecordDecisionRequest {
   outcome: ReviewStatus;
   /** Structured review rationale for the decision. */
   rationale: string;
+};
+
+/** Saved detector flag of a canonical record. */
+export interface RecordFlagBlock {
+  /** Provenance of the flag: saved Phase 3 output; never recomputed. */
+  provenance: string;
+  /** Saved Phase 3 bottom-1% flag (0/1). */
+  value: number;
+};
+
+/** Ground-truth label of a canonical record. */
+export interface RecordLabelBlock {
+  /** Ground-truth evaluation label (0/1). */
+  Class: number;
+  /** Provenance of the label: ground-truth ULB evaluation label joined on row_id; distinct from the detector flag. */
+  provenance: string;
+};
+
+/** Saved scores of a canonical record. */
+export interface RecordScoreBlock {
+  anomaly_definition: string;
+  /** Saved oriented score -native_score (higher = more anomalous). */
+  anomaly_score: number;
+  native_definition: string;
+  /** Phase 3 native estimator score (lower = more anomalous). */
+  native_score: number;
 };
 
 /** Provenance of a precomputed research result (artifact + digest). */

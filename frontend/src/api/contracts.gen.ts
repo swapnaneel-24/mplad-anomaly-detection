@@ -74,6 +74,13 @@ export interface ArtifactProvenance {
   sha256: string;
 };
 
+/** Whether the figure payload can be served right now. */
+export interface Availability {
+  available: boolean;
+  detail?: string | unknown;
+  reason?: "artifact_missing" | "integrity_failed" | "source_not_admitted" | unknown;
+};
+
 /** The verified ten-run benchmark catalog with capability availability. */
 export interface BenchmarkCatalogResponse {
   /** Per-capability availability of the DVC-backed evidence layers ('metrics', 'row_level'): available / reason (artifact_missing or integrity_failed) / detail. The catalog itself is always served from Git-verified metadata. */
@@ -380,6 +387,14 @@ export interface ErrorEnvelope {
 /** Controlled event-type vocabulary for the append-only ``case_events`` table. */
 export type EventType = "created" | "note_added" | "status_changed" | "decision_recorded" | "reopened";
 
+/** One link from an objective/RQ to existing capability evidence. */
+export interface EvidenceLink {
+  reference: string;
+  source_id?: string | unknown;
+  type: string;
+  verification_status?: "verified" | "unverified" | "unavailable";
+};
+
 /** Identity of one consumed DVC-backed payload (Layer B). */
 export interface FamilyProvenance {
   /** Verified DVC pointer MD5 of the payload. */
@@ -393,6 +408,38 @@ export interface FamilyProvenance {
   verification: string;
 };
 
+/** The verified Phase 5B figure catalog. */
+export interface FigureCatalogResponse {
+  /** True when the DVC-backed catalog CSV is present and verified; false on a clean checkout. */
+  catalog_metadata_available: boolean;
+  dataset_id: string;
+  figures: Array<FigureEntry>;
+  limitations: Array<string>;
+  manifest_status: "verified" | "integrity_failed" | "source_not_admitted";
+  models_fitted: number;
+  phase: "5B";
+  publication_gate: Publication;
+  source_id: string;
+  stream: "A";
+};
+
+/** One canonical Phase 5B figure, with all state dimensions separated. */
+export interface FigureEntry {
+  /** Concise source-backed accessibility description (derived from title). */
+  alt_text: string;
+  availability: Availability;
+  /** Full conventions text; used as the visible caption, not raw alt. */
+  conventions?: string | unknown;
+  figure_no: number;
+  filename: string;
+  input_artifacts?: string | unknown;
+  integrity: IntegrityStatus;
+  publication: Publication;
+  purpose?: string | unknown;
+  /** Source-backed title from the catalog CSV; null if the CSV is unavailable. */
+  title?: string | unknown;
+};
+
 /** Liveness: the API process can answer requests. */
 export interface HealthLiveResponse {
   /** Application name. */
@@ -400,6 +447,13 @@ export interface HealthLiveResponse {
   status: "alive";
   /** Backend application version. */
   version: string;
+};
+
+/** The 284,807-row LOF Novelty Mode companion, kept distinct from the canonical sample. */
+export interface HistoricalCompanion {
+  canonical_comparable?: boolean;
+  limitations?: Array<string>;
+  population: number;
 };
 
 export interface HypergeometricResponse {
@@ -427,6 +481,15 @@ export interface HypergeometricResponse {
   survival_upper_tail: number;
   threshold_pct: number;
   union_size: number;
+};
+
+/** Raw-byte integrity of one figure artifact against its declared identities. */
+export interface IntegrityStatus {
+  /** Verified manifest SHA-256 (only set when state=verified). */
+  sha256?: string | unknown;
+  /** Verified raw size in bytes (only set when state=verified). */
+  size_bytes?: number | unknown;
+  state: "verified" | "artifact_missing" | "integrity_failed" | "source_not_admitted";
 };
 
 /** Login credentials (bounded; login payloads cannot be oversized). */
@@ -476,6 +539,16 @@ export interface MultithresholdResponse {
   selection_caveat: string;
   source_id: string;
   thresholds: Array<ThresholdRow>;
+};
+
+/** One source-native objective from docs/provenance_log.md §1. */
+export interface ObjectiveEntry {
+  evidence?: Array<EvidenceLink>;
+  limitations?: Array<string>;
+  methodology_sources?: Array<string>;
+  objective_id: "(a)" | "(b)" | "(c)";
+  research_questions?: Array<string>;
+  statement: string;
 };
 
 export interface PairedDifferenceRow {
@@ -546,6 +619,13 @@ export interface Phase5AProtocolResponse {
   stream: "A";
 };
 
+/** Whether the figure binary is authorised for public delivery. */
+export interface Publication {
+  detail?: string | unknown;
+  enabled: boolean;
+  reason?: "publication_not_approved" | "licensing_unresolved" | unknown;
+};
+
 /** One configured dependency check (name and status only; no details). */
 export interface ReadinessCheck {
   name: string;
@@ -601,6 +681,13 @@ export interface RecordScoreBlock {
   native_score: number;
 };
 
+/** Source and artifact references for reproducibility. */
+export interface Reproducibility {
+  artifact_references?: Array<Record<string, never>>;
+  limitations?: Array<string>;
+  source_references?: Array<Record<string, never>>;
+};
+
 /** Provenance of a precomputed research result (artifact + digest). */
 export interface ResearchProvenance {
   /** Repository-relative path to the frozen artifact. */
@@ -611,6 +698,14 @@ export interface ResearchProvenance {
   canonicalization: "raw-bytes" | "frozen-checker-compatible";
   /** Digest algorithm. */
   digest_algorithm: "sha-256";
+};
+
+/** One research question from docs/Phase-0.md §0.4. */
+export interface ResearchQuestionEntry {
+  linked_objective: "(a)" | "(b)" | "(c)";
+  rq_id: "RQ1" | "RQ2" | "RQ3" | "RQ4" | "RQ5" | "RQ6";
+  source_reference: string;
+  statement: string;
 };
 
 /** One precomputed aggregate reference value with its description.
@@ -828,6 +923,16 @@ export interface ThresholdRow {
   /** 'saved_canonical' (the frozen 1% flags) or 'derived_topk'. */
   selection_source: string;
   threshold_pct: number;
+};
+
+/** Objectives, research questions, historical companion, and reproducibility links. */
+export interface TraceabilityResponse {
+  historical_companion: HistoricalCompanion;
+  limitations: Array<string>;
+  objectives: Array<ObjectiveEntry>;
+  reproducibility: Reproducibility;
+  research_questions: Array<ResearchQuestionEntry>;
+  source_identity: Record<string, never>;
 };
 
 /** Input contract for a status transition. */

@@ -56,6 +56,10 @@ EXPECTED_PATHS = {
     "/api/v1/research/phase5a/uncertainty",
     "/api/v1/research/phase5a/agreement",
     "/api/v1/research/phase5a/review-policies",
+    # PR-11: Phase 5B figure gallery and objective traceability (GET only).
+    "/api/v1/research/phase5b/catalog",
+    "/api/v1/research/phase5b/figures/{figure_no}/image",
+    "/api/v1/research/phase5b/traceability",
 }
 
 

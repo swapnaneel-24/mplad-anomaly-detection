@@ -11,6 +11,7 @@ from app.api.v1 import (
     health,
     meta,
     phase5a,
+    phase5b,
     research,
     sources,
     synthetic,
@@ -30,3 +31,6 @@ api_router.include_router(benchmark.router)
 # PR-10: Phase 5A uncertainty/agreement/review-policy evidence (read-only),
 # mounted under /api/v1/research/phase5a on the same research API surface.
 api_router.include_router(phase5a.router)
+# PR-11: Phase 5B figure gallery and objective traceability (read-only),
+# mounted under /api/v1/research/phase5b on the same research API surface.
+api_router.include_router(phase5b.router)

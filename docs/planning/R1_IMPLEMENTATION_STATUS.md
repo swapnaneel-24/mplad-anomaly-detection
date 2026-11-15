@@ -3,9 +3,9 @@
 - **Document ID:** `STATUS-PEIARS-R1-001`
 - **Status:** Living implementation-status record
 - **Current milestone:** M2 — Verified Stream A Research Integration
-- **Current implementation branch:** `pr-10-phase5a-evidence`
-- **Verified PR-10 baseline (`main` HEAD):** `d9715cfda089623f741ce63ef54a5157bfd4286e` (PR #4 merge commit: `89615e5dcc173f3586ff284525ef872b9bc9af9c`)
-- **Last updated:** 2026-11-14
+- **Current implementation branch:** `pr-11-phase5b-gallery`
+- **Verified PR-11 baseline (`main` HEAD):** `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3` (PR #5 merge commit)
+- **Last updated:** 2026-11-15
 
 ## 1. Governing documents
 
@@ -25,7 +25,7 @@ This ledger is subordinate to the SRS, ADRs, and implementation backlog. It does
 |---|---|---|
 | M0 — Governance and sign-off | Operational baseline established; formal sign-off unresolved | Record accepted decisions and outstanding approvals |
 | M1 — Walking skeleton | Completed as reported, PR-01 through PR-07 | React/FastAPI/PostgreSQL workflow, fixture-based case journey, auth boundary, Compose and CI |
-| M2 — Verified research integration | In progress | PR-08 merged; PR-09 implemented & locally verified on `pr-10-phase5a-evidence` (pending PR #4 CI & merge review); PR-10–12 remain |
+| M2 — Verified research integration | In progress | PR-08, PR-09 and PR-10 merged; PR-11 source admission in progress; PR-12 remains |
 | M3 — PMGSY observatory and review | Not started under this roadmap | Approved source admission, record explorer, real-source case flow and export |
 | M4 — R1 deployment and hardening | Not started under this roadmap | AT-01–12, public HTTPS release and security/reproducibility gates |
 | M5a/M5b/M5c — R2 enhancements | Deferred | Separate gated and independently versioned experiments |
@@ -164,7 +164,7 @@ These PR numbers are implementation subdivisions proposed under the foundational
 - Canonical Phase 4 metrics and row-level file schemas remain to be inspected.
 - DVC payload availability differs between trusted local environments and normal hosted CI.
 - Independently verified row-level CSV availability may be insufficient; no pickle-based API shortcut is approved.
-- The Windows-specific `pgserver` harness exception remains documented.
+- The Windows-specific `pgserver` harness exception was **resolved in PR-10** — the SCRAM fixture was corrected to use `host` (TCP/IPv4+IPv6) scram-sha-256 rules; the earlier `accepted Windows harness exception` classification was incorrect.
 - M3 source admission and M4 public release decisions remain separate and unresolved.
 
 ## 10. Update protocol
@@ -178,4 +178,83 @@ After each PR:
 5. Identify unresolved limitations, accepted deviations and next milestone.
 6. Mark the PR accepted only after maintainer review and required checks.
 
-Next scheduled work: PR-09 source-contract preflight, then bounded implementation if the canonical source identities and schemas pass admission.
+Next scheduled work: PR-11 source-admission preflight (Phase 5B figure catalog, eight canonical PNG identities, methodology and objective-traceability sources), then bounded implementation if the sources pass admission.
+
+---
+## PR-10 — Phase 5A Uncertainty, Agreement, and Review-Policy Evidence
+
+**GitHub PR:** #5
+**Status:** MERGED — Accepted
+**Source branch:** `pr-10-phase5a-evidence` (deleted after merge)
+**Verified pre-merge head:** `8724d86287c46f09077fde6a26e65d10c5feace0`
+**Main merge commit:** `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3`
+**Merge strategy:** Merge commit (`gh pr merge 5 --merge --delete-branch`)
+**Milestone:** M2 — Verified Stream A Research Integration
+**Backlog mapping:** M2-03, with applicable M2-04 provenance and failure-state protections
+**Requirements:** FR-14, FR-17, FR-18, FR-31, FR-32; AT-02 and applicable AT-03/AT-10
+
+### Accepted implementation
+
+- Integrated read-only, manifest-backed Phase 5A research evidence.
+- Exposed approved bootstrap uncertainty, agreement and review-policy evidence through the existing FastAPI/React architecture.
+- Preserved independent DVC capability availability and fail-closed integrity behavior.
+- Verified Phase 5 metadata and DVC payload identities against approved trust anchors.
+- Preserved the distinction between saved scientific evidence and unsupported runtime-derived metrics.
+- Maintained public read-only research access and protected reviewer-case operations.
+- Protected existing Phase 3–6 science and DVC artifacts.
+
+### Verification evidence
+
+**Maintainer-reported Windows 11 verification:**
+
+- Backend: 704/704 passed.
+- Frontend Vitest: 134/134 passed.
+- Chromium Playwright: 21/21 passed.
+- Typecheck, lint, OpenAPI consistency and production build: passed.
+- Real materialized Phase 5A DVC verification: passed.
+- Clean-checkout unavailable-artifact verification: passed.
+
+**Hosted GitHub Actions:**
+
+All five required checks passed on commit `8724d86287c46f09077fde6a26e65d10c5feace0`:
+
+1. Backend tests — Python 3.12 with PostgreSQL.
+2. Browser E2E — Chromium and real backend.
+3. Container build and Compose smoke.
+4. Frontend — Node 22, typecheck, lint, Vitest, build, OpenAPI.
+5. Frozen research integrity — SHA-256.
+
+**Post-merge verification:**
+
+- `main` HEAD: `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3`.
+- Working tree: clean.
+- Frozen integrity: 28/28 matching.
+- No unauthorized modification to protected scientific files, manifests or DVC pointers.
+
+**Resolved issue:** The earlier PostgreSQL SCRAM fixture failure was corrected in PR-10. It is no longer classified as an accepted Windows harness exception.
+
+**Deferred non-blocking issue:** 812 reported dependency/deprecation warnings remain for a separately scoped maintenance task.
+
+### Scope boundary
+
+PR-10 does not complete M2 or R1. Phase 5B figure publication, methodology, objective traceability and full M2 acceptance remain outstanding.
+
+---
+
+## PR-11 — Phase 5B Figure Gallery, Methodology, and Original Objective Traceability
+
+**Status:** Planned — Source admission pending
+**Branch:** `pr-11-phase5b-gallery`
+**Baseline:** `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3`
+**Milestone:** M2 — Verified Stream A Research Integration
+**Backlog:** M2-03 and M2-05
+**Primary requirements:** FR-15, FR-19, FR-33, FR-34, FR-35, with FR-31/32 integrity and provenance protection
+**Acceptance:** AT-02, with applicable AT-03, AT-04 and AT-10 checks
+
+**Scope:** Authentic Phase 5B figure gallery, source-backed scientific methodology, original-objective traceability and clear distinction between canonical ULB evidence and historical or exploratory sources.
+
+**Not included:** Model fitting, new projections, R2 PCA/UMAP enhancements, new review-policy calculations, PMGSY modelling, MPLADS reconciliation or full M2 release acceptance.
+
+**Next implementation gate:** Verify the Phase 5B figure catalog, eight canonical PNG identities, reproduction manifests, licensing/publication eligibility, methodology sources and historical-companion provenance before implementing the presentation layer.
+
+**M2 status:** IN PROGRESS. PR-12 remains the final M2 integration and acceptance gate.

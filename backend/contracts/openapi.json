@@ -294,6 +294,47 @@
         "title": "ArtifactProvenance",
         "type": "object"
       },
+      "Availability": {
+        "description": "Whether the figure payload can be served right now.",
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "artifact_missing",
+                  "integrity_failed",
+                  "source_not_admitted"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "title": "Availability",
+        "type": "object"
+      },
       "BenchmarkCatalogResponse": {
         "description": "The verified ten-run benchmark catalog with capability availability.",
         "properties": {
@@ -1531,6 +1572,46 @@
         "title": "EventType",
         "type": "string"
       },
+      "EvidenceLink": {
+        "description": "One link from an objective/RQ to existing capability evidence.",
+        "properties": {
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "verification_status": {
+            "default": "verified",
+            "enum": [
+              "verified",
+              "unverified",
+              "unavailable"
+            ],
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "reference"
+        ],
+        "title": "EvidenceLink",
+        "type": "object"
+      },
       "FamilyProvenance": {
         "description": "Identity of one consumed DVC-backed payload (Layer B).",
         "properties": {
@@ -1570,6 +1651,164 @@
         "title": "FamilyProvenance",
         "type": "object"
       },
+      "FigureCatalogResponse": {
+        "description": "The verified Phase 5B figure catalog.",
+        "properties": {
+          "catalog_metadata_available": {
+            "description": "True when the DVC-backed catalog CSV is present and verified; false on a clean checkout.",
+            "title": "Catalog Metadata Available",
+            "type": "boolean"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "figures": {
+            "items": {
+              "$ref": "#/components/schemas/FigureEntry"
+            },
+            "title": "Figures",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "manifest_status": {
+            "enum": [
+              "verified",
+              "integrity_failed",
+              "source_not_admitted"
+            ],
+            "title": "Manifest Status",
+            "type": "string"
+          },
+          "models_fitted": {
+            "const": 0,
+            "title": "Models Fitted",
+            "type": "integer"
+          },
+          "phase": {
+            "const": "5B",
+            "title": "Phase",
+            "type": "string"
+          },
+          "publication_gate": {
+            "$ref": "#/components/schemas/Publication"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          },
+          "stream": {
+            "const": "A",
+            "title": "Stream",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "dataset_id",
+          "phase",
+          "stream",
+          "models_fitted",
+          "manifest_status",
+          "catalog_metadata_available",
+          "publication_gate",
+          "figures",
+          "limitations"
+        ],
+        "title": "FigureCatalogResponse",
+        "type": "object"
+      },
+      "FigureEntry": {
+        "description": "One canonical Phase 5B figure, with all state dimensions separated.",
+        "properties": {
+          "alt_text": {
+            "description": "Concise source-backed accessibility description (derived from title).",
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "availability": {
+            "$ref": "#/components/schemas/Availability"
+          },
+          "conventions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Full conventions text; used as the visible caption, not raw alt.",
+            "title": "Conventions"
+          },
+          "figure_no": {
+            "maximum": 8.0,
+            "minimum": 1.0,
+            "title": "Figure No",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "input_artifacts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Artifacts"
+          },
+          "integrity": {
+            "$ref": "#/components/schemas/IntegrityStatus"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/Publication"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Source-backed title from the catalog CSV; null if the CSV is unavailable.",
+            "title": "Title"
+          }
+        },
+        "required": [
+          "figure_no",
+          "filename",
+          "alt_text",
+          "integrity",
+          "availability",
+          "publication"
+        ],
+        "title": "FigureEntry",
+        "type": "object"
+      },
       "HealthLiveResponse": {
         "description": "Liveness: the API process can answer requests.",
         "properties": {
@@ -1595,6 +1834,33 @@
           "version"
         ],
         "title": "HealthLiveResponse",
+        "type": "object"
+      },
+      "HistoricalCompanion": {
+        "description": "The 284,807-row LOF Novelty Mode companion, kept distinct from the canonical sample.",
+        "properties": {
+          "canonical_comparable": {
+            "const": false,
+            "default": false,
+            "title": "Canonical Comparable",
+            "type": "boolean"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "population"
+        ],
+        "title": "HistoricalCompanion",
         "type": "object"
       },
       "HypergeometricResponse": {
@@ -1715,6 +1981,50 @@
           "limitations"
         ],
         "title": "HypergeometricResponse",
+        "type": "object"
+      },
+      "IntegrityStatus": {
+        "description": "Raw-byte integrity of one figure artifact against its declared identities.",
+        "properties": {
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Verified manifest SHA-256 (only set when state=verified).",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Verified raw size in bytes (only set when state=verified).",
+            "title": "Size Bytes"
+          },
+          "state": {
+            "enum": [
+              "verified",
+              "artifact_missing",
+              "integrity_failed",
+              "source_not_admitted"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "IntegrityStatus",
         "type": "object"
       },
       "LoginRequest": {
@@ -1921,6 +2231,58 @@
           "limitations"
         ],
         "title": "MultithresholdResponse",
+        "type": "object"
+      },
+      "ObjectiveEntry": {
+        "description": "One source-native objective from docs/provenance_log.md §1.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceLink"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "methodology_sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Methodology Sources",
+            "type": "array"
+          },
+          "objective_id": {
+            "enum": [
+              "(a)",
+              "(b)",
+              "(c)"
+            ],
+            "title": "Objective Id",
+            "type": "string"
+          },
+          "research_questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Research Questions",
+            "type": "array"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "objective_id",
+          "statement"
+        ],
+        "title": "ObjectiveEntry",
         "type": "object"
       },
       "PairedDifferenceRow": {
@@ -2234,6 +2596,46 @@
         "title": "Phase5AProtocolResponse",
         "type": "object"
       },
+      "Publication": {
+        "description": "Whether the figure binary is authorised for public delivery.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "publication_not_approved",
+                  "licensing_unresolved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "Publication",
+        "type": "object"
+      },
       "ReadinessCheck": {
         "description": "One configured dependency check (name and status only; no details).",
         "properties": {
@@ -2387,6 +2789,36 @@
         "title": "RecordScoreBlock",
         "type": "object"
       },
+      "Reproducibility": {
+        "description": "Source and artifact references for reproducibility.",
+        "properties": {
+          "artifact_references": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Artifact References",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "source_references": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Source References",
+            "type": "array"
+          }
+        },
+        "title": "Reproducibility",
+        "type": "object"
+      },
       "ResearchProvenance": {
         "description": "Provenance of a precomputed research result (artifact + digest).",
         "properties": {
@@ -2423,6 +2855,48 @@
           "canonicalization"
         ],
         "title": "ResearchProvenance",
+        "type": "object"
+      },
+      "ResearchQuestionEntry": {
+        "description": "One research question from docs/Phase-0.md §0.4.",
+        "properties": {
+          "linked_objective": {
+            "enum": [
+              "(a)",
+              "(b)",
+              "(c)"
+            ],
+            "title": "Linked Objective",
+            "type": "string"
+          },
+          "rq_id": {
+            "enum": [
+              "RQ1",
+              "RQ2",
+              "RQ3",
+              "RQ4",
+              "RQ5",
+              "RQ6"
+            ],
+            "title": "Rq Id",
+            "type": "string"
+          },
+          "source_reference": {
+            "title": "Source Reference",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rq_id",
+          "statement",
+          "source_reference",
+          "linked_objective"
+        ],
+        "title": "ResearchQuestionEntry",
         "type": "object"
       },
       "ResearchResultItem": {
@@ -3147,6 +3621,53 @@
           "observation_count"
         ],
         "title": "ThresholdRow",
+        "type": "object"
+      },
+      "TraceabilityResponse": {
+        "description": "Objectives, research questions, historical companion, and reproducibility links.",
+        "properties": {
+          "historical_companion": {
+            "$ref": "#/components/schemas/HistoricalCompanion"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "objectives": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveEntry"
+            },
+            "title": "Objectives",
+            "type": "array"
+          },
+          "reproducibility": {
+            "$ref": "#/components/schemas/Reproducibility"
+          },
+          "research_questions": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchQuestionEntry"
+            },
+            "title": "Research Questions",
+            "type": "array"
+          },
+          "source_identity": {
+            "additionalProperties": true,
+            "title": "Source Identity",
+            "type": "object"
+          }
+        },
+        "required": [
+          "source_identity",
+          "objectives",
+          "research_questions",
+          "historical_companion",
+          "reproducibility",
+          "limitations"
+        ],
+        "title": "TraceabilityResponse",
         "type": "object"
       },
       "TransitionStatusRequest": {
@@ -5304,6 +5825,156 @@
           }
         },
         "summary": "Saved bootstrap and paired uncertainty evidence",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/phase5b/catalog": {
+      "get": {
+        "description": "Returns the eight canonical Phase 5B figures with per-figure integrity (raw-byte identity), availability (payload present), and publication (binary authorised) state. Publicly readable. Binary delivery is withheld by default pending licensing verification; enabling it requires the PEIARS_PHASE5B_PUBLIC_FIGURES_ENABLED setting.",
+        "operationId": "get_phase5b_catalog_api_v1_research_phase5b_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FigureCatalogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Publication gate is disabled."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Phase 5B artifact unavailable or integrity failure."
+          }
+        },
+        "summary": "Verified Phase 5B figure catalog and availability",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/phase5b/figures/{figure_no}/image": {
+      "get": {
+        "description": "Returns the raw bytes of the requested canonical figure PNG (1-8), verified against both the DVC pointer and the figure manifest using raw-byte hashing. Returns 403 PUBLICATION_NOT_APPROVED when the publication gate is disabled (the default), and 503 SERVICE_NOT_READY when the payload is missing or fails verification.",
+        "operationId": "get_phase5b_figure_image_api_v1_research_phase5b_figures__figure_no__image_get",
+        "parameters": [
+          {
+            "description": "Canonical figure number (1-8).",
+            "in": "path",
+            "name": "figure_no",
+            "required": true,
+            "schema": {
+              "description": "Canonical figure number (1-8).",
+              "maximum": 8,
+              "minimum": 1,
+              "title": "Figure No",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "image/png": {}
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Controlled delivery of one verified canonical figure PNG",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/phase5b/traceability": {
+      "get": {
+        "description": "Returns the three source-native objectives from docs/provenance_log.md §1, the six research questions from docs/Phase-0.md §0.4, the 284,807-row historical companion disclaimer, and reproducibility references. The data shape uses source-native identifiers (a)/(b)/(c) and RQ1-RQ6; no invented OBJ-* identifiers are introduced.",
+        "operationId": "get_phase5b_traceability_api_v1_research_phase5b_traceability_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceabilityResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Publication gate is disabled."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Phase 5B artifact unavailable or integrity failure."
+          }
+        },
+        "summary": "Source-native objectives (a)/(b)/(c) and RQ1–RQ6 traceability",
         "tags": [
           "research"
         ]

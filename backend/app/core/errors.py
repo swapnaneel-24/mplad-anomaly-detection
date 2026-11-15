@@ -74,6 +74,8 @@ class ErrorCode:
     FORBIDDEN = "FORBIDDEN"
     RATE_LIMITED = "RATE_LIMITED"
     CSRF_TOKEN_INVALID = "CSRF_TOKEN_INVALID"
+    # PR-11
+    PUBLICATION_NOT_APPROVED = "PUBLICATION_NOT_APPROVED"
 
 
 _STATUS_CODE_MAP: dict[int, str] = {
@@ -107,6 +109,8 @@ _DEFAULT_MESSAGES: dict[str, str] = {
     ErrorCode.FORBIDDEN: "You do not have permission to perform this action.",
     ErrorCode.RATE_LIMITED: "Too many failed login attempts. Try again later.",
     ErrorCode.CSRF_TOKEN_INVALID: "The request failed CSRF validation.",
+    # PR-11
+    ErrorCode.PUBLICATION_NOT_APPROVED: "Public delivery of this artifact has not been approved.",
 }
 
 

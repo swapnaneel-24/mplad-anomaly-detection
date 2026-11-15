@@ -181,6 +181,13 @@ class Settings(BaseSettings):
     #: fictional and must never be presented as research findings.
     demonstration_sources: bool = False
 
+    # --- Phase 5B public figure publication (PR-11) ---------------------------
+    #: When true, the Phase 5B figure binary delivery endpoint serves the eight
+    #: canonical verified PNGs. When false (the default), the catalog and
+    #: traceability metadata remain public but individual PNG bytes are
+    #: withheld pending licensing and publication authorization.
+    phase5b_public_figures_enabled: bool = False
+
     @field_validator("session_secret", mode="before")
     @classmethod
     def _clean_session_secret(cls, value: object) -> object:

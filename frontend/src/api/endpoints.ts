@@ -19,6 +19,17 @@ import type {
   LoginRequest,
   LogoutResponse,
   MetaResponse,
+  Phase5AAgreementGroupsResponse,
+  Phase5AAgreementMatrixResponse,
+  Phase5ABootstrapMetricsResponse,
+  Phase5ADiscoveryCurveResponse,
+  Phase5AHypergeometricResponse,
+  Phase5AMultithresholdResponse,
+  Phase5APairedDifferencesResponse,
+  Phase5AUncertaintyResponse,
+  Phase5ACombinedAgreementResponse,
+  Phase5AProtocolResponse,
+  Phase5AReviewPoliciesResponse,
   ReadinessResponse,
   RecordDecisionRequest,
   ResearchResultsResponse,
@@ -294,4 +305,99 @@ export function getBenchmarkRecord(
     `/research/benchmark/experiments/${encodeURIComponent(runId)}/records/${rowId}`,
     { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
   );
+}
+
+// --- Phase 5A evidence (PR-10: uncertainty/agreement/review-policy) ------
+
+export function getPhase5AProtocol(signal?: AbortSignal): Promise<Phase5AProtocolResponse> {
+  return request<Phase5AProtocolResponse>("/research/phase5a/catalog", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5ABootstrap(signal?: AbortSignal): Promise<Phase5ABootstrapMetricsResponse> {
+  return request<Phase5ABootstrapMetricsResponse>("/research/phase5a/bootstrap", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5APairedDifferences(
+  signal?: AbortSignal,
+): Promise<Phase5APairedDifferencesResponse> {
+  return request<Phase5APairedDifferencesResponse>("/research/phase5a/paired-differences", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5AAgreementMatrix(
+  kind: "spearman" | "jaccard",
+  signal?: AbortSignal,
+): Promise<Phase5AAgreementMatrixResponse> {
+  return request<Phase5AAgreementMatrixResponse>(
+    `/research/phase5a/agreement/${encodeURIComponent(kind)}`,
+    { signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
+}
+
+export function getPhase5AOverlapNull(signal?: AbortSignal): Promise<Phase5AHypergeometricResponse> {
+  return request<Phase5AHypergeometricResponse>("/research/phase5a/overlap-null", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5AGroups(signal?: AbortSignal): Promise<Phase5AAgreementGroupsResponse> {
+  return request<Phase5AAgreementGroupsResponse>("/research/phase5a/review-policies", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5APolicies(signal?: AbortSignal): Promise<Phase5AReviewPoliciesResponse> {
+  return request<Phase5AReviewPoliciesResponse>("/research/phase5a/policies", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5AThresholds(signal?: AbortSignal): Promise<Phase5AMultithresholdResponse> {
+  return request<Phase5AMultithresholdResponse>("/research/phase5a/thresholds", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5ADiscoveryCurve(
+  runId: string,
+  opts: { limit?: number; offset?: number; signal?: AbortSignal } = {},
+): Promise<Phase5ADiscoveryCurveResponse> {
+  const params = new URLSearchParams({ run_id: runId });
+  if (opts.limit !== undefined) params.set("limit", String(opts.limit));
+  if (opts.offset !== undefined) params.set("offset", String(opts.offset));
+  return request<Phase5ADiscoveryCurveResponse>(
+    `/research/phase5a/discovery-curve?${params.toString()}`,
+    { signal: opts.signal, timeoutMs: DEFAULT_TIMEOUT_MS },
+  );
+}
+
+
+export function getPhase5AUncertainty(signal?: AbortSignal): Promise<Phase5AUncertaintyResponse> {
+  return request<Phase5AUncertaintyResponse>("/research/phase5a/uncertainty", {
+    signal, timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5AAgreement(signal?: AbortSignal): Promise<Phase5ACombinedAgreementResponse> {
+  return request<Phase5ACombinedAgreementResponse>("/research/phase5a/agreement", {
+    signal, timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5AReviewPolicies(signal?: AbortSignal): Promise<Phase5AAgreementGroupsResponse> {
+  return request<Phase5AAgreementGroupsResponse>("/research/phase5a/review-policies", {
+    signal, timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
 }

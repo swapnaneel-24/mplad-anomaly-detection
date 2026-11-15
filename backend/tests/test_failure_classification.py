@@ -122,6 +122,8 @@ def scram_database():
         # (pg_hba matches per-database, first match wins).
         hba_path.write_text(
             "local   peiars_credtest   all   scram-sha-256\n"
+            "host  peiars_credtest peiars_cred_user 127.0.0.1/32 scram-sha-256\n"
+            "host  peiars_credtest peiars_cred_user ::1/128     scram-sha-256\n"
             + hba_path.read_text(encoding="utf-8"),
             encoding="utf-8",
         )

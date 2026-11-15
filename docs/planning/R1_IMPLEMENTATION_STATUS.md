@@ -3,8 +3,8 @@
 - **Document ID:** `STATUS-PEIARS-R1-001`
 - **Status:** Living implementation-status record
 - **Current milestone:** M2 — Verified Stream A Research Integration
-- **Current implementation branch:** `pr-09-canonical-benchmark`
-- **Verified PR-09 baseline (`main` HEAD):** `0a23577dc52839ff2ea54cdc3fcbc32e35523fd3`
+- **Current implementation branch:** `pr-10-phase5a-evidence`
+- **Verified PR-10 baseline (`main` HEAD):** `d9715cfda089623f741ce63ef54a5157bfd4286e` (PR #4 merge commit: `89615e5dcc173f3586ff284525ef872b9bc9af9c`)
 - **Last updated:** 2026-11-14
 
 ## 1. Governing documents
@@ -25,7 +25,7 @@ This ledger is subordinate to the SRS, ADRs, and implementation backlog. It does
 |---|---|---|
 | M0 — Governance and sign-off | Operational baseline established; formal sign-off unresolved | Record accepted decisions and outstanding approvals |
 | M1 — Walking skeleton | Completed as reported, PR-01 through PR-07 | React/FastAPI/PostgreSQL workflow, fixture-based case journey, auth boundary, Compose and CI |
-| M2 — Verified research integration | In progress | PR-08 merged; PR-09 implemented & locally verified on `pr-09-canonical-benchmark` (pending PR #4 CI & merge review); PR-10–12 remain |
+| M2 — Verified research integration | In progress | PR-08 merged; PR-09 implemented & locally verified on `pr-10-phase5a-evidence` (pending PR #4 CI & merge review); PR-10–12 remain |
 | M3 — PMGSY observatory and review | Not started under this roadmap | Approved source admission, record explorer, real-source case flow and export |
 | M4 — R1 deployment and hardening | Not started under this roadmap | AT-01–12, public HTTPS release and security/reproducibility gates |
 | M5a/M5b/M5c — R2 enhancements | Deferred | Separate gated and independently versioned experiments |
@@ -72,7 +72,7 @@ PR-08 does not establish completion of `M2-01` through `M2-05`. It does not yet 
 ## 4. PR-09 baseline and scientific source inventory
 
 - **Proposed PR title:** Canonical Ten-Run IF/LOF Benchmark Integration
-- **Branch:** `pr-09-canonical-benchmark`
+- **Branch:** `pr-10-phase5a-evidence`
 - **Starting `main` commit:** `0a23577dc52839ff2ea54cdc3fcbc32e35523fd3`
 - **Working-tree status:** No tracked modifications at baseline.
 - **Local untracked directories:** `.pgdata/`, `backend/.venv312/` — local development state; excluded from PR scope.

@@ -42,6 +42,20 @@ EXPECTED_PATHS = {
     "/api/v1/research/benchmark/experiments/{run_id}",
     "/api/v1/research/benchmark/metrics",
     "/api/v1/research/benchmark/experiments/{run_id}/records/{row_id}",
+    # PR-10: Phase 5A uncertainty/agreement/review-policy evidence (GET only).
+    "/api/v1/research/phase5a",
+    "/api/v1/research/phase5a/bootstrap",
+    "/api/v1/research/phase5a/paired-differences",
+    "/api/v1/research/phase5a/agreement/{kind}",
+    "/api/v1/research/phase5a/overlap-null",
+    "/api/v1/research/phase5a/groups",
+    "/api/v1/research/phase5a/policies",
+    "/api/v1/research/phase5a/thresholds",
+    "/api/v1/research/phase5a/discovery-curve",
+    "/api/v1/research/phase5a/catalog",
+    "/api/v1/research/phase5a/uncertainty",
+    "/api/v1/research/phase5a/agreement",
+    "/api/v1/research/phase5a/review-policies",
 }
 
 

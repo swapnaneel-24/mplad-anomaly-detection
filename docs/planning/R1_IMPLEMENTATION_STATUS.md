@@ -3,8 +3,8 @@
 - **Document ID:** `STATUS-PEIARS-R1-001`
 - **Status:** Living implementation-status record
 - **Current milestone:** M2 — Verified Stream A Research Integration
-- **Current implementation branch:** `pr-11-phase5b-gallery`
-- **Verified PR-11 baseline (`main` HEAD):** `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3` (PR #5 merge commit)
+- **Current implementation branch:** `main` (PR-11 merged at `8ed0669`; PR-12 not yet started)
+- **Verified PR-11 baseline (`main` HEAD):** `8ed0669af2b07a2c8aa45d3d5aa174104b017335` (PR #6 merge commit)
 - **Last updated:** 2026-11-15
 
 ## 1. Governing documents
@@ -25,7 +25,7 @@ This ledger is subordinate to the SRS, ADRs, and implementation backlog. It does
 |---|---|---|
 | M0 — Governance and sign-off | Operational baseline established; formal sign-off unresolved | Record accepted decisions and outstanding approvals |
 | M1 — Walking skeleton | Completed as reported, PR-01 through PR-07 | React/FastAPI/PostgreSQL workflow, fixture-based case journey, auth boundary, Compose and CI |
-| M2 — Verified research integration | In progress | PR-08, PR-09 and PR-10 merged; PR-11 source admission in progress; PR-12 remains |
+| M2 — Verified research integration | In progress | PR-08, PR-09, PR-10 and PR-11 merged; PR-12 remains the integrated M2 acceptance gate |
 | M3 — PMGSY observatory and review | Not started under this roadmap | Approved source admission, record explorer, real-source case flow and export |
 | M4 — R1 deployment and hardening | Not started under this roadmap | AT-01–12, public HTTPS release and security/reproducibility gates |
 | M5a/M5b/M5c — R2 enhancements | Deferred | Separate gated and independently versioned experiments |
@@ -178,7 +178,7 @@ After each PR:
 5. Identify unresolved limitations, accepted deviations and next milestone.
 6. Mark the PR accepted only after maintainer review and required checks.
 
-Next scheduled work: PR-11 source-admission preflight (Phase 5B figure catalog, eight canonical PNG identities, methodology and objective-traceability sources), then bounded implementation if the sources pass admission.
+Next scheduled work: PR-12 — M2 integrated scientific acceptance and traceability, branching from main at 8ed0669 (PR-11 merge commit).
 
 ---
 ## PR-10 — Phase 5A Uncertainty, Agreement, and Review-Policy Evidence
@@ -243,18 +243,21 @@ PR-10 does not complete M2 or R1. Phase 5B figure publication, methodology, obje
 
 ## PR-11 — Phase 5B Figure Gallery, Methodology, and Original Objective Traceability
 
-**Status:** Planned — Source admission pending
-**Branch:** `pr-11-phase5b-gallery`
-**Baseline:** `e57cc15239e2f590d9aa3ca6bc2bab7ca1310dd3`
-**Milestone:** M2 — Verified Stream A Research Integration
-**Backlog:** M2-03 and M2-05
-**Primary requirements:** FR-15, FR-19, FR-33, FR-34, FR-35, with FR-31/32 integrity and provenance protection
-**Acceptance:** AT-02, with applicable AT-03, AT-04 and AT-10 checks
+**Status:** MERGED — Accepted
+**GitHub PR:** #6
+**Final reviewed head:** `9990a71cb12ad073fc9ff299d4f391998dbfc14f`
+**Merge commit:** `8ed0669af2b07a2c8aa45d3d5aa174104b017335`
+**Merged:** 2026-11-15T13:49:48Z
+**Merge strategy:** Merge commit; reviewed implementation history preserved.
 
-**Scope:** Authentic Phase 5B figure gallery, source-backed scientific methodology, original-objective traceability and clear distinction between canonical ULB evidence and historical or exploratory sources.
+**Accepted scope:** Eight canonical Phase 5B figures, verified catalog and gated PNG delivery, source-backed methodology, source-native objectives (a)/(b)/(c), RQ1–RQ6 traceability, and historical-companion separation.
 
-**Not included:** Model fitting, new projections, R2 PCA/UMAP enhancements, new review-policy calculations, PMGSY modelling, MPLADS reconciliation or full M2 release acceptance.
+**Acceptance evidence:** All five required GitHub Actions checks passed on the final reviewed head. Windows verification reported 50/50 Phase 5B tests, 56/56 Phase 5A/OpenAPI regression tests, and 9/9 real-DVC figure/catalog integrity checks. Earlier full backend regression reported 750 passing tests; final hosted backend CI passed. Frontend verification included 134 Vitest tests, 21 Playwright tests, typecheck, lint, OpenAPI consistency, and build. Post-merge frozen integrity: 28/28 files matched.
 
-**Next implementation gate:** Verify the Phase 5B figure catalog, eight canonical PNG identities, reproduction manifests, licensing/publication eligibility, methodology sources and historical-companion provenance before implementing the presentation layer.
+**Review findings:** Catalog CSV DVC-pointer verification (R1) and runtime traceability verification-status accuracy (R2) were resolved in commit `9990a71`.
 
-**M2 status:** IN PROGRESS. PR-12 remains the final M2 integration and acceptance gate.
+**Retained boundaries:** No scientific artifacts were regenerated or modified. Phase 5B public PNG binary delivery remains disabled by default pending licensing and publication authorization. The historical 284,807-record LOF Novelty Mode companion remains distinct from the canonical 30,000-record benchmark.
+
+**Milestone:** M2 IN PROGRESS. PR-12 remains the integrated scientific acceptance and traceability gate.
+
+**Next scheduled work:** PR-12 — M2 integrated scientific acceptance and traceability.

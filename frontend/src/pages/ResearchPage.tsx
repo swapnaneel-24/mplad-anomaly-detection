@@ -16,6 +16,13 @@
 // admitted DVC payload is available, and offers a canonical row_id lookup
 // into the admitted evaluation dataset. Unavailable capabilities render an
 // explicit unavailable state (never a synthetic fallback).
+//
+// PR-10: extended with a "Phase 5A Evidence" section (uncertainty,
+// agreement, review-policy and discovery-curve evidence) served read-only
+// from the verified Phase 5A adapter. Each family has an independent
+// unavailable state; no synthetic metrics are ever shown. Scientific labels
+// protect against over-interpretation (anomaly ≠ fraud; CI ≠ probability of
+// wrongdoing; unequal-budget policies; post-hoc selection caveat).
 
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +33,16 @@ import {
   getBenchmarkExperiment,
   getBenchmarkMetrics,
   getBenchmarkRecord,
+  getPhase5AProtocol,
+  getPhase5ABootstrap,
+  getPhase5APairedDifferences,
+  getPhase5AAgreementMatrix,
+  getPhase5AOverlapNull,
+  getPhase5AGroups,
+  getPhase5AUncertainty,
+  getPhase5AAgreement,
+  getPhase5AThresholds,
+  getPhase5ADiscoveryCurve,
 } from "@/api/endpoints";
 import { ApiError } from "@/api/client";
 import type {
@@ -36,6 +53,14 @@ import type {
   BenchmarkExperimentDetail,
   BenchmarkMetricsResponse,
   BenchmarkRecordResponse,
+  Phase5AProtocolResponse,
+  Phase5ABootstrapMetricsResponse,
+  Phase5APairedDifferencesResponse,
+  Phase5AAgreementMatrixResponse,
+  Phase5AHypergeometricResponse,
+  Phase5AAgreementGroupsResponse,
+  Phase5AMultithresholdResponse,
+  Phase5ADiscoveryCurveResponse,
 } from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
@@ -133,6 +158,22 @@ export function ResearchPage(): JSX.Element {
   const [record, setRecord] = useState<BenchmarkRecordResponse | null>(null);
   const [recordError, setRecordError] = useState<ApiError | null>(null);
   const [recordLoading, setRecordLoading] = useState(false);
+
+  // PR-10: Phase 5A evidence state.
+  const [phase5aProtocol, setPhase5aProtocol] = useState<Phase5AProtocolResponse | null>(null);
+  const [phase5aError, setPhase5aError] = useState<ApiError | null>(null);
+  const [phase5aLoading, setPhase5aLoading] = useState(false);
+  const [matrixKind, setMatrixKind] = useState<"spearman" | "jaccard">("spearman");
+  const [bootstrap, setBootstrap] = useState<Phase5ABootstrapMetricsResponse | null>(null);
+  const [paired, setPaired] = useState<Phase5APairedDifferencesResponse | null>(null);
+  const [matrix, setMatrix] = useState<Phase5AAgreementMatrixResponse | null>(null);
+  const [hypergeom, setHypergeom] = useState<Phase5AHypergeometricResponse | null>(null);
+  const [groups, setGroups] = useState<Phase5AAgreementGroupsResponse | null>(null);
+  const [thresholds, setThresholds] = useState<Phase5AMultithresholdResponse | null>(null);
+  const [discovery, setDiscovery] = useState<Phase5ADiscoveryCurveResponse | null>(null);
+  const [discoveryRunId, setDiscoveryRunId] = useState("IF_001");
+  const [discoveryPage, setDiscoveryPage] = useState(0);
+  const PAGE_SIZE = 100;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -236,6 +277,89 @@ export function ResearchPage(): JSX.Element {
     })();
     return () => controller.abort();
   }, [benchmarkCatalog?.capabilities?.metrics?.available]);
+
+  // PR-10: fetch the Phase 5A protocol (Layer A; always works on a clean checkout).
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      setPhase5aLoading(true);
+      setPhase5aError(null);
+      try {
+        const p = await getPhase5AProtocol(controller.signal);
+        setPhase5aProtocol(p);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setPhase5aError(err instanceof ApiError ? err : null);
+      } finally {
+        if (!controller.signal.aborted) setPhase5aLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
+
+  // PR-10: fetch a Phase 5A family when its capability becomes available.
+  const fetchFamily = async <T,>(
+    fetcher: (signal: AbortSignal) => Promise<T>,
+    setter: (v: T | null) => void,
+    family: string,
+  ): Promise<void> => {
+    const available = phase5aProtocol?.capabilities?.[family]?.available;
+    if (!available) return;
+    const controller = new AbortController();
+    try {
+      const resp = await fetcher(controller.signal);
+      setter(resp);
+    } catch (err) {
+      if (err instanceof ApiError && err.aborted) return;
+      setter(null);
+    }
+  };
+  useEffect(() => {
+    // Composite routes provide the compact PR-10 API. When one dependent
+    // artifact is missing, retain independent fallback to the admitted one.
+    if (phase5aProtocol?.capabilities.bootstrap?.available &&
+        phase5aProtocol?.capabilities.paired?.available) {
+      void getPhase5AUncertainty().then((v) => {
+        setBootstrap(v.bootstrap);
+        setPaired(v.paired_differences);
+      }).catch(() => { setBootstrap(null); setPaired(null); });
+    } else {
+      void fetchFamily(getPhase5ABootstrap, setBootstrap, "bootstrap");
+      void fetchFamily(getPhase5APairedDifferences, setPaired, "paired");
+    }
+    if (phase5aProtocol?.capabilities.spearman?.available &&
+        phase5aProtocol?.capabilities.jaccard?.available) {
+      void getPhase5AAgreement().then((v) => {
+        setMatrix(matrixKind === "spearman" ? v.spearman : v.jaccard);
+      }).catch(() => setMatrix(null));
+    } else {
+      void fetchFamily((signal) => getPhase5AAgreementMatrix(matrixKind, signal), setMatrix, matrixKind);
+    }
+    void fetchFamily(getPhase5AOverlapNull, setHypergeom, "hypergeometric");
+    void fetchFamily(getPhase5AGroups, setGroups, "groups");
+    void fetchFamily(getPhase5AThresholds, setThresholds, "multithreshold");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase5aProtocol, matrixKind]);
+
+  // PR-10: fetch the discovery-curve page (bounded).
+  useEffect(() => {
+    if (!phase5aProtocol?.capabilities?.discovery?.available) return;
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const resp = await getPhase5ADiscoveryCurve(discoveryRunId, {
+          limit: PAGE_SIZE,
+          offset: discoveryPage * PAGE_SIZE,
+          signal: controller.signal,
+        });
+        setDiscovery(resp);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setDiscovery(null);
+      }
+    })();
+    return () => controller.abort();
+  }, [phase5aProtocol?.capabilities?.discovery?.available, discoveryRunId, discoveryPage]);
 
   if (loading && !meta) {
     return <div className="research-page workspace-composition" aria-busy="true"><Loading label="Loading metadata…" /></div>;
@@ -618,6 +742,314 @@ export function ResearchPage(): JSX.Element {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* PR-10: Phase 5A Uncertainty, Agreement & Review-Policy Evidence */}
+          <h2 className="section-h2">Phase 5A Evidence — Uncertainty, Agreement, Review Policies</h2>
+          <p className="editorial">
+            The frozen Phase 5A layer reports saved bootstrap uncertainty, pairwise
+            rank/flag agreement, a hypergeometric overlap null, four-way agreement
+            groups, four review policies, multi-threshold sensitivity and a
+            fraud-discovery curve for the ULB 30,000-row benchmark.{" "}
+            <strong>IF_003, IF_004, LOF_004 and the IF_003/LOF_004 pair were
+            selected post-hoc</strong>; comparisons are exploratory, not
+            confirmatory. A confidence interval is not a calibrated probability
+            of wrongdoing; a hypergeometric p-value describes the stated overlap
+            null only. Saved DVC payloads are absent in this deployment, so each
+            family shows an explicit unavailable state — no synthetic values.
+          </p>
+          {phase5aLoading && <Loading label="Loading Phase 5A protocol…" />}
+          {phase5aError && (
+            <ErrorPanel error={phase5aError} onRetry={() => window.location.reload()} />
+          )}
+          {phase5aProtocol && (
+            <div className="research-page__phase5a">
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Verified protocol</h3>
+                <dl className="def-list">
+                  <dt className="def-list__term">Phase / stream / layer</dt>
+                  <dd className="def-list__def mono">
+                    {phase5aProtocol.phase} / {phase5aProtocol.stream} / {phase5aProtocol.layer}
+                  </dd>
+                  <dt className="def-list__term">Models fitted</dt>
+                  <dd className="def-list__def">{phase5aProtocol.models_fitted} (analysis-only)</dd>
+                  <dt className="def-list__term">Bootstrap</dt>
+                  <dd className="def-list__def mono">
+                    {String(phase5aProtocol.bootstrap_protocol?.n_replicates ?? 2000)} replicates ·{" "}
+                    CI {String(phase5aProtocol.bootstrap_protocol?.ci_level ?? 0.95)} ·{" "}
+                    {String(phase5aProtocol.bootstrap_protocol?.ci_method ?? "percentile")} · seed{" "}
+                    {String(phase5aProtocol.bootstrap_protocol?.seed ?? 42)}
+                  </dd>
+                  <dt className="def-list__term">Paired comparison</dt>
+                  <dd className="def-list__def mono">
+                    {String(phase5aProtocol.paired_comparison?.definition ?? "LOF_004 - IF_003")}
+                    {" "}
+                    (direction frozen; never inverted)
+                  </dd>
+                  <dt className="def-list__term">Sample</dt>
+                  <dd className="def-list__def">
+                    {String(phase5aProtocol.sample?.sample_size ?? 30000)} rows ·{" "}
+                    {String(phase5aProtocol.sample?.fraud_count ?? 47)} fraud labels
+                  </dd>
+                </dl>
+                <p className="research-page__phase5a-caution">
+                  {phase5aProtocol.selection_caveat}
+                </p>
+                <table className="data-table">
+                  <caption className="table-caption">Per-family availability (DVC-backed)</caption>
+                  <thead>
+                    <tr><th scope="col">Family</th><th scope="col">Available</th><th scope="col">Reason</th></tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(phase5aProtocol.capabilities).map(([fam, cap]) => (
+                      <tr key={fam}>
+                        <td className="mono">{fam}</td>
+                        <td>{cap.available ? "yes" : "no"}</td>
+                        <td className="mono">{cap.reason ?? "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bootstrap uncertainty */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Bootstrap uncertainty</h3>
+                {bootstrap ? (
+                  <>
+                    <table className="data-table">
+                      <thead>
+                        <tr><th scope="col">Run</th><th scope="col">Metric</th><th scope="col">Point</th><th scope="col">CI lower</th><th scope="col">CI upper</th><th scope="col">Replicates</th></tr>
+                      </thead>
+                      <tbody>
+                        {bootstrap.metrics.map((m) => (
+                          <tr key={`${m.run_id}-${m.metric}`}>
+                            <td className="mono">{m.run_id}</td><td className="mono">{m.metric}</td>
+                            <td className="mono">{m.point_estimate.toFixed(4)}</td>
+                            <td className="mono">{m.ci_lower.toFixed(4)}</td>
+                            <td className="mono">{m.ci_upper.toFixed(4)}</td>
+                            <td className="mono">{m.n_replicates}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="research-page__phase5a-caution">
+                      Intervals are NOT calibrated fraud probabilities; overlapping/non-overlapping intervals do not by themselves establish significance.
+                    </p>
+                  </>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The DVC-backed bootstrap payload has not been provisioned in this deployment; saved bootstrap intervals are unavailable.
+                  </p>
+                )}
+              </div>
+
+              {/* Paired differences */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Paired bootstrap differences (LOF_004 − IF_003)</h3>
+                {paired ? (
+                  <table className="data-table">
+                    <thead>
+                      <tr><th scope="col">Metric</th><th scope="col">Point Δ</th><th scope="col">CI lower</th><th scope="col">CI upper</th></tr>
+                    </thead>
+                    <tbody>
+                      {paired.differences.map((d) => (
+                        <tr key={d.metric}>
+                          <td className="mono">{d.metric}</td>
+                          <td className="mono">{d.point_estimate.toFixed(4)}</td>
+                          <td className="mono">{d.ci_lower.toFixed(4)}</td>
+                          <td className="mono">{d.ci_upper.toFixed(4)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The paired-differences payload is unavailable; no paired comparison is shown.
+                  </p>
+                )}
+              </div>
+
+              {/* Agreement matrices */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Pairwise agreement matrix</h3>
+                <div className="research-page__phase5a-matrix-tabs" role="tablist" aria-label="Agreement matrix kind">
+                  {(["spearman", "jaccard"] as const).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      role="tab"
+                      aria-selected={matrixKind === k}
+                      className="research-page__phase5a-matrix-tab"
+                      onClick={() => setMatrixKind(k)}
+                    >
+                      {k === "spearman" ? "Spearman rank" : "Jaccard 1%"}
+                    </button>
+                  ))}
+                </div>
+                {matrix ? (
+                  <>
+                    <table className="data-table">
+                      <caption className="table-caption">{matrix.definition}</caption>
+                      <thead>
+                        <tr><th scope="col">run_id</th>{matrix.run_labels.map((r) => (<th key={r} scope="col" className="mono">{r}</th>))}</tr>
+                      </thead>
+                      <tbody>
+                        {matrix.matrix.map((row) => (
+                          <tr key={row.run_id}>
+                            <td className="mono">{row.run_id}</td>
+                            {matrix.run_labels.map((col) => (
+                              <td key={col} className="mono">{(row.values[col] ?? 0).toFixed(3)}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="research-page__phase5a-caution">
+                      {matrix.kind === "spearman"
+                        ? "Rank agreement ≠ fraud-detection correctness."
+                        : "Flag overlap ≠ rank agreement and ≠ labelled recovery."}
+                    </p>
+                  </>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The {matrixKind} matrix payload is unavailable.
+                  </p>
+                )}
+              </div>
+
+              {/* Hypergeometric */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Hypergeometric overlap (IF_003 vs LOF_004, 1%)</h3>
+                {hypergeom ? (
+                  <dl className="def-list">
+                    <dt className="def-list__term">Observed / expected</dt>
+                    <dd className="def-list__def mono">
+                      {hypergeom.observed_intersection} / {hypergeom.expected_intersection.toFixed(2)}
+                      {" "}(enrichment {hypergeom.enrichment_observed_over_expected.toFixed(2)}×)
+                    </dd>
+                    <dt className="def-list__term">log_survival / log10_survival</dt>
+                    <dd className="def-list__def mono">
+                      {hypergeom.log_survival.toFixed(4)} / {hypergeom.log10_survival.toFixed(4)}
+                      {" "}(preserved; not exponentiated)
+                    </dd>
+                    <dt className="def-list__term">Null model</dt>
+                    <dd className="def-list__def">{hypergeom.null_model}</dd>
+                  </dl>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The hypergeometric-overlap payload is unavailable.
+                  </p>
+                )}
+                <p className="research-page__phase5a-caution">
+                  The p-value describes the stated overlap null only — not the probability that flagged records are fraudulent or that any detector is correct.
+                </p>
+              </div>
+
+              {/* Review policies */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Review policies (unequal review costs)</h3>
+                {groups && (
+                  <table className="data-table">
+                    <caption className="table-caption">Four-way agreement groups (IF_003 vs LOF_004, 1%)</caption>
+                    <thead>
+                      <tr><th scope="col">Group</th><th scope="col">Observations</th><th scope="col">Fraud</th><th scope="col">Recall contribution</th></tr>
+                    </thead>
+                    <tbody>
+                      {groups.groups.map((g) => (
+                        <tr key={g.group}>
+                          <td className="mono">{g.group}</td>
+                          <td className="mono">{g.observation_count}</td>
+                          <td className="mono">{g.fraud_count}</td>
+                          <td className="mono">{g.recall_contribution.toFixed(4)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                <p className="research-page__phase5a-caution">
+                  Only saved disjoint agreement groups are displayed. Counts,
+                  fraud proportions and recall contributions come directly from
+                  frozen Phase 5A records; no new per-policy precision, recall
+                  or overlap ratios are calculated during API requests.
+                </p>
+              </div>
+
+              {/* Multi-threshold sensitivity */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Multi-threshold sensitivity</h3>
+                {thresholds ? (
+                  <table className="data-table">
+                    <thead>
+                      <tr><th scope="col">Threshold %</th><th scope="col">k</th><th scope="col">Source</th><th scope="col">Canonical</th><th scope="col">n_methods</th></tr>
+                    </thead>
+                    <tbody>
+                      {thresholds.thresholds.map((t) => (
+                        <tr key={t.threshold_pct}>
+                          <td className="mono">{t.threshold_pct}%</td>
+                          <td className="mono">{t.k_nominal}</td>
+                          <td className="mono">{t.selection_source}</td>
+                          <td>{t.is_canonical ? "yes" : "no"}</td>
+                          <td className="mono">{t.n_methods}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The multi-threshold payload is unavailable.
+                  </p>
+                )}
+              </div>
+
+              {/* Discovery curve (bounded) */}
+              <div className="research-page__phase5a-family">
+                <h3 className="section-h3">Fraud-discovery curve (bounded)</h3>
+                {phase5aProtocol.capabilities.discovery?.available ? (
+                  <>
+                    <div className="research-page__record-form">
+                      <label className="def-list__term" htmlFor="phase5a-discovery-run">Run</label>
+                      <select
+                        id="phase5a-discovery-run"
+                        className="research-page__record-input"
+                        value={discoveryRunId}
+                        onChange={(e) => { setDiscoveryRunId(e.target.value); setDiscoveryPage(0); }}
+                      >
+                        {["IF_001","IF_002","IF_003","IF_004","IF_005","LOF_001","LOF_002","LOF_003","LOF_004","LOF_005"].map((r) => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                      <button type="button" disabled={discoveryPage === 0} onClick={() => setDiscoveryPage((p) => Math.max(0, p - 1))}>Prev</button>
+                      <button type="button" disabled={!discovery?.has_more} onClick={() => setDiscoveryPage((p) => p + 1)}>Next</button>
+                      <span className="editorial-muted">
+                        page {discoveryPage + 1} · {discovery ? `${discovery.offset}–${discovery.offset + discovery.rows.length} of ${discovery.total}` : "…"}
+                      </span>
+                    </div>
+                    {discovery && (
+                      <table className="data-table">
+                        <thead>
+                          <tr><th scope="col">Budget</th><th scope="col">Fraud found</th><th scope="col">Precision</th><th scope="col">Recall</th></tr>
+                        </thead>
+                        <tbody>
+                          {discovery.rows.map((r, i) => (
+                            <tr key={`${r.budget}-${i}`}>
+                              <td className="mono">{String(r.budget)}</td>
+                              <td className="mono">{r.fraud_found}</td>
+                              <td className="mono">{r.precision.toFixed(4)}</td>
+                              <td className="mono">{r.recall.toFixed(4)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </>
+                ) : (
+                  <p className="research-page__phase5a-unavailable">
+                    The discovery-curve payload has not been provisioned; the bounded viewer is unavailable.
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </section>

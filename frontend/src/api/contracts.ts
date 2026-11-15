@@ -479,3 +479,250 @@ export interface BenchmarkRecordResponse {
   is_precomputed: true;
   is_live_prediction: false;
 }
+
+// --- Phase 5A evidence (PR-10: uncertainty/agreement/review-policy) ------
+
+/** Per-family availability of one DVC-backed Phase 5A evidence family. */
+export interface Phase5ACapabilityStatus {
+  available: boolean;
+  reason: "artifact_missing" | "integrity_failed" | null;
+  detail: string | null;
+}
+
+/** Identity of one consumed DVC-backed Phase 5A payload. */
+export interface Phase5AFamilyProvenance {
+  artifact_path: string;
+  artifact_md5: string;
+  artifact_sha256: string;
+  digest_algorithm: "sha-256";
+  verification: string;
+}
+
+export interface Phase5AProtocolResponse {
+  source_id: string;
+  dataset_id: string;
+  phase: "5A";
+  stream: "A";
+  layer: string;
+  run_mode: string;
+  models_fitted: 0;
+  created_utc: string;
+  environment: Record<string, unknown>;
+  model_fitting: Record<string, unknown>;
+  analytical_conventions: Record<string, unknown>;
+  bootstrap_protocol: Record<string, unknown>;
+  selection_caveat: string;
+  sample: Record<string, unknown>;
+  multi_threshold_percents: number[];
+  canonical_threshold_pct: number;
+  evaluated_run_ids: string[];
+  paired_comparison: Record<string, unknown>;
+  overlap_runs: Record<string, unknown>;
+  capabilities: Record<string, Phase5ACapabilityStatus>;
+  provenance: Record<string, unknown>;
+  limitations: string[];
+}
+
+export interface Phase5ABootstrapMetricRow {
+  run_id: string;
+  metric: string;
+  point_estimate: number;
+  bootstrap_mean: number;
+  bootstrap_std: number;
+  ci_lower: number;
+  ci_upper: number;
+  n_replicates: number;
+}
+
+export interface Phase5ABootstrapMetricsResponse {
+  source_id: string;
+  dataset_id: string;
+  bootstrap_protocol: Record<string, unknown>;
+  selection_caveat: string;
+  metrics: Phase5ABootstrapMetricRow[];
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5APairedDifferenceRow {
+  comparison: string;
+  run_a: string;
+  run_b: string;
+  metric: string;
+  point_estimate: number;
+  bootstrap_mean: number;
+  bootstrap_std: number;
+  ci_lower: number;
+  ci_upper: number;
+  n_replicates: number;
+}
+
+export interface Phase5APairedDifferencesResponse {
+  source_id: string;
+  dataset_id: string;
+  direction: string;
+  run_a: string;
+  run_b: string;
+  selection_caveat: string;
+  differences: Phase5APairedDifferenceRow[];
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5AMatrixRow {
+  run_id: string;
+  values: Record<string, number>;
+}
+
+export interface Phase5AAgreementMatrixResponse {
+  source_id: string;
+  dataset_id: string;
+  kind: "spearman" | "jaccard";
+  run_labels: string[];
+  matrix: Phase5AMatrixRow[];
+  bounds: Record<string, number>;
+  highlighted_pair: Record<string, string>;
+  selection_caveat: string;
+  definition: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5AHypergeometricResponse {
+  source_id: string;
+  dataset_id: string;
+  run_a: string;
+  run_b: string;
+  threshold_pct: number;
+  n_observations: number;
+  run_a_flagged: number;
+  run_b_flagged: number;
+  observed_intersection: number;
+  union_size: number;
+  expected_intersection: number;
+  enrichment_observed_over_expected: number;
+  survival_upper_tail: number;
+  log_survival: number;
+  log10_survival: number;
+  null_model: string;
+  selection_caveat: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5AAgreementGroupRow {
+  group: "both" | "if_only" | "lof_only" | "neither";
+  observation_count: number;
+  fraud_count: number;
+  non_fraud_count: number;
+  fraud_proportion: number;
+  recall_contribution: number;
+}
+
+export interface Phase5AAgreementGroupsResponse {
+  source_id: string;
+  dataset_id: string;
+  run_a: string;
+  run_b: string;
+  threshold_pct: number;
+  groups: Phase5AAgreementGroupRow[];
+  conservation: Record<string, unknown>;
+  selection_caveat: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5AReviewPolicyRow {
+  policy: "both_only" | "if_003_flags" | "lof_004_flags" | "union";
+  label: string;
+  review_count: number;
+  sample_share: number;
+  labelled_positives_found: number;
+  precision: number;
+  recall_contribution: number;
+  selection_basis: string;
+  unequal_budget_note: string;
+}
+
+export interface Phase5AReviewPoliciesResponse {
+  source_id: string;
+  dataset_id: string;
+  run_a: string;
+  run_b: string;
+  threshold_pct: number;
+  labelled_positive_denominator: number;
+  sample_size: number;
+  policies: Phase5AReviewPolicyRow[];
+  selection_caveat: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5AThresholdRow {
+  threshold_pct: number;
+  k_nominal: number;
+  selection_source: string;
+  is_canonical: boolean;
+  n_methods: number;
+  observation_count: number;
+}
+
+export interface Phase5AMultithresholdResponse {
+  source_id: string;
+  dataset_id: string;
+  canonical_threshold_pct: number;
+  approved_thresholds: number[];
+  thresholds: Phase5AThresholdRow[];
+  selection_caveat: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+export interface Phase5ADiscoveryCurveRow {
+  run_id: string;
+  budget: number | string;
+  fraud_found: number;
+  precision: number;
+  recall: number;
+}
+
+export interface Phase5ADiscoveryCurveResponse {
+  source_id: string;
+  dataset_id: string;
+  run_id: string;
+  offset: number;
+  limit: number;
+  total: number;
+  has_more: boolean;
+  rows: Phase5ADiscoveryCurveRow[];
+  selection_caveat: string;
+  provenance: Phase5AFamilyProvenance;
+  limitations: string[];
+  is_precomputed: true;
+  is_live_prediction: false;
+}
+
+
+// Phase 5A focused, read-only composite resource contracts (PR-10).
+export type Phase5AUncertaintyResponse = {
+  bootstrap: Phase5ABootstrapMetricsResponse;
+  paired_differences: Phase5APairedDifferencesResponse;
+};
+export type Phase5ACombinedAgreementResponse = {
+  spearman: Phase5AAgreementMatrixResponse;
+  jaccard: Phase5AAgreementMatrixResponse;
+};

@@ -267,6 +267,22 @@ class TestDisabledSourceExposureSweep:
             # demonstration content).
             "/api/v1/research/benchmark/experiments",
             "/api/v1/research/benchmark/metrics",
+            # PR-10: Phase 5A evidence routes (Layer A protocol always
+            # serves; Layer B routes report the sanitized unavailable state
+            # when DVC payloads are absent — neither carries synthetic
+            # demonstration content).
+            "/api/v1/research/phase5a",
+            "/api/v1/research/phase5a/bootstrap",
+            "/api/v1/research/phase5a/paired-differences",
+            "/api/v1/research/phase5a/overlap-null",
+            "/api/v1/research/phase5a/groups",
+            "/api/v1/research/phase5a/policies",
+            "/api/v1/research/phase5a/thresholds",
+            "/api/v1/research/phase5a/discovery-curve",
+            "/api/v1/research/phase5a/catalog",
+            "/api/v1/research/phase5a/uncertainty",
+            "/api/v1/research/phase5a/agreement",
+            "/api/v1/research/phase5a/review-policies",
         ]
         # OpenAPI-driven completeness: sweep every documented non-
         # parameterized GET path. Parameterized GETs are covered by the
@@ -354,6 +370,9 @@ class TestDisabledSourceExposureSweep:
             f"/api/v1/research/sources/{research_source_id}/results",
             f"/api/v1/research/benchmark/experiments/{benchmark_run_id}",
             f"/api/v1/research/benchmark/experiments/{benchmark_run_id}/records/{benchmark_row_id}",
+            # PR-10: Phase 5A parameterized GETs (agreement/{kind} only;
+            # discovery-curve is non-parameterized — run_id is a query param).
+            "/api/v1/research/phase5a/agreement/spearman",
         }
         # All parameterized GET paths documented in the OpenAPI contract
         # must be covered by the probe (substituting the persisted
@@ -370,6 +389,7 @@ class TestDisabledSourceExposureSweep:
                 f"/benchmark/experiments/{benchmark_run_id}",
                 "/benchmark/experiments/{run_id}",
             )
+            .replace("/agreement/spearman", "/agreement/{kind}")
             for path in probe_paths
         }
         assert documented_param_gets <= documented_param_templates, (

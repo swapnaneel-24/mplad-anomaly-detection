@@ -17,7 +17,52 @@ export interface AddNoteRequest {
   note_text: string;
 };
 
+export interface AgreementGroupRow {
+  fraud_count: number;
+  fraud_proportion: number;
+  group: "both" | "if_only" | "lof_only" | "neither";
+  non_fraud_count: number;
+  observation_count: number;
+  recall_contribution: number;
+};
+
+export interface AgreementGroupsResponse {
+  conservation: Record<string, never>;
+  dataset_id: string;
+  groups: Array<AgreementGroupRow>;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limitations: Array<string>;
+  provenance: FamilyProvenance;
+  run_a: string;
+  run_b: string;
+  selection_caveat: string;
+  source_id: string;
+  threshold_pct: number;
+};
+
+export interface AgreementMatrixResponse {
+  bounds: Record<string, never>;
+  dataset_id: string;
+  definition: string;
+  highlighted_pair: Record<string, never>;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  kind: "spearman" | "jaccard";
+  limitations: Array<string>;
+  matrix: Array<MatrixRow>;
+  provenance: FamilyProvenance;
+  run_labels: Array<string>;
+  selection_caveat: string;
+  source_id: string;
+};
+
 /** Identity of one consumed frozen artifact. */
+export interface AgreementResponse {
+  jaccard: AgreementMatrixResponse;
+  spearman: AgreementMatrixResponse;
+};
+
 export interface ArtifactProvenance {
   /** Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest). */
   canonicalization: string;
@@ -152,6 +197,37 @@ export interface BenchmarkRunMetrics {
   tp: number;
 };
 
+/** One saved bootstrap interval for one (run, metric). */
+export interface BootstrapMetricRow {
+  bootstrap_mean: number;
+  bootstrap_std: number;
+  ci_lower: number;
+  ci_upper: number;
+  metric: string;
+  n_replicates: number;
+  point_estimate: number;
+  run_id: string;
+};
+
+export interface BootstrapMetricsResponse {
+  bootstrap_protocol: Record<string, never>;
+  dataset_id: string;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limitations: Array<string>;
+  metrics: Array<BootstrapMetricRow>;
+  provenance: FamilyProvenance;
+  selection_caveat: string;
+  source_id: string;
+};
+
+/** Per-family availability of one DVC-backed evidence family. */
+export interface CapabilityStatus {
+  available: boolean;
+  detail?: string | unknown;
+  reason?: "artifact_missing" | "integrity_failed" | unknown;
+};
+
 /** Full detail of a review case (single-case view). */
 export interface CaseDetail {
   created_at: string;
@@ -260,6 +336,31 @@ export interface DatasetScope {
   threshold_rule: string;
 };
 
+export interface DiscoveryCurveResponse {
+  dataset_id: string;
+  has_more: boolean;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limit: number;
+  limitations: Array<string>;
+  offset: number;
+  provenance: FamilyProvenance;
+  rows: Array<DiscoveryCurveRow>;
+  run_id: string;
+  selection_caveat: string;
+  source_id: string;
+  total: number;
+};
+
+export interface DiscoveryCurveRow {
+  /** Saved budget (int when parseable). */
+  budget: number | string;
+  fraud_found: number;
+  precision: number;
+  recall: number;
+  run_id: string;
+};
+
 /** Machine-readable error payload (sanitized; no tracebacks). */
 export interface ErrorBody {
   /** Stable machine-readable error code. */
@@ -279,6 +380,19 @@ export interface ErrorEnvelope {
 /** Controlled event-type vocabulary for the append-only ``case_events`` table. */
 export type EventType = "created" | "note_added" | "status_changed" | "decision_recorded" | "reopened";
 
+/** Identity of one consumed DVC-backed payload (Layer B). */
+export interface FamilyProvenance {
+  /** Verified DVC pointer MD5 of the payload. */
+  artifact_md5: string;
+  /** Repository-relative payload path. */
+  artifact_path: string;
+  /** Commit-manifest SHA-256 of the payload. */
+  artifact_sha256: string;
+  digest_algorithm?: "sha-256";
+  /** Verification statement. */
+  verification: string;
+};
+
 /** Liveness: the API process can answer requests. */
 export interface HealthLiveResponse {
   /** Application name. */
@@ -286,6 +400,33 @@ export interface HealthLiveResponse {
   status: "alive";
   /** Backend application version. */
   version: string;
+};
+
+export interface HypergeometricResponse {
+  dataset_id: string;
+  enrichment_observed_over_expected: number;
+  expected_intersection: number;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limitations: Array<string>;
+  /** Base-10 log survival; preserved as recorded. */
+  log10_survival: number;
+  /** Natural-log survival; preserved as recorded (never exponentiated to a misleading zero). */
+  log_survival: number;
+  n_observations: number;
+  null_model: string;
+  observed_intersection: number;
+  provenance: FamilyProvenance;
+  run_a: string;
+  run_a_flagged: number;
+  run_b: string;
+  run_b_flagged: number;
+  selection_caveat: string;
+  source_id: string;
+  /** Upper-tail probability under the stated null; preserved as recorded. */
+  survival_upper_tail: number;
+  threshold_pct: number;
+  union_size: number;
 };
 
 /** Login credentials (bounded; login payloads cannot be oversized). */
@@ -300,6 +441,11 @@ export interface LoginRequest {
 export interface LogoutResponse {
   /** Fixed value: 'logged_out'. */
   status: string;
+};
+
+export interface MatrixRow {
+  run_id: string;
+  values: Record<string, never>;
 };
 
 /** Non-sensitive application metadata (``GET /api/v1/meta``). */
@@ -319,6 +465,47 @@ export interface MetaResponse {
   subsystems: Record<string, never>;
 };
 
+export interface MultithresholdResponse {
+  approved_thresholds: Array<number>;
+  canonical_threshold_pct: number;
+  dataset_id: string;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limitations: Array<string>;
+  provenance: FamilyProvenance;
+  selection_caveat: string;
+  source_id: string;
+  thresholds: Array<ThresholdRow>;
+};
+
+export interface PairedDifferenceRow {
+  bootstrap_mean: number;
+  bootstrap_std: number;
+  ci_lower: number;
+  ci_upper: number;
+  comparison: string;
+  metric: string;
+  n_replicates: number;
+  point_estimate: number;
+  run_a: string;
+  run_b: string;
+};
+
+export interface PairedDifferencesResponse {
+  dataset_id: string;
+  differences: Array<PairedDifferenceRow>;
+  /** Frozen subtraction direction (LOF_004 - IF_003). */
+  direction: string;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  limitations: Array<string>;
+  provenance: FamilyProvenance;
+  run_a: string;
+  run_b: string;
+  selection_caveat: string;
+  source_id: string;
+};
+
 /** Provenance of a run's parameter configuration. */
 export interface ParameterSourceProvenance {
   /** Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest). */
@@ -331,6 +518,32 @@ export interface ParameterSourceProvenance {
   path: string;
   /** SHA-256 digest of the artifact bytes. */
   sha256: string;
+};
+
+/** Verified Phase 5A protocol metadata and per-family availability. */
+export interface Phase5AProtocolResponse {
+  analytical_conventions: Record<string, never>;
+  bootstrap_protocol: Record<string, never>;
+  canonical_threshold_pct: number;
+  capabilities: Record<string, never>;
+  created_utc: string;
+  dataset_id: string;
+  environment: Record<string, never>;
+  evaluated_run_ids: Array<string>;
+  layer: string;
+  limitations: Array<string>;
+  model_fitting: Record<string, never>;
+  models_fitted: number;
+  multi_threshold_percents: Array<number>;
+  overlap_runs: Record<string, never>;
+  paired_comparison: Record<string, never>;
+  phase: "5A";
+  provenance: Record<string, never>;
+  run_mode: string;
+  sample: Record<string, never>;
+  selection_caveat: string;
+  source_id: string;
+  stream: "A";
 };
 
 /** One configured dependency check (name and status only; no details). */
@@ -505,6 +718,37 @@ export interface ResearchSourceSummary {
   source_id: string;
 };
 
+export interface ReviewPoliciesResponse {
+  dataset_id: string;
+  is_live_prediction?: boolean;
+  is_precomputed?: true;
+  labelled_positive_denominator: number;
+  limitations: Array<string>;
+  policies: Array<ReviewPolicyRow>;
+  provenance: FamilyProvenance;
+  run_a: string;
+  run_b: string;
+  sample_size: number;
+  selection_caveat: string;
+  source_id: string;
+  threshold_pct: number;
+};
+
+export interface ReviewPolicyRow {
+  label: string;
+  labelled_positives_found: number;
+  policy: "both_only" | "if_003_flags" | "lof_004_flags" | "union";
+  precision: number;
+  /** Recall contribution; denominator = 47 labelled positives. */
+  recall_contribution: number;
+  /** Actual review workload (records). */
+  review_count: number;
+  sample_share: number;
+  selection_basis: string;
+  /** Warning that the four policies have unequal review costs. */
+  unequal_budget_note: string;
+};
+
 /** Controlled review-status vocabulary.
 
 A ``str`` enum so values survive JSON round-trips and SQLA string
@@ -576,6 +820,16 @@ export interface SyntheticRecordSummary {
   title: string;
 };
 
+export interface ThresholdRow {
+  is_canonical: boolean;
+  k_nominal: number;
+  n_methods: number;
+  observation_count: number;
+  /** 'saved_canonical' (the frozen 1% flags) or 'derived_topk'. */
+  selection_source: string;
+  threshold_pct: number;
+};
+
 /** Input contract for a status transition. */
 export interface TransitionStatusRequest {
   /** Actor reference for the transition author (≤128 chars). */
@@ -593,6 +847,11 @@ export interface TransitionStatusRequest {
 Carries only approved public fields: user id, username, display
 name, role and the effective permission list. Never a password
 hash, session token or account internals. */
+export interface UncertaintyResponse {
+  bootstrap: BootstrapMetricsResponse;
+  paired_differences: PairedDifferencesResponse;
+};
+
 export interface UserResponse {
   /** Human-readable display name. */
   display_name: string;

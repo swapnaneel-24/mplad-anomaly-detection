@@ -3,8 +3,8 @@
 - **Document ID:** `STATUS-PEIARS-R1-001`
 - **Status:** Living implementation-status record
 - **Current milestone:** M2 — Verified Stream A Research Integration
-- **Current implementation branch:** `main` (PR-11 merged at `8ed0669`; PR-12 not yet started)
-- **Verified PR-11 baseline (`main` HEAD):** `8ed0669af2b07a2c8aa45d3d5aa174104b017335` (PR #6 merge commit)
+- **Current implementation branch:** `pr-12-m2-integrated-acceptance` (PR-12 — Source admission in progress; M2 remains IN PROGRESS)
+- **Verified current baseline (`main` HEAD):** `10d8613558e4056f3d831698adccaec3c79a60cc` (PR #7 merge commit; includes PR-11 acceptance ledger)
 - **Last updated:** 2026-11-15
 
 ## 1. Governing documents
@@ -178,7 +178,7 @@ After each PR:
 5. Identify unresolved limitations, accepted deviations and next milestone.
 6. Mark the PR accepted only after maintainer review and required checks.
 
-Next scheduled work: PR-12 — M2 integrated scientific acceptance and traceability, branching from main at 8ed0669 (PR-11 merge commit).
+Next scheduled work: PR-12 — M2 integrated scientific acceptance and traceability, branching from main at 10d8613 (PR-11 acceptance ledger on main).
 
 ---
 ## PR-10 — Phase 5A Uncertainty, Agreement, and Review-Policy Evidence

@@ -54,6 +54,23 @@ from app.services.phase5b_catalog import (
 PROTOCOL_PATH = "/api/v1/research/phase5b"
 _REAL_FIGURES_DIR = svc.PHASE5_FIGURES_DIR
 
+# Skip markers for tests that require materialized DVC payloads.
+# On hosted CI only the .dvc pointers (Git-tracked) exist; the PNGs and the
+# catalog CSV are DVC payloads and are absent on a clean checkout.
+_HAS_PAYLOADS = all(
+    (_REAL_FIGURES_DIR / name).is_file()
+    for name in svc._CANONICAL_FIGURES.values()
+)
+_HAS_CATALOG_CSV = (svc.REPO_ROOT / svc.PHASE5_CATALOG_REL).is_file()
+requires_payloads = pytest.mark.skipif(
+    not _HAS_PAYLOADS,
+    reason="DVC PNG payloads absent (hosted CI); payload-tamper test requires materialized files",
+)
+requires_catalog_csv = pytest.mark.skipif(
+    not _HAS_CATALOG_CSV,
+    reason="DVC catalog CSV absent (hosted CI); tamper test requires materialized file",
+)
+
 
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
@@ -146,11 +163,13 @@ class TestCatalogIdentity:
 
 
 class TestThreeWayConsistency:
+    @requires_catalog_csv
     def test_catalog_metadata_available(self):
         client = _client()
         data = client.get(f"{PROTOCOL_PATH}/catalog").json()
         assert data["catalog_metadata_available"] is True
 
+    @requires_catalog_csv
     def test_each_png_matches_catalog_filename_and_title(self):
         client = _client()
         figures = client.get(f"{PROTOCOL_PATH}/catalog").json()["figures"]
@@ -207,6 +226,7 @@ class TestMetadataTampering:
             assert r.status_code == 503
             assert r.json()["error"]["details"]["reason"] == "integrity_failed"
 
+    @requires_catalog_csv
     def test_tampered_catalog_csv_fails(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             p = tree["figures_dir"] / "phase5_figure_catalog.csv"
@@ -216,6 +236,7 @@ class TestMetadataTampering:
             r = client.get(f"{PROTOCOL_PATH}/catalog")
             assert r.status_code == 503
 
+    @requires_catalog_csv
     def test_missing_catalog_csv_downgrades_metadata(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             (tree["figures_dir"] / "phase5_figure_catalog.csv").unlink()
@@ -236,6 +257,7 @@ class TestMetadataTampering:
 
 
 class TestDvcAbsence:
+    @requires_payloads
     def test_missing_png_marks_artifact_missing(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             (tree["figures_dir"] / "phase5_plot3_hypergeometric_overlap.png").unlink()
@@ -246,6 +268,7 @@ class TestDvcAbsence:
             assert f3["availability"]["available"] is False
             assert f3["availability"]["reason"] == "artifact_missing"
 
+    @requires_payloads
     def test_missing_pointer_fails_integrity(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             (tree["figures_dir"] / "phase5_plot2_fraud_discovery.png.dvc").unlink()
@@ -261,6 +284,7 @@ class TestDvcAbsence:
 
 
 class TestIndependentAvailability:
+    @requires_payloads
     def test_one_missing_figure_does_not_affect_others(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             (tree["figures_dir"] / "phase5_plot5_jaccard_matrix.png").unlink()
@@ -279,6 +303,7 @@ class TestIndependentAvailability:
 
 
 class TestDigestVerification:
+    @requires_payloads
     def test_byte_flip_in_png_fails_sha(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             p = tree["figures_dir"] / "phase5_plot1_precision_recall.png"
@@ -289,6 +314,7 @@ class TestDigestVerification:
             data = client.get(f"{PROTOCOL_PATH}/catalog").json()
             assert data["figures"][0]["integrity"]["state"] == "integrity_failed"
 
+    @requires_payloads
     def test_truncated_png_fails_size(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             p = tree["figures_dir"] / "phase5_plot7_rank_vs_rank.png"
@@ -305,6 +331,7 @@ class TestDigestVerification:
 
 
 class TestPngFormatValidation:
+    @requires_payloads
     def test_real_png_passes(self):
         raw = (_REAL_FIGURES_DIR / "phase5_plot1_precision_recall.png").read_bytes()
         _validate_png(raw, "test.png")  # no exception
@@ -369,6 +396,7 @@ class TestPathSecurity:
 
 
 class TestCacheMutationRecovery:
+    @requires_payloads
     def test_tamper_then_restore(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             client = _client()
@@ -415,6 +443,7 @@ class TestPublicationGate:
         assert r.status_code == 403
         assert r.json()["error"]["code"] == "PUBLICATION_NOT_APPROVED"
 
+    @requires_payloads
     def test_image_served_when_enabled(self, tmp_path):
         with _isolated_figure_tree(tmp_path) as tree:
             client = _client(publication_enabled=True)

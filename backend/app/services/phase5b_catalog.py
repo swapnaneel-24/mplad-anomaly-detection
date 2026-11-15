@@ -129,7 +129,15 @@ def _read_verified_manifest() -> dict[str, Any]:
 def _verify_artifact_against_manifest(
     manifest: dict[str, Any], artifact_name: str, raw_bytes: bytes
 ) -> None:
-    """Verify a raw-bytes artifact against its manifest entry (SHA-256 + size)."""
+    """Verify a raw-bytes artifact against its manifest entry (SHA-256 + size).
+
+    Binary artifacts (PNG) must match raw bytes exactly -- they have no
+    line-ending variants. Text artifacts (JSON metadata, CSV) may differ
+    by CRLF vs LF line endings between the OS that produced the manifest
+    and the OS checking out the repo; we accept any of raw / CRLF-
+    reconstructed / LF-canonicalized representations whose length AND
+    SHA-256 both match the manifest entry.
+    """
     artifacts = manifest.get("artifacts") or {}
     entry = artifacts.get(artifact_name)
     if not isinstance(entry, dict):
@@ -142,15 +150,23 @@ def _verify_artifact_against_manifest(
         raise Phase5BIntegrityError(
             f"Manifest entry for {artifact_name!r} is malformed."
         )
-    if len(raw_bytes) != expected_size:
-        raise Phase5BIntegrityError(
-            f"Size mismatch for {artifact_name!r}."
-        )
-    actual_sha = hashlib.sha256(raw_bytes).hexdigest()
-    if actual_sha != expected_sha:
-        raise Phase5BIntegrityError(
-            f"SHA-256 mismatch for {artifact_name!r}."
-        )
+    candidates: list[bytes] = [raw_bytes]
+    if b"\x00" not in raw_bytes:
+        for transformed in (
+            trust.reconstruct_crlf(raw_bytes),
+            trust.canonicalize_frozen_checker(raw_bytes),
+        ):
+            if transformed not in candidates:
+                candidates.append(transformed)
+    for candidate in candidates:
+        if (
+            len(candidate) == expected_size
+            and hashlib.sha256(candidate).hexdigest() == expected_sha
+        ):
+            return
+    raise Phase5BIntegrityError(
+        f"Manifest identity failed for {artifact_name!r}."
+    )
 
 
 def _verify_plot_metadata(manifest: dict[str, Any]) -> None:

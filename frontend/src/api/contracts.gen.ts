@@ -57,12 +57,12 @@ export interface AgreementMatrixResponse {
   source_id: string;
 };
 
-/** Identity of one consumed frozen artifact. */
 export interface AgreementResponse {
   jaccard: AgreementMatrixResponse;
   spearman: AgreementMatrixResponse;
 };
 
+/** Identity of one consumed frozen artifact. */
 export interface ArtifactProvenance {
   /** Byte canonicalization applied before hashing: 'frozen-checker-compatible' (CRLF→LF, matching ci/check_frozen_integrity.py) or 'windows-commit-manifest-compatible' (LF→CRLF reconstruction matching the Windows-produced Phase 4 commit manifest). */
   canonicalization: string;
@@ -842,16 +842,16 @@ export interface TransitionStatusRequest {
   to_status: ReviewStatus;
 };
 
-/** Sanitized public representation of an authenticated user.
-
-Carries only approved public fields: user id, username, display
-name, role and the effective permission list. Never a password
-hash, session token or account internals. */
 export interface UncertaintyResponse {
   bootstrap: BootstrapMetricsResponse;
   paired_differences: PairedDifferencesResponse;
 };
 
+/** Sanitized public representation of an authenticated user.
+
+Carries only approved public fields: user id, username, display
+name, role and the effective permission list. Never a password
+hash, session token or account internals. */
 export interface UserResponse {
   /** Human-readable display name. */
   display_name: string;

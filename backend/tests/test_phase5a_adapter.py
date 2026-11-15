@@ -43,6 +43,7 @@ import io
 import json
 from pathlib import Path
 from unittest.mock import patch
+from contextlib import contextmanager
 
 import pytest
 from fastapi.testclient import TestClient
@@ -272,7 +273,8 @@ def _deploy_family(root: Path, family: str, csv_text: str) -> dict:
         "discovery": ("phase5_fraud_discovery_curve.csv", csv_text),
     }
     name, text = specs[family]
-    data = text.encode()
+    normalised = text.replace("\r\n", "\n").replace("\r", "\n")
+    data = normalised.encode("utf-8")
     payload_rel = f"{REPRO_DIR}/{name}"
     pointer_rel = f"{payload_rel}.dvc"
     payload_path = _write_payload(root, payload_rel, data)
@@ -315,6 +317,23 @@ def use_synthetic_payloads(deploy: dict):
         sizes[d["name"]] = len(d["data"])
     return _SyntheticPatch(new_specs, hashes, sizes)
 
+@contextmanager
+def _absent_family_specs(tmp_path: Path):
+    """Force every family's payload/pointer to nonexistent paths."""
+    original = svc._FAMILY_SPECS
+    absent_root = tmp_path / "absent"
+    absent_root.mkdir(exist_ok=True)
+    absent_specs = tuple(
+        (fam, str(absent_root / Path(rel).name),
+              str(absent_root / Path(ptr).name), role)
+        for fam, rel, ptr, role in original
+    )
+    with patch.object(svc, "_FAMILY_SPECS", absent_specs):
+        _invalidate_layer_b()
+        try:
+            yield
+        finally:
+            _invalidate_layer_b()
 
 class _SyntheticPatch:
     def __init__(self, new_specs, hashes, sizes):
@@ -358,12 +377,13 @@ class TestProtocol:
             "multithreshold", "hypergeometric", "groups", "discovery",
         }
 
-    def test_family_specific_artifact_missing_states(self, p5a_client):
+    def test_family_specific_artifact_missing_states(self, p5a_client, tmp_path):
         """2. Each family reports artifact_missing independently."""
-        caps = p5a_client.get(PROTOCOL_PATH).json()["capabilities"]
-        for fam, cap in caps.items():
-            assert cap["available"] is False, fam
-            assert cap["reason"] == "artifact_missing", fam
+        with _absent_family_specs(tmp_path):
+            caps = p5a_client.get(PROTOCOL_PATH).json()["capabilities"]
+            for fam, cap in caps.items():
+                assert cap["available"] is False, fam
+                assert cap["reason"] == "artifact_missing", fam
 
     def test_protocol_metadata_mapping(self, p5a_client):
         """3. Exact Phase 5A protocol metadata mapping."""
@@ -872,14 +892,17 @@ class TestOpenAPI:
 
 
 class TestCleanCheckoutReadiness:
-    def test_health_and_unrelated_routes_work_without_payloads(self, p5a_app, p5a_user):
+    def test_health_and_unrelated_routes_work_without_payloads(
+        self, p5a_app, p5a_user, tmp_path
+    ):
         """24. Unrelated application readiness during missing research payloads."""
         client = TestClient(p5a_app)
         assert client.get("/api/v1/health/live").status_code == 200
-        assert client.get("/api/v1/research/phase5a").status_code == 200
-        # Layer B routes report the sanitized unavailable state (not a crash).
-        assert client.get("/api/v1/research/phase5a/bootstrap").status_code == 503
-        assert client.get("/api/v1/research/sources").status_code == 200
+        with _absent_family_specs(tmp_path):
+            assert client.get("/api/v1/research/phase5a").status_code == 200
+            # Layer B routes report the sanitized unavailable state (not a crash).
+            assert client.get("/api/v1/research/phase5a/bootstrap").status_code == 503
+            assert client.get("/api/v1/research/sources").status_code == 200
 
 
 # ---------------------------------------------------------------------------
@@ -894,17 +917,18 @@ class TestServiceContract:
         assert set(caps) == {"bootstrap", "paired", "spearman", "jaccard",
                              "multithreshold", "hypergeometric", "groups", "discovery"}
 
-    def test_family_absent_raises_unavailable(self):
-        s = Phase5AEvidenceService()
-        for method in [s.get_bootstrap, s.get_paired_differences,
-                       s.get_hypergeometric, s.get_groups,
-                       s.get_thresholds]:
+    def test_family_absent_raises_unavailable(self, tmp_path):
+        with _absent_family_specs(tmp_path):
+            s = Phase5AEvidenceService()
+            for method in [s.get_bootstrap, s.get_paired_differences,
+                           s.get_hypergeometric, s.get_groups,
+                           s.get_thresholds]:
+                with pytest.raises(Phase5AUnavailableError):
+                    method()
             with pytest.raises(Phase5AUnavailableError):
-                method()
-        with pytest.raises(Phase5AUnavailableError):
-            s.get_agreement_matrix("spearman")
-        with pytest.raises(Phase5AUnavailableError):
-            s.get_discovery_curve("IF_001")
+                s.get_agreement_matrix("spearman")
+            with pytest.raises(Phase5AUnavailableError):
+                s.get_discovery_curve("IF_001")
 
     def test_unknown_kind_raises_source_not_found(self):
         s = Phase5AEvidenceService()

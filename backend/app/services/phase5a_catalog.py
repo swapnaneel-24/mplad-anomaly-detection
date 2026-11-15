@@ -207,7 +207,7 @@ _RUN_ID_RE = __import__("re").compile(r"^(IF|LOF)_(00[1-5])$")
 # Verify this pin against the actual authoritative Git file in the maintainer's
 # checkout before merge (the bundled source representation is not Git itself).
 TRUSTED_PHASE5_COMMIT_MANIFEST_SHA256: str = (
-    "5e8311f2246bf3b8295648fb727d8277edeb340863002109a41ac2dc1dba7d5d"
+    "d8a59afd1794a55ff460dd29d33399950df73ff1f516e39d723aa809742ceb7e"
 )
 
 
@@ -553,7 +553,7 @@ def _load_family_raw(family: str) -> dict[str, Any]:
     pointer = trust.parse_dvc_pointer(
         pointer_bytes, pointer_rel, integrity_cls=_INTEGRITY_CLS
     )
-    expected_name = payload_rel.rsplit("/", 1)[-1]
+    expected_name = Path(payload_rel).name
     if pointer["path"] != expected_name:
         _invalidate_layer_b(family)
         raise Phase5AIntegrityError("The DVC pointer targets an unexpected output.")

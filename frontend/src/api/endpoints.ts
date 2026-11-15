@@ -29,6 +29,8 @@ import type {
   Phase5AUncertaintyResponse,
   Phase5ACombinedAgreementResponse,
   Phase5AProtocolResponse,
+  FigureCatalogResponse,
+  TraceabilityResponse,
   Phase5AReviewPoliciesResponse,
   ReadinessResponse,
   RecordDecisionRequest,
@@ -46,6 +48,7 @@ import type {
 } from "@/api/contracts";
 import { CSRF_HEADER } from "@/api/contracts";
 import {
+  API_BASE,
   AUTH_TIMEOUT_MS,
   DEFAULT_TIMEOUT_MS,
   type RequestOptions,
@@ -400,4 +403,25 @@ export function getPhase5AReviewPolicies(signal?: AbortSignal): Promise<Phase5AA
   return request<Phase5AAgreementGroupsResponse>("/research/phase5a/review-policies", {
     signal, timeoutMs: DEFAULT_TIMEOUT_MS,
   });
+}
+
+// --- Phase 5B figures (PR-11) ------------------------------------------
+
+export function getPhase5BCatalog(signal?: AbortSignal): Promise<FigureCatalogResponse> {
+  return request<FigureCatalogResponse>("/research/phase5b/catalog", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getPhase5BTraceability(signal?: AbortSignal): Promise<TraceabilityResponse> {
+  return request<TraceabilityResponse>("/research/phase5b/traceability", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+/** URL builder for a canonical figure PNG (usable directly as <img src=...>). */
+export function phase5bFigureImageUrl(figureNo: number): string {
+  return `${API_BASE}/research/phase5b/figures/${figureNo}/image`;
 }

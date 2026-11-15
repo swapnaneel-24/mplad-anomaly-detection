@@ -43,6 +43,9 @@ import {
   getPhase5AAgreement,
   getPhase5AThresholds,
   getPhase5ADiscoveryCurve,
+  getPhase5BCatalog,
+  getPhase5BTraceability,
+  phase5bFigureImageUrl,
 } from "@/api/endpoints";
 import { ApiError } from "@/api/client";
 import type {
@@ -61,6 +64,8 @@ import type {
   Phase5AAgreementGroupsResponse,
   Phase5AMultithresholdResponse,
   Phase5ADiscoveryCurveResponse,
+  FigureCatalogResponse,
+  TraceabilityResponse,
 } from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
@@ -174,6 +179,12 @@ export function ResearchPage(): JSX.Element {
   const [discoveryRunId, setDiscoveryRunId] = useState("IF_001");
   const [discoveryPage, setDiscoveryPage] = useState(0);
   const PAGE_SIZE = 100;
+
+  // PR-11: Phase 5B figure gallery state.
+  const [phase5bCatalog, setPhase5bCatalog] = useState<FigureCatalogResponse | null>(null);
+  const [phase5bTraceability, setPhase5bTraceability] = useState<TraceabilityResponse | null>(null);
+  const [phase5bError, setPhase5bError] = useState<ApiError | null>(null);
+  const [phase5bLoading, setPhase5bLoading] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -360,6 +371,29 @@ export function ResearchPage(): JSX.Element {
     })();
     return () => controller.abort();
   }, [phase5aProtocol?.capabilities?.discovery?.available, discoveryRunId, discoveryPage]);
+
+  // PR-11: fetch Phase 5B catalog and traceability in parallel on mount.
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      setPhase5bLoading(true);
+      setPhase5bError(null);
+      try {
+        const [catalog, trace] = await Promise.all([
+          getPhase5BCatalog(controller.signal),
+          getPhase5BTraceability(controller.signal),
+        ]);
+        setPhase5bCatalog(catalog);
+        setPhase5bTraceability(trace);
+      } catch (err) {
+        if (err instanceof ApiError && err.aborted) return;
+        setPhase5bError(err instanceof ApiError ? err : null);
+      } finally {
+        if (!controller.signal.aborted) setPhase5bLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
 
   if (loading && !meta) {
     return <div className="research-page workspace-composition" aria-busy="true"><Loading label="Loading metadata…" /></div>;
@@ -1054,6 +1088,163 @@ export function ResearchPage(): JSX.Element {
           )}
         </section>
 
+          {/* PR-11: Phase 5B Figure Gallery & Objective Traceability */}
+          <h2 className="section-h2">Phase 5B — Figure Gallery and Methodology</h2>
+          <p className="editorial">
+            The eight canonical Phase 5B figures visualize the same 30,000-row
+            ULB benchmark that underpins the Phase 5A evidence above. Every
+            figure's binary identity is verified against both its DVC pointer
+            and the Phase 5B reproduction manifest.{" "}
+            <strong>Binary delivery is withheld by default</strong> pending
+            independent licensing verification; the verified catalog,
+            methodology, and objective traceability are served publicly.
+          </p>
+          {phase5bLoading && <Loading label="Loading Phase 5B catalog…" />}
+          {phase5bError && (
+            <ErrorPanel error={phase5bError} onRetry={() => window.location.reload()} />
+          )}
+          {phase5bCatalog && (
+            <div className="research-page__phase5b">
+              <p className="research-page__phase5b-notice">
+                Publication gate:{" "}
+                <strong>
+                  {phase5bCatalog.publication_gate.enabled ? "enabled" : "disabled"}
+                </strong>
+                {!phase5bCatalog.publication_gate.enabled &&
+                  Boolean(phase5bCatalog.publication_gate.detail) && (
+                    <> — {String(phase5bCatalog.publication_gate.detail)}</>
+                  )}
+              </p>
+              <div className="research-page__phase5b-grid">
+                {phase5bCatalog.figures.map((f) => (
+                  <figure key={f.figure_no} className="research-page__phase5b-figure">
+                    <figcaption className="research-page__phase5b-caption">
+                      <span className="mono">Figure {f.figure_no}</span>
+                      <span className="research-page__phase5b-title">
+                        {f.title ? String(f.title) : <em>metadata unavailable</em>}
+                      </span>
+                    </figcaption>
+                    {f.publication.enabled && f.availability.available ? (
+                      <img
+                        src={phase5bFigureImageUrl(f.figure_no)}
+                        alt={String(f.alt_text)}
+                        className="research-page__phase5b-image"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="research-page__phase5b-placeholder">
+                        {!f.availability.available
+                          ? <span>{String(f.availability.reason ?? "unavailable")}</span>
+                          : <span>Binary withheld — publication not approved</span>}
+                      </div>
+                    )}
+                    {Boolean(f.conventions) && (
+                      <details className="research-page__phase5b-conventions">
+                        <summary>Conventions &amp; caveats</summary>
+                        <p className="editorial-muted">{String(f.conventions)}</p>
+                      </details>
+                    )}
+                  </figure>
+                ))}
+              </div>
+              <p className="research-page__phase5b-meta">
+                Manifest status: <strong>{phase5bCatalog.manifest_status}</strong>{" "}
+                · Catalog metadata:{" "}
+                <strong>
+                  {phase5bCatalog.catalog_metadata_available ? "available" : "unavailable"}
+                </strong>
+              </p>
+            </div>
+          )}
+          {phase5bTraceability && (
+            <>
+              <h3 className="section-h3">Methodology and Original Objectives</h3>
+              <p className="editorial">
+                Objectives are shown as source-native identifiers (a)/(b)/(c)
+                from <code className="mono">docs/provenance_log.md</code> §1,
+                mapped to research questions RQ1–RQ6 from{" "}
+                <code className="mono">docs/Phase-0.md</code> §0.4. No
+                artificial OBJ-* identifiers are introduced.
+              </p>
+              {phase5bTraceability.objectives.map((obj) => {
+                const methodologySources = obj.methodology_sources ?? [];
+                const evidence = obj.evidence ?? [];
+                const limitations = obj.limitations ?? [];
+                return (
+                  <article
+                    key={obj.objective_id}
+                    className="research-page__phase5b-objective"
+                  >
+                    <h4 className="section-h3">
+                      Objective {obj.objective_id} — {obj.statement}
+                    </h4>
+                    {methodologySources.length > 0 && (
+                      <p className="editorial-muted research-page__phase5b-refs">
+                        Methodology:{" "}
+                        {methodologySources.map((s, i) => (
+                          <code key={i} className="mono">{s}</code>
+                        ))}
+                      </p>
+                    )}
+                    {evidence.length > 0 && (
+                      <ul className="list-clean research-page__phase5b-evidence">
+                        {evidence.map((e, i) => (
+                          <li key={i}>
+                            <span className="mono">{e.type}</span>: {e.reference}{" "}
+                            <em>({e.verification_status})</em>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {limitations.length > 0 && (
+                      <details>
+                        <summary>Limitations ({limitations.length})</summary>
+                        <ul className="list-clean">
+                          {limitations.map((l, i) => (
+                            <li key={i}>{l}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
+                  </article>
+                );
+              })}
+              <h4 className="section-h3">Research questions RQ1–RQ6</h4>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">RQ</th>
+                    <th scope="col">Statement</th>
+                    <th scope="col">Linked objective</th>
+                    <th scope="col">Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {phase5bTraceability.research_questions.map((rq) => (
+                    <tr key={rq.rq_id}>
+                      <td className="mono">{rq.rq_id}</td>
+                      <td>{rq.statement}</td>
+                      <td className="mono">{rq.linked_objective}</td>
+                      <td className="mono">{rq.source_reference}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <h4 className="section-h3">Historical companion — non-comparable</h4>
+              <div className="research-page__phase5b-history">
+                <p className="editorial">
+                  The historical 284,807-row LOF Novelty Mode companion is{" "}
+                  <strong>not comparable</strong> to the canonical 30,000-row
+                  benchmark.
+                </p>
+                <ul className="list-clean">
+                  {(phase5bTraceability.historical_companion.limitations ?? []).map((l, i) => (
+                    <li key={i}>{l}</li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
         <aside className="research-page__sidebar" aria-label="Artifacts, limitations, cautions">
           <section className="research-page__sidebar-section panel">
             <div className="panel__header">

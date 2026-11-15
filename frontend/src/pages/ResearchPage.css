@@ -198,3 +198,114 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-faint);
 }
+
+/* --- PR-11: Phase 5B figure gallery and traceability ------------------ */
+
+.research-page__phase5b {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.research-page__phase5b-notice {
+  border-left: 3px solid var(--color-warning, #b58900);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+}
+
+.research-page__phase5b-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.research-page__phase5b-figure {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  background: var(--color-surface);
+}
+
+.research-page__phase5b-caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.research-page__phase5b-title {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.research-page__phase5b-image {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.research-page__phase5b-placeholder {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4) var(--space-3);
+  text-align: center;
+  color: var(--color-text-faint);
+  font-size: var(--font-size-sm);
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.research-page__phase5b-conventions {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.research-page__phase5b-conventions summary {
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.research-page__phase5b-meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+}
+
+.research-page__phase5b-objective {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.research-page__phase5b-refs {
+  font-size: var(--font-size-xs);
+}
+
+.research-page__phase5b-refs code {
+  display: inline-block;
+  margin-right: var(--space-2);
+}
+
+.research-page__phase5b-evidence {
+  font-size: var(--font-size-sm);
+}
+
+.research-page__phase5b-history {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--color-surface);
+}

@@ -46,7 +46,8 @@ export type ErrorCode =
   | "UNAUTHORIZED"
   | "FORBIDDEN"
   | "RATE_LIMITED"
-  | "CSRF_TOKEN_INVALID";
+  | "CSRF_TOKEN_INVALID"
+  | "PUBLICATION_NOT_APPROVED";
 
 export interface ErrorBody {
   /** Stable machine-readable error code. */
@@ -725,4 +726,100 @@ export type Phase5AUncertaintyResponse = {
 export type Phase5ACombinedAgreementResponse = {
   spearman: Phase5AAgreementMatrixResponse;
   jaccard: Phase5AAgreementMatrixResponse;
+};
+
+// --- PR-11: Phase 5B figure gallery and objective traceability --------
+
+export interface Availability {
+  available: boolean;
+  detail?: string | unknown;
+  reason?: "artifact_missing" | "integrity_failed" | "source_not_admitted" | unknown;
+};
+
+export interface EvidenceLink {
+  reference: string;
+  source_id?: string | unknown;
+  type: string;
+  verification_status?: "verified" | "unverified" | "unavailable";
+};
+
+export interface FigureCatalogResponse {
+  /** True when the DVC-backed catalog CSV is present and verified; false on a clean checkout. */
+  catalog_metadata_available: boolean;
+  dataset_id: string;
+  figures: Array<FigureEntry>;
+  limitations: Array<string>;
+  manifest_status: "verified" | "integrity_failed" | "source_not_admitted";
+  models_fitted: number;
+  phase: "5B";
+  publication_gate: Publication;
+  source_id: string;
+  stream: "A";
+};
+
+export interface FigureEntry {
+  /** Concise source-backed accessibility description (derived from title). */
+  alt_text: string;
+  availability: Availability;
+  /** Full conventions text; used as the visible caption, not raw alt. */
+  conventions?: string | unknown;
+  figure_no: number;
+  filename: string;
+  input_artifacts?: string | unknown;
+  integrity: Phase5BIntegrityStatus;
+  publication: Publication;
+  purpose?: string | unknown;
+  /** Source-backed title from the catalog CSV; null if the CSV is unavailable. */
+  title?: string | unknown;
+};
+
+export interface HistoricalCompanion {
+  canonical_comparable?: boolean;
+  limitations?: Array<string>;
+  population: number;
+};
+
+export interface Phase5BIntegrityStatus {
+  /** Verified manifest SHA-256 (only set when state=verified). */
+  sha256?: string | unknown;
+  /** Verified raw size in bytes (only set when state=verified). */
+  size_bytes?: number | unknown;
+  state: "verified" | "artifact_missing" | "integrity_failed" | "source_not_admitted";
+};
+
+export interface ObjectiveEntry {
+  evidence?: Array<EvidenceLink>;
+  limitations?: Array<string>;
+  methodology_sources?: Array<string>;
+  objective_id: "(a)" | "(b)" | "(c)";
+  research_questions?: Array<string>;
+  statement: string;
+};
+
+export interface Publication {
+  detail?: string | unknown;
+  enabled: boolean;
+  reason?: "publication_not_approved" | "licensing_unresolved" | unknown;
+};
+
+export interface Reproducibility {
+  artifact_references?: Array<Record<string, unknown>>;
+  limitations?: Array<string>;
+  source_references?: Array<Record<string, unknown>>;
+};
+
+export interface ResearchQuestionEntry {
+  linked_objective: "(a)" | "(b)" | "(c)";
+  rq_id: "RQ1" | "RQ2" | "RQ3" | "RQ4" | "RQ5" | "RQ6";
+  source_reference: string;
+  statement: string;
+};
+
+export interface TraceabilityResponse {
+  historical_companion: HistoricalCompanion;
+  limitations: Array<string>;
+  objectives: Array<ObjectiveEntry>;
+  reproducibility: Reproducibility;
+  research_questions: Array<ResearchQuestionEntry>;
+  source_identity: Record<string, unknown>;
 };

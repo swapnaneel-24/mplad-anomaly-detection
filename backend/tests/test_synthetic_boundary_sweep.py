@@ -283,6 +283,11 @@ class TestDisabledSourceExposureSweep:
             "/api/v1/research/phase5a/uncertainty",
             "/api/v1/research/phase5a/agreement",
             "/api/v1/research/phase5a/review-policies",
+            # PR-11: Phase 5B figure catalog and objective traceability
+            # (Layer A metadata; both serve manifest-verified content and
+            # never synthetic demonstration content).
+            "/api/v1/research/phase5b/catalog",
+            "/api/v1/research/phase5b/traceability",
         ]
         # OpenAPI-driven completeness: sweep every documented non-
         # parameterized GET path. Parameterized GETs are covered by the
@@ -373,6 +378,10 @@ class TestDisabledSourceExposureSweep:
             # PR-10: Phase 5A parameterized GETs (agreement/{kind} only;
             # discovery-curve is non-parameterized — run_id is a query param).
             "/api/v1/research/phase5a/agreement/spearman",
+            # PR-11: Phase 5B figure binary (integer-only figure_no; 403
+            # under the default publication gate -- the sanitized error
+            # envelope carries no synthetic content).
+            "/api/v1/research/phase5b/figures/1/image",
         }
         # All parameterized GET paths documented in the OpenAPI contract
         # must be covered by the probe (substituting the persisted
@@ -390,6 +399,7 @@ class TestDisabledSourceExposureSweep:
                 "/benchmark/experiments/{run_id}",
             )
             .replace("/agreement/spearman", "/agreement/{kind}")
+            .replace("/figures/1/image", "/figures/{figure_no}/image")
             for path in probe_paths
         }
         assert documented_param_gets <= documented_param_templates, (

@@ -229,6 +229,37 @@ def _verify_png_against_pointer(figure_no: int, raw_bytes: bytes) -> None:
         )
 
 
+def _verify_catalog_csv_against_pointer(raw_bytes: bytes) -> None:
+    """Verify the catalog CSV raw bytes against its DVC pointer (MD5 + size).
+
+    The catalog CSV is DVC-backed. Manifest SHA-256 alone is insufficient
+    for full DVC identity: the .dvc pointer supplies the MD5 + size + path
+    triple that every other DVC-backed artifact in PR-11 also checks.
+    """
+    pointer_filename = "phase5_figure_catalog.csv.dvc"
+    pointer_path = PHASE5_FIGURES_DIR / pointer_filename
+    try:
+        pointer_bytes = pointer_path.read_bytes()
+    except FileNotFoundError as exc:
+        raise Phase5BIntegrityError(
+            "The DVC pointer for the figure catalog CSV is missing."
+        ) from exc
+    pointer = trust.parse_dvc_pointer(
+        pointer_bytes, pointer_filename, integrity_cls=Phase5BIntegrityError
+    )
+    if pointer["path"] != "phase5_figure_catalog.csv":
+        raise Phase5BIntegrityError(
+            "The DVC pointer for the figure catalog CSV targets an unexpected output."
+        )
+    if len(raw_bytes) != pointer["size"]:
+        raise Phase5BIntegrityError(
+            "The DVC pointer size for the figure catalog CSV does not match the payload."
+        )
+    if trust.md5_raw(raw_bytes) != pointer["md5"]:
+        raise Phase5BIntegrityError(
+            "The DVC pointer MD5 for the figure catalog CSV does not match the payload."
+        )
+
 def _load_catalog_csv(manifest: dict[str, Any]) -> list[dict[str, str]] | None:
     """Load the DVC-backed catalog CSV, or None when the payload is absent."""
     path = REPO_ROOT / PHASE5_CATALOG_REL
@@ -237,6 +268,7 @@ def _load_catalog_csv(manifest: dict[str, Any]) -> list[dict[str, str]] | None:
     except (FileNotFoundError, OSError):
         return None
     _verify_artifact_against_manifest(manifest, "phase5_figure_catalog.csv", raw, kind="text")
+    _verify_catalog_csv_against_pointer(raw)
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -395,6 +427,26 @@ class Phase5BCatalogService:
 def _build_traceability() -> dict[str, Any]:
     """Compose the traceability payload from admitted source documents."""
 
+    # Derive current figure verification status from the live catalog, so
+    # the response distinguishes the documentary reference (PR-11 source
+    # admission) from current artifact availability (DVC payloads
+    # materialized + verified now).
+    try:
+        _catalog = PHASE5B_CATALOG_SERVICE.get_catalog(publication_enabled=False)
+        _verified_count = sum(
+            1
+            for _fig in _catalog["figures"]
+            if _fig["integrity"]["state"] == "verified"
+        )
+        if _verified_count == 8:
+            figures_status = "verified"
+        elif _verified_count == 0:
+            figures_status = "unavailable"
+        else:
+            figures_status = "unverified"
+    except (Phase5BUnavailableError, Phase5BIntegrityError):
+        figures_status = "unavailable"
+
     objectives = [
         {
             "objective_id": "(a)",
@@ -450,7 +502,7 @@ def _build_traceability() -> dict[str, Any]:
                     "type": "phase5b_figures",
                     "source_id": "pr-11-phase5b",
                     "reference": "PR-11 eight canonical figures",
-                    "verification_status": "verified",
+                    "verification_status": figures_status,
                 },
             ],
             "limitations": [

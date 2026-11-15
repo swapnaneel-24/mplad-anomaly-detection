@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import shutil
 import struct
 import subprocess
@@ -250,6 +251,34 @@ class TestMetadataTampering:
                 # PNG binaries still verify against the manifest
                 assert f["integrity"]["state"] == "verified"
 
+
+    @requires_catalog_csv
+    def test_missing_catalog_pointer_fails_integrity(self, tmp_path):
+        """Missing .dvc pointer for the catalog CSV -> integrity_failed."""
+        with _isolated_figure_tree(tmp_path) as tree:
+            (tree["figures_dir"] / "phase5_figure_catalog.csv.dvc").unlink()
+            client = _client()
+            r = client.get(f"{PROTOCOL_PATH}/catalog")
+            assert r.status_code == 503
+            assert r.json()["error"]["details"]["reason"] == "integrity_failed"
+
+    @requires_catalog_csv
+    def test_mismatched_catalog_pointer_md5_fails_integrity(self, tmp_path):
+        """Tampered .dvc pointer MD5 for the catalog CSV -> integrity_failed."""
+        with _isolated_figure_tree(tmp_path) as tree:
+            pointer = tree["figures_dir"] / "phase5_figure_catalog.csv.dvc"
+            text = pointer.read_bytes().decode("utf-8")
+            tampered = re.sub(
+                r"md5: [0-9a-f]{32}",
+                "md5: 00000000000000000000000000000000",
+                text,
+            )
+            assert tampered != text, "pointer md5 line not found for tampering"
+            pointer.write_bytes(tampered.encode("utf-8"))
+            client = _client()
+            r = client.get(f"{PROTOCOL_PATH}/catalog")
+            assert r.status_code == 503
+            assert r.json()["error"]["details"]["reason"] == "integrity_failed"
 
 # ---------------------------------------------------------------------------
 # E. DVC absence

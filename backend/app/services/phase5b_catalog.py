@@ -294,15 +294,13 @@ class Phase5BCatalogService:
 
             alt_text = f"Figure {n} — {title}" if title else f"Figure {n} (metadata unavailable)"
 
-            pub_for_figure = (
-                dict(publication)
-                if availability["available"]
-                else {
-                    "enabled": False,
-                    "reason": availability["reason"],
-                    "detail": None,
-                }
-            )
+            # Publication is an independent dimension: it reflects the
+            # licensing/publication decision, NOT payload availability.
+            # Availability carries the artifact_missing / integrity_failed
+            # reason separately; cascading it into publication would
+            # violate Publication.reason's literal set and conflate two
+            # orthogonal states (PR-11 §4 invariant).
+            pub_for_figure = dict(publication)
 
             figures.append(
                 {

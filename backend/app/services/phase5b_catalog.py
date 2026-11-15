@@ -28,7 +28,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from app.services import frozen_evidence_trust as trust
 
@@ -71,6 +71,13 @@ _PNG_MAGIC: bytes = b"\x89PNG\r\n\x1a\n"
 _PNG_MIN_DIM: int = 100
 _PNG_MAX_DIM: int = 8000
 _PNG_MIN_BYTES: int = 1024
+
+#: Explicit artifact classification for manifest verification. ``"text"``
+#: permits LF/CRLF-compatible representations (JSON metadata, CSV catalog);
+#: ``"binary"`` requires exact raw-byte identity (canonical PNGs). No
+#: default kind exists: every call site must select the correct value, and
+#: unknown kinds fail closed.
+ArtifactKind = Literal["text", "binary"]
 
 
 class Phase5BUnavailableError(Exception):
@@ -127,16 +134,24 @@ def _read_verified_manifest() -> dict[str, Any]:
 
 
 def _verify_artifact_against_manifest(
-    manifest: dict[str, Any], artifact_name: str, raw_bytes: bytes
+    manifest: dict[str, Any],
+    artifact_name: str,
+    raw_bytes: bytes,
+    *,
+    kind: ArtifactKind,
 ) -> None:
     """Verify a raw-bytes artifact against its manifest entry (SHA-256 + size).
 
-    Binary artifacts (PNG) must match raw bytes exactly -- they have no
-    line-ending variants. Text artifacts (JSON metadata, CSV) may differ
-    by CRLF vs LF line endings between the OS that produced the manifest
-    and the OS checking out the repo; we accept any of raw / CRLF-
-    reconstructed / LF-canonicalized representations whose length AND
-    SHA-256 both match the manifest entry.
+    ``kind`` explicitly classifies the artifact:
+
+    * ``"binary"`` -- only raw bytes are accepted. Canonical PNGs must use
+      this kind; newline reconstruction is never attempted.
+    * ``"text"`` -- raw bytes plus CRLF-reconstructed and LF-canonicalized
+      representations are all tried. JSON metadata and CSV catalog entries
+      must use this kind.
+
+    There is no default. Every call site must select the correct kind, and
+    unknown kinds fail closed.
     """
     artifacts = manifest.get("artifacts") or {}
     entry = artifacts.get(artifact_name)
@@ -150,14 +165,20 @@ def _verify_artifact_against_manifest(
         raise Phase5BIntegrityError(
             f"Manifest entry for {artifact_name!r} is malformed."
         )
-    candidates: list[bytes] = [raw_bytes]
-    if b"\x00" not in raw_bytes:
+    if kind == "binary":
+        candidates: list[bytes] = [raw_bytes]
+    elif kind == "text":
+        candidates = [raw_bytes]
         for transformed in (
             trust.reconstruct_crlf(raw_bytes),
             trust.canonicalize_frozen_checker(raw_bytes),
         ):
             if transformed not in candidates:
                 candidates.append(transformed)
+    else:
+        raise Phase5BIntegrityError(
+            f"Unknown artifact kind {kind!r} for {artifact_name!r}."
+        )
     for candidate in candidates:
         if (
             len(candidate) == expected_size
@@ -165,7 +186,7 @@ def _verify_artifact_against_manifest(
         ):
             return
     raise Phase5BIntegrityError(
-        f"Manifest identity failed for {artifact_name!r}."
+        f"Manifest identity failed for {artifact_name!r} (kind={kind})."
     )
 
 
@@ -178,7 +199,7 @@ def _verify_plot_metadata(manifest: dict[str, Any]) -> None:
         raise Phase5BUnavailableError(
             "The Phase 5B plot metadata JSON is missing."
         ) from exc
-    _verify_artifact_against_manifest(manifest, "phase5_plot_metadata.json", raw)
+    _verify_artifact_against_manifest(manifest, "phase5_plot_metadata.json", raw, kind="text")
 
 
 def _verify_png_against_pointer(figure_no: int, raw_bytes: bytes) -> None:
@@ -215,7 +236,7 @@ def _load_catalog_csv(manifest: dict[str, Any]) -> list[dict[str, str]] | None:
         raw = path.read_bytes()
     except (FileNotFoundError, OSError):
         return None
-    _verify_artifact_against_manifest(manifest, "phase5_figure_catalog.csv", raw)
+    _verify_artifact_against_manifest(manifest, "phase5_figure_catalog.csv", raw, kind="text")
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -264,7 +285,7 @@ class Phase5BCatalogService:
                 {"available": False, "reason": "artifact_missing", "detail": None},
             )
         try:
-            _verify_artifact_against_manifest(manifest, filename, raw)
+            _verify_artifact_against_manifest(manifest, filename, raw, kind="binary")
             _verify_png_against_pointer(figure_no, raw)
             _validate_png(raw, filename)
         except Phase5BIntegrityError:
@@ -361,7 +382,7 @@ class Phase5BCatalogService:
             raise Phase5BUnavailableError(
                 f"Figure {figure_no} payload is missing."
             ) from exc
-        _verify_artifact_against_manifest(manifest, filename, raw)
+        _verify_artifact_against_manifest(manifest, filename, raw, kind="binary")
         _verify_png_against_pointer(figure_no, raw)
         _validate_png(raw, filename)
         return raw

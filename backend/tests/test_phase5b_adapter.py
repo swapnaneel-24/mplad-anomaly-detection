@@ -605,3 +605,54 @@ class TestTrustedLocalRealDvcPayloads:
             pytest.skip("DVC catalog CSV absent")
         catalog = PHASE5B_CATALOG_SERVICE.get_catalog(publication_enabled=False)
         assert catalog["catalog_metadata_available"] is True
+
+# ---------------------------------------------------------------------------
+# Q. Artifact-kind discrimination (R1 -- explicit text/binary classification)
+# ---------------------------------------------------------------------------
+
+
+class TestArtifactKindDiscrimination:
+    """Verifier must not fall back to text normalization for binary artifacts."""
+
+    def test_binary_with_newlines_and_no_nul_rejects_text_normalization(self):
+        """Binary kind requires raw-byte identity even if text reconstructions match."""
+        lf_bytes = b"line one\nline two\n" * 50
+        crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+        assert b"\x00" not in lf_bytes  # no NUL: the old heuristic would misfire
+        manifest = {
+            "artifacts": {
+                "synthetic_artifact.bin": {
+                    "sha256": hashlib.sha256(crlf_bytes).hexdigest(),
+                    "size_bytes": len(crlf_bytes),
+                }
+            }
+        }
+        # Positive control: kind="text" permits CRLF reconstruction -> passes.
+        svc._verify_artifact_against_manifest(
+            manifest, "synthetic_artifact.bin", lf_bytes, kind="text"
+        )
+        # kind="binary": only raw bytes accepted -> must fail closed.
+        with pytest.raises(Phase5BIntegrityError):
+            svc._verify_artifact_against_manifest(
+                manifest, "synthetic_artifact.bin", lf_bytes, kind="binary"
+            )
+
+    def test_text_lf_and_crlf_checkouts_verify_under_text_kind(self):
+        """Text kind accepts any LF/CRLF-compatible representation that authenticates."""
+        lf_bytes = b'{"a": 1}\n' * 50
+        crlf_bytes = lf_bytes.replace(b"\n", b"\r\n")
+        manifest = {
+            "artifacts": {
+                "synthetic_metadata.json": {
+                    "sha256": hashlib.sha256(crlf_bytes).hexdigest(),
+                    "size_bytes": len(crlf_bytes),
+                }
+            }
+        }
+        # Both on-disk forms must verify under kind="text".
+        svc._verify_artifact_against_manifest(
+            manifest, "synthetic_metadata.json", lf_bytes, kind="text"
+        )
+        svc._verify_artifact_against_manifest(
+            manifest, "synthetic_metadata.json", crlf_bytes, kind="text"
+        )

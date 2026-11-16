@@ -3,8 +3,8 @@
 - **Document ID:** `STATUS-PEIARS-R1-001`
 - **Status:** Living implementation-status record
 - **Current milestone:** M2 — Verified Stream A Research Integration
-- **Current implementation branch:** `pr-12-m2-integrated-acceptance` (PR-12 — Source admission in progress; M2 remains IN PROGRESS)
-- **Verified current baseline (`main` HEAD):** `10d8613558e4056f3d831698adccaec3c79a60cc` (PR #7 merge commit; includes PR-11 acceptance ledger)
+- **Current implementation branch:** `main` (PR-12 merged at `2f96fdb`; M2 — Verified Stream A research integration COMPLETED)
+- **Verified current baseline (`main` HEAD):** `2f96fdb667ca3a92c8df1ac1c521fbcb3363666f` (PR #8 merge commit; includes PR-12 M2 acceptance)
 - **Last updated:** 2026-11-15
 
 ## 1. Governing documents
@@ -25,7 +25,7 @@ This ledger is subordinate to the SRS, ADRs, and implementation backlog. It does
 |---|---|---|
 | M0 — Governance and sign-off | Operational baseline established; formal sign-off unresolved | Record accepted decisions and outstanding approvals |
 | M1 — Walking skeleton | Completed as reported, PR-01 through PR-07 | React/FastAPI/PostgreSQL workflow, fixture-based case journey, auth boundary, Compose and CI |
-| M2 — Verified research integration | In progress | PR-08, PR-09, PR-10 and PR-11 merged; PR-12 remains the integrated M2 acceptance gate |
+| M2 — Verified Stream A research integration | **COMPLETED** | PR-08 through PR-12 merged; PR-12 (PR #8) accepted on 2f96fdb. Scope: verified Stream A research integration only — PMGSY modelling, MPLADS modelling and deployment readiness remain out of M2 scope. |
 | M3 — PMGSY observatory and review | Not started under this roadmap | Approved source admission, record explorer, real-source case flow and export |
 | M4 — R1 deployment and hardening | Not started under this roadmap | AT-01–12, public HTTPS release and security/reproducibility gates |
 | M5a/M5b/M5c — R2 enhancements | Deferred | Separate gated and independently versioned experiments |
@@ -178,7 +178,7 @@ After each PR:
 5. Identify unresolved limitations, accepted deviations and next milestone.
 6. Mark the PR accepted only after maintainer review and required checks.
 
-Next scheduled work: PR-12 — M2 integrated scientific acceptance and traceability, branching from main at 10d8613 (PR-11 acceptance ledger on main).
+Next scheduled work: M2 is COMPLETED (verified Stream A research integration, PR-12 merge 2f96fdb). M3 (PMGSY observatory) not authorized. D0 (accelerated Docker validation) authorized separately. D1 (public deployment preview) planned subject to deployment safety. M4 (production deployment) not completed.
 
 ---
 ## PR-10 — Phase 5A Uncertainty, Agreement, and Review-Policy Evidence
@@ -261,3 +261,29 @@ PR-10 does not complete M2 or R1. Phase 5B figure publication, methodology, obje
 **Milestone:** M2 IN PROGRESS. PR-12 remains the integrated scientific acceptance and traceability gate.
 
 **Next scheduled work:** PR-12 — M2 integrated scientific acceptance and traceability.
+
+## PR-12 — M2 Integrated Scientific Acceptance and Traceability
+
+**Status:** MERGED — Accepted
+**GitHub PR:** #8
+**Final reviewed head:** `b06abfc8ef704d3bbe2c6702f56c9784cc3d96d2`
+**Merge commit:** `2f96fdb667ca3a92c8df1ac1c521fbcb3363666f`
+**Merged:** 2026-11-16T04:01:07Z
+**Merge strategy:** Merge commit; reviewed implementation history preserved.
+**Hosted CI on final reviewed head:** 5/5 successful (run 43800723014)
+
+**Accepted scope:** Integration acceptance gate for M2. Consolidates the accepted PR-08 through PR-11 evidence into an explicit 10-row acceptance matrix; closes frontend Phase 5B coverage (AG-2); documents the PR-08 frozen-source vs DVC-backed provenance distinction; preserves the historical 284,807-row LOF companion distinction; no new research capability added.
+
+**Acceptance evidence:** All five required GitHub Actions jobs passed on the final reviewed head (Backend 1m52s, Browser E2E 1m18s, Container 1m17s, Frontend 44s, Frozen 11s). Windows verification: 754/754 backend tests with materialized DVC payloads (886 warnings, same three classes as PR-08 through PR-11); 141/141 frontend Vitest tests (25 files; +7 new F5B scenarios); typecheck, lint, openapi:check and build all pass; real-DVC 9/9 (8 PNGs + catalog CSV SHA-256 vs figure manifest). Playwright NOT RUN locally on Windows (POSIX env-var prefix in playwright.config.ts unsupported by Windows cmd; bash.exe is WSL launcher stub); hosted Ubuntu Playwright PASS confirms non-blocking. Post-merge frozen integrity: 28/28 files matched.
+
+**Review findings resolved:** AG-1 (PR-08 reason-code specificity) closed as NOT APPLICABLE — the existing PR-08 contract emits `{"dependency": "research-source"}` without `details.reason`; preserving that distinction is required. AG-2 (frontend Phase 5B integration coverage) closed by `phase5b-workspace.test.tsx` (7 scenarios F5B-01 through F5B-07). AG-3 (integrated cross-surface acceptance) closed by `PR12_TEST_MATRIX.md` — 1 10-row matrix with composed-evidence framing. F5B-07 race condition (originally waited on unconditionally-rendered heading) resolved in `b06abfc8ef704d3bbe2c6702f56c9784cc3d96d2` by awaiting the ErrorPanel `role="alert"` state before asserting absence of fabricated content.
+
+**Retained boundaries:** No scientific artifacts regenerated or modified. Phase 5B public PNG binary delivery remains disabled by default pending licensing verification. The historical 284,807-record LOF Novelty Mode companion remains distinct from the canonical 30,000-record benchmark. PR-08 failure envelope preserved as-is (no `details.reason`). DVC migration deferred to M4.
+
+**M2 status:** **COMPLETED** — verified Stream A research integration. Explicit qualification: this refers to verified Stream A research integration only, not PMGSY modelling, MPLADS modelling or deployment readiness.
+
+**Next scheduled work:** M3 (PMGSY observatory and review) not authorized. D0 (accelerated Docker validation) authorized separately. D1 (public deployment preview) planned subject to deployment safety. M4 (production deployment) not completed.
+
+---
+
+*End of PR-12 integration acceptance.*

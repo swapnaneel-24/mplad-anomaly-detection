@@ -407,11 +407,16 @@ describe("phase5b figure gallery and traceability", () => {
 
     renderApp({ initialEntries: ["/research"] });
 
-    // Wait for the page to actually render. The section heading is emitted
-    // unconditionally (outside any data-gated conditional), so its
-    // appearance implies the outer meta/auth gates have resolved and the
-    // phase5b fetch lifecycle has settled.
-    await screen.findByText(/Phase 5B.*Figure Gallery/);
+    // The section heading renders unconditionally, so its presence alone
+    // does not prove the asynchronous 503 fetch has settled. Wait for the
+    // ErrorPanel (role="alert") — the definitive API-failure state — to
+    // become visible before asserting the absence of fabricated content.
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(/unavailable/i);
+
+    // Confirm we are in the API-failure branch of the Phase 5B section
+    // (the heading remains rendered above the error, per ResearchPage).
+    expect(screen.getByText(/Phase 5B.*Figure Gallery/)).toBeInTheDocument();
 
     // No figures, no objectives, no RQ table — no fabricated content
     expect(screen.queryByText(/^Figure 1$/)).toBeNull();

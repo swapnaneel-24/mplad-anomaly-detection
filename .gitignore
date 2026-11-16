@@ -60,3 +60,6 @@ Thumbs.db
 .pgdata/
 backend/.venv312/
 inspection.txt
+
+# Ad-hoc review artifacts (not part of the shipped tree)
+PR11_SOURCE_FOR_REVIEW.md

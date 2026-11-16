@@ -1,3 +1,3 @@
 # Generated TypeScript contracts are hashed raw by check-openapi.mjs;
 # force LF so the check is stable on Windows checkouts (core.autocrlf=true).
-frontend/src/api/contracts.gen.ts text eol=lf
+frontend/src/api/contracts.gen.ts text eol=lffrontend/nginx/templates/*.template text eol=lf

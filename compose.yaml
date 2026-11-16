@@ -140,6 +140,10 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    environment:
+      # Template substitution values (see frontend/nginx/templates/default.conf.template)
+      PORT: "80"                          # container listen port (matches ports: mapping below)
+      BACKEND_URL: "http://backend:8000"   # private Docker DNS; Railway overrides with its own
     ports:
       # The single browser-visible origin. Override the host port via
       # PEIARS_FRONTEND_PORT in .env.compose if 8080 is taken.

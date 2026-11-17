@@ -24,8 +24,8 @@
 # unchanged when present; fall back to $scheme only when there is no incoming
 # proxy header (local Compose case).
 map $http_x_forwarded_proto $peiars_forwarded_proto {
-    default $http_x_forwarded_proto;
-    ""      $scheme;
+    ~*^(https?)$ $1;
+    default      $scheme
 }
 
 server {

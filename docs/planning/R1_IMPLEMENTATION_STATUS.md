@@ -287,3 +287,27 @@ PR-10 does not complete M2 or R1. Phase 5B figure publication, methodology, obje
 ---
 
 *End of PR-12 integration acceptance.*
+
+---
+
+## Phase 5A Follow-up — Absent-Payload Test Isolation
+
+**Status:** MERGED — Accepted
+**GitHub PR:** #10
+**Source branch:** `fix/phase5a-absent-payload-tests`
+**Starting main commit:** `16c47592f848c74ff417b1ae788c1ff65da7b29b`
+**Final reviewed head:** `dfd30f8ccd0020d1a072a68b7990faaa7bd7973c`
+**Merge commit:** `fc3789a02e9ed61e21838586a8cdf1b475fe5c15`
+**Hosted CI on final reviewed head:** 5/5 successful (run 44013642573)
+
+**Accepted scope:** Correct test-isolation assumptions in `backend/tests/test_phase5a_adapter.py` (+8/–8) by wrapping three absent-payload tests (`test_family_specific_artifact_missing_states`, `test_health_and_unrelated_routes_work_without_payloads`, and `test_family_absent_raises_unavailable`) in the existing `_absent_family_specs(tmp_path)` context manager. No production services, APIs, manifests, DVC pointers, or protected scientific files were modified.
+
+**Acceptance evidence:** All five required GitHub Actions jobs passed on `dfd30f8ccd0020d1a072a68b7990faaa7bd7973c` (Backend tests 2m9s, Browser E2E 1m58s, Container build + Compose smoke 1m8s, Frontend 1m12s, Frozen research integrity 6s). Local Windows 11 verification (Python 3.12.4, pytest 9.0.2, materialized DVC payloads): 45/45 Phase 5A adapter tests and 754/754 backend tests passed when executed from `backend/`. Post-merge frozen integrity on `main` (`fc3789a`): 28/28 files matched.
+
+**Review findings resolved:** Eliminated false failures on workstations with materialized DVC payloads by substituting nonexistent family paths and invalidating Layer B cache state inside the test context manager without altering production availability semantics.
+
+**Retained limitations:** Two tests in `backend/tests/test_failure_classification.py` fail when `pytest` is invoked from the repository root rather than `backend/`; tracked separately as a test-portability issue.
+
+**M2 status:** **COMPLETED — UNCHANGED.** Improves test portability only; does not reopen M2 or authorize PMGSY or MPLADS modelling.
+
+**Next scheduled work:** D1a Railway public-preview container adaptation and hosted HTTPS validation.

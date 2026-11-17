@@ -1,4 +1,4 @@
-"""PR-10 — Phase 5A uncertainty/agreement/review-policy evidence tests.
+﻿"""PR-10 â€” Phase 5A uncertainty/agreement/review-policy evidence tests.
 
 Covers the mandatory fixture-only CI scenarios from the PR-10 brief
 (section 9.A), using deterministic synthetic fixtures stored only under
@@ -147,7 +147,7 @@ def clear_caches():
 
 
 # ---------------------------------------------------------------------------
-# Synthetic DVC payload builders (SYNTHETIC — test-only, never canonical)
+# Synthetic DVC payload builders (SYNTHETIC â€” test-only, never canonical)
 # ---------------------------------------------------------------------------
 
 
@@ -223,8 +223,8 @@ def _syn_groups_csv() -> str:
     out = io.StringIO()
     w = csv.writer(out)
     w.writerow(svc.AGREEMENT_GROUPS_COLUMNS)
-    # both=120, if_only=180, lof_only=180, neither=29520 → sum=30000
-    # fraud: both=30, if_only=10, lof_only=5, neither=2 → sum=47
+    # both=120, if_only=180, lof_only=180, neither=29520 â†’ sum=30000
+    # fraud: both=30, if_only=10, lof_only=5, neither=2 â†’ sum=47
     groups = [
         ("both", 120, 30, 0.25, 30 / 47),
         ("if_only", 180, 10, 10 / 180, 10 / 47),
@@ -359,7 +359,7 @@ class _SyntheticPatch:
 
 
 # ---------------------------------------------------------------------------
-# Scenarios 1–3: protocol metadata (Layer A, real Git metadata)
+# Scenarios 1â€“3: protocol metadata (Layer A, real Git metadata)
 # ---------------------------------------------------------------------------
 
 
@@ -458,7 +458,7 @@ class TestTamperedMetadata:
 
 
 # ---------------------------------------------------------------------------
-# Scenarios 5–6: DVC pointer verification + CRLF handling
+# Scenarios 5â€“6: DVC pointer verification + CRLF handling
 # ---------------------------------------------------------------------------
 
 
@@ -584,7 +584,7 @@ class TestIndependentAvailability:
 
 
 # ---------------------------------------------------------------------------
-# Scenarios 9–17: per-family scientific contracts (Layer B, synthetic payloads)
+# Scenarios 9â€“17: per-family scientific contracts (Layer B, synthetic payloads)
 # ---------------------------------------------------------------------------
 
 
@@ -602,7 +602,7 @@ class TestFamilies:
         r = p5a_client.get(PROTOCOL_PATH + "/bootstrap")
         assert r.status_code == 200
         body = r.json()
-        assert len(body["metrics"]) == 3 * 5  # 3 runs × 5 metrics
+        assert len(body["metrics"]) == 3 * 5  # 3 runs Ã— 5 metrics
         for m in body["metrics"]:
             assert m["run_id"] in BOOTSTRAP_RUNS
             assert m["metric"] in METRIC_NAMES

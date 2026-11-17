@@ -25,7 +25,7 @@
 # proxy header (local Compose case).
 map $http_x_forwarded_proto $peiars_forwarded_proto {
     ~*^(https?)$ $1;
-    default      $scheme
+    default      $scheme;
 }
 
 server {

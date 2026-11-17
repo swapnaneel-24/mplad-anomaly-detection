@@ -85,4 +85,4 @@ EXPOSE 80
 # and closes connections when `daemon off;` is set (the default CMD of the
 # official image). No override needed.
 HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=10 \
-  CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
+  CMD wget -q -O /dev/null "http://127.0.0.1:${PORT:-80}/" || exit 1

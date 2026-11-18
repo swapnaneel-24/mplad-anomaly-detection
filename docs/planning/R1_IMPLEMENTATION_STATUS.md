@@ -311,3 +311,52 @@ PR-10 does not complete M2 or R1. Phase 5B figure publication, methodology, obje
 **M2 status:** **COMPLETED — UNCHANGED.** Improves test portability only; does not reopen M2 or authorize PMGSY or MPLADS modelling.
 
 **Next scheduled work:** D1a Railway public-preview container adaptation and hosted HTTPS validation.
+---
+
+## D1-A — Railway Public-Preview Container Adaptation
+
+**Status:** MERGED — Accepted (Platform Preview)
+**GitHub PR:** #13
+**Source branch:** `d1a-railway-preview`
+**Starting main commit:** `16c47592f848c74ff417b1ae788c1ff65da7b29b`
+**Final reviewed head:** `baae5f5902aad904399a2e00b6b9546c52bac70f`
+**Merge commit:** `a3673ecf1b4f132bf33f59b207886b344079988b`
+**Hosted CI on final reviewed head:** 5/5 GitHub Actions checks successful (run `44246167479`) + 2/2 Railway service deployments successful
+**Deployed preview URL:** `https://frontend-production-ecf1d886.up.railway.app`
+
+**Accepted scope:** Adapted the existing React/nginx, FastAPI, and PostgreSQL Compose architecture for accelerated D1-A Railway platform-preview deployment without introducing new research computations or altering frozen scientific artifacts:
+- `backend/Dockerfile`: Environment-configurable bind host (`PEIARS_BIND_HOST`, defaulting to `0.0.0.0`, set to `::` for dual-stack `.railway.internal` connectivity), dynamic `PORT` (`${PORT:-8000}`), Uvicorn `--proxy-headers`, configurable `FORWARDED_ALLOW_IPS`, and port-aware healthcheck.
+- `frontend/nginx/templates/default.conf.template` & `frontend/Dockerfile`: Converted static `nginx` config to an env-rendered template using `${BACKEND_URL}` and `${PORT}`, added strict `X-Forwarded-Proto` scheme sanitization (`~*^(https?)$ $1; default $scheme;`), and updated the Docker healthcheck to probe `${PORT:-80}`.
+- `compose.yaml`, `.gitignore`, `.gitattributes`: Preserved local Compose defaults (`PORT=80`, `BACKEND_URL=http://backend:8000`, `PEIARS_BIND_HOST=0.0.0.0`) and enforced independent `text eol=lf` rules for `frontend/src/api/contracts.gen.ts` and `frontend/nginx/templates/*.template`.
+
+**Acceptance evidence:**
+- **Hosted CI & Build Verification (`baae5f5902aad904399a2e00b6b9546c52bac70f`):** All 5 GitHub Actions workflows passed in run `44246167479` (Backend tests 2m5s, Browser E2E 1m22s, Container build + Compose smoke 1m26s, Frontend 1m3s, Frozen research integrity 7s), alongside 2/2 Railway deployment checks (`backend` and `frontend`). Post-merge frozen integrity on `main` (`a3673ecf1b4f132bf33f59b207886b344079988b`): `28/28` files matched.
+- **Hosted Railway HTTPS Smoke Verification (`https://frontend-production-ecf1d886.up.railway.app`):**
+  - Public SPA & routing: `GET /` (`HTTP 200`), `GET /research` (`HTTP 200`).
+  - Private-network API proxy & database readiness: `GET /api/v1/health/live` (`HTTP 200`), `GET /api/v1/health/ready` (`HTTP 200`, Alembic schema at `head` on private managed PostgreSQL).
+  - HTTPS session & CSRF security: `GET /api/v1/auth/csrf` (`HTTP 200`); `POST /api/v1/auth/login` over HTTPS (`HTTP 200`) issued `peiars_session` with `HttpOnly; Max-Age=28800; Path=/; SameSite=lax; Secure` and `peiars_csrf` with `Secure`; cross-origin `POST /api/v1/auth/logout` with `Origin: https://evil.example.com` rejected with `HTTP 403`.
+  - Authenticated persistence & restart recovery: `POST /api/v1/cases` referencing active synthetic record `synth-001` (`synthetic-demonstration` / `synthetic-v1`) with rotated CSRF token returned `HTTP 201` (`a1eb040a-417c-452a-acb4-da437d37e7dc`), read back `HTTP 200`, and survived a full `railway redeploy` of both `backend` and `frontend` (`HTTP 200`).
+  - Fail-closed research boundaries: Unprovisioned `GET /api/v1/research/benchmark/experiments` returned sanitized `HTTP 503` (no fabricated data); `GET /api/v1/research/phase5b/figures/1/image` rejected with `HTTP 403` (publication gate enforced).
+
+**Finding dispositions (D1-A preview topology):**
+- **B1 — Configurable backend port:** **CLOSED** (`PORT=8000` and `${PORT:-8000}` verified locally and on Railway).
+- **B2 — Trusted forwarding peers:** **CLOSED** for the tested Railway environment (`--proxy-headers` with `FORWARDED_ALLOW_IPS=100.64.0.0/10,fd12::/16` verified against observed Railway edge/internal peer traffic; deployment-specific qualification retained below).
+- **B3 — Configurable nginx upstream:** **CLOSED** for the tested private-network topology (`BACKEND_URL=http://backend.railway.internal:8000`).
+- **B4 — HTTPS scheme propagation:** **CLOSED** for the tested public HTTPS origin (`https://frontend-production-ecf1d886.up.railway.app`) via `~*^(https?)$ $1` sanitization, `Secure` + `HttpOnly` cookies, CSRF writes (`201`), and cross-origin rejection (`403`).
+- **B5 — Private-network compatibility:** **CLOSED** for the tested Railway environment (`PEIARS_BIND_HOST=::` dual-stack listener; `backend` and managed `postgres` isolated to private networking with no public domains).
+- **B6 — Frontend dynamic-port healthcheck:** **CLOSED** (`frontend/Dockerfile` probes `${PORT:-80}`).
+
+**Retained qualifications and operational limitations:**
+- **D1-A preview boundary:** D1-A is accepted strictly as an accelerated platform preview, not a completed research-provisioned deployment (D1-B) or full production hardening release (M4).
+- **Deployment-specific proxy trust range:** `FORWARDED_ALLOW_IPS=100.64.0.0/10,fd12::/16` reflects the observed Railway edge and private-network peer ranges in this preview environment; revalidate trusted peer addresses whenever network topology or hosting changes.
+- **Nginx upstream DNS caching:** `proxy_pass ${BACKEND_URL}` resolves `backend.railway.internal` at Nginx startup; when `backend` is redeployed and receives a new internal container IP, `frontend` must also be redeployed to refresh Nginx's cached upstream address (adding a dynamic DNS `resolver` directive is deferred to a future hardening follow-up).
+
+**Milestone status:**
+- **M2 — Verified research integration:** **COMPLETED** (unchanged; frozen scientific integrity `28/28`).
+- **D0 — Local Docker validation:** **COMPLETED**.
+- **D1-A — Railway platform preview:** **ACCEPTED**.
+- **D1-B — Research evidence provisioning:** **DEFERRED**.
+- **M3 — PMGSY observatory and review:** **NOT AUTHORIZED**.
+- **M4 — Production deployment:** **NOT COMPLETED**.
+
+**Next scheduled work:** D1-B research artifact provisioning or M4 production hardening, subject to separate authorization; M3 remains unauthorized.

@@ -63,17 +63,26 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # header-forwarding contract (Host, X-Forwarded-For, X-Forwarded-Proto,
 # Cookie/Set-Cookie preserved; no path rewriting; no cookie attribute
 # stripping).
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Copy the nginx TEMPLATE (not a static config) into /etc/nginx/templates/.
+# The official nginx:1.27-alpine image's docker-entrypoint.d/20-envsubst-on-
+# templates.sh renders it to /etc/nginx/conf.d/default.conf at container
+# startup, substituting PORT and BACKEND_URL from the environment. If either
+# is missing, the rendered config is invalid and nginx exits non-zero
+# (fail-closed by design; see templates/default.conf.template header).
+COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 
 # nginx runs as non-root by default in the official image's unprivileged
 # variant only; the standard alpine image listens on 80 as root. To keep the
 # local stack simple and documented, we keep the standard image and expose 80.
 # A hardened deployment should switch to nginxinc/nginx-unprivileged and port
 # 8080 (out of scope for PR-06B's local-development security context).
+# Local default. The template renders `listen ${PORT};` at container start,
+# so on a platform that injects $PORT the effective listener is that port.
+# The EXPOSE hint stays at 80 for Compose and documentation clarity.
 EXPOSE 80
 
 # Graceful shutdown: nginx handles SIGTERM (sent by `docker compose stop`)
 # and closes connections when `daemon off;` is set (the default CMD of the
 # official image). No override needed.
 HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=10 \
-  CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
+  CMD wget -q -O /dev/null "http://127.0.0.1:${PORT:-80}/" || exit 1

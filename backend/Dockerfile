@@ -85,9 +85,7 @@ EXPOSE 8000
 # recover) while readiness correctly stays 503 — see
 # docs/dev/CONTAINER_TROUBLESHOOTING.md.
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=10 \
-  CMD python -c "import urllib.request,sys; \
-r=urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/live',timeout=3); \
-sys.exit(0 if r.status==200 else 1)" || exit 1
+  CMD python -c "import os,sys,urllib.request; p=os.environ.get('PORT','8000'); r=urllib.request.urlopen(f'http://127.0.0.1:{p}/api/v1/health/live',timeout=3); sys.exit(0 if r.status==200 else 1)" || exit 1
 
 # --- Entrypoint ------------------------------------------------------------
 # The documented ASGI startup entrypoint (see backend/scripts/serve.py
@@ -95,18 +93,22 @@ sys.exit(0 if r.status==200 else 1)" || exit 1
 # inside the container (the Compose network restricts which peers can reach
 # it; the backend port is NOT published to the host by default).
 #
-# --proxy-headers is intentionally NOT set: the local Compose stack is HTTP
-# on a private bridge network with a single browser-visible origin (the
-# frontend nginx). The backend reads its cookie-secure policy from
-# PEIARS_SESSION_COOKIE_SECURE (config-driven, not request-driven), and CSRF
-# validates the Origin header (a request header nginx forwards unchanged).
-# For a future HTTPS-terminated production deployment, enable --proxy-headers
-# together with an explicit --forwarded-allow-ips list of trusted proxy IPs.
+# --proxy-headers is ENABLED in the CMD below so that, behind a TLS-
+# terminating ingress (Railway, Render, any reverse proxy that forwards
+# X-Forwarded-Proto), uvicorn honours the client-visible HTTPS scheme when
+# constructing request.url / request.base_url. Without it, the CSRF Origin
+# check compares Origin (https://public-domain) against base_url (http://
+# internal-host) and rejects every state-changing request.
+#
+# --forwarded-allow-ips restricts which peers may supply those headers. The
+# default of 127.0.0.1 trusts nothing cross-container (safe for local
+# Compose, where the frontend nginx is at a different IP and its headers are
+# therefore ignored — matching pre-proxy-headers behaviour exactly). A hosted
+# deployment sets FORWARDED_ALLOW_IPS to the private network CIDR that the
+# frontend service occupies.
 #
 # The Windows selector-event-loop workaround in scripts/serve.py is a no-op
 # on Linux (`sys.platform != "win32"`) and is not used here because uvicorn
 # is invoked directly. On Linux the default epoll loop is correct for
 # psycopg 3.
-CMD ["uvicorn", "app.main:create_app", "--factory", \
-     "--host", "0.0.0.0", "--port", "8000", \
-     "--access-log", "--no-server-header"]
+CMD ["sh", "-c", "exec uvicorn app.main:create_app --factory --host \"${PEIARS_BIND_HOST:-0.0.0.0}\" --port \"${PORT:-8000}\" --proxy-headers --forwarded-allow-ips \"${FORWARDED_ALLOW_IPS:-127.0.0.1}\" --access-log --no-server-header"]

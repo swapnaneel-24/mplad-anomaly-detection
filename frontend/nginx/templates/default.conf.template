@@ -1,0 +1,82 @@
+# PEIARS frontend nginx configuration (envsubst template).
+#
+# This file lives at /etc/nginx/templates/default.conf.template inside the
+# container. The official nginx:1.27-alpine image's docker-entrypoint.d/
+# 20-envsubst-on-templates.sh script renders it to /etc/nginx/conf.d/default.conf
+# at container startup, substituting ONLY variables that are present in the
+# process environment. nginx's own runtime variables ($host, $http_host, $uri,
+# $scheme, $http_x_forwarded_proto, $remote_addr, $proxy_add_x_forwarded_for)
+# are NOT touched by envsubst because they are not env-defined names.
+#
+# Substituted values (must be set in the container environment):
+#   ${PORT}         TCP port nginx listens on. Railway injects $PORT; local
+#                   Compose leaves it unset so the default is 80.
+#   ${BACKEND_URL}  Full origin (scheme://host:port) of the backend service.
+#                   Local Compose sets http://backend:8000; Railway sets the
+#                   private DNS URL (e.g. http://peiars-backend.railway.internal:8000).
+#                   If unset, the rendered config becomes "proxy_pass ;" which
+#                   nginx rejects at load time → the container exits non-zero.
+#                   That is the intentional fail-closed behaviour.
+
+# --- Upstream scheme propagation (B4) ---------------------------------------
+# We receive HTTP from the platform's TLS-terminating ingress. The client-
+# visible scheme lives in X-Forwarded-Proto, not in $scheme. Forward it
+# unchanged when present; fall back to $scheme only when there is no incoming
+# proxy header (local Compose case).
+map $http_x_forwarded_proto $peiars_forwarded_proto {
+    ~*^(https?)$ $1;
+    default      $scheme;
+}
+
+server {
+    listen       ${PORT};
+    listen  [::]:${PORT};
+    server_name  _;
+
+    # Security: HTTP-oriented header set. HSTS is deliberately absent (this
+    # container has no TLS; TLS lives at the platform ingress). If HSTS is
+    # ever required, terminate it at the external proxy, not here.
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options        "DENY"    always;
+    add_header Referrer-Policy        "no-referrer" always;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    # --- API reverse proxy -------------------------------------------------
+    # Upstream comes from BACKEND_URL. Header-preservation contract:
+    #   * Host            — forwarded as $http_host (exact browser Host,
+    #                       including port) so the backend's request.base_url
+    #                       and the CSRF Origin check see the real origin.
+    #   * X-Forwarded-Proto — the CLIENT-VISIBLE scheme (see map above). This
+    #                       is what makes the backend's --proxy-headers flag
+    #                       produce https:// URLs behind Railway/Render.
+    #   * Cookie / Set-Cookie — forwarded unchanged. Do not add any
+    #                       proxy_cookie_* directives; they would break the
+    #                       signed double-submit CSRF flow.
+    location /api/ {
+        proxy_pass         ${BACKEND_URL};
+        proxy_http_version 1.1;
+        proxy_set_header   Connection        "";
+        proxy_set_header   Host              $http_host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $peiars_forwarded_proto;
+        proxy_connect_timeout 10s;
+        proxy_send_timeout    60s;
+        proxy_read_timeout    60s;
+        proxy_buffering       off;
+    }
+
+    # --- Static asset caching ---------------------------------------------
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # --- SPA fallback ------------------------------------------------------
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

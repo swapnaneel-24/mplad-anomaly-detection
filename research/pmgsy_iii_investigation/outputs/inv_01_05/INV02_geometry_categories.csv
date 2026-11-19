@@ -1,0 +1,4 @@
+state,features,attr_groups,attr_groups_same_geom,attr_groups_diff_geom,mrl_groups_dup,mrl_groups_same_geom,mrl_groups_diff_geom
+Bihar,1476,0,0,0,37,0,37
+Uttar Pradesh,2757,1,1,0,143,1,142
+Madhya Pradesh,4635,0,0,0,661,0,661

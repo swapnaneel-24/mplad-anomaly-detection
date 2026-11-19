@@ -1,0 +1,37 @@
+state,raw_col,raw_dtype,n_rows,n_non_null,n_unique,numeric_parseable_share,numeric_nunique,in_master_csv,sample_values
+Bihar,MRL_ID,int64,1476,1476,1433,1.0,1433,True,"[np.int64(261172), np.int64(263897), np.int64(252347)]"
+Bihar,STATE_ID,int64,1476,1476,1,1.0,1,True,[np.int64(5)]
+Bihar,DISTRICT_I,int64,1476,1476,38,1.0,38,True,"[np.int64(285), np.int64(132), np.int64(532)]"
+Bihar,LGD_STATE,int64,1476,1476,1,1.0,1,True,[np.int64(10)]
+Bihar,LGD_DISTRI,int64,1476,1476,38,1.0,38,True,"[np.int64(201), np.int64(195), np.int64(223)]"
+Bihar,BLOCK_ID,int64,1476,1476,306,1.0,306,True,"[np.int64(47), np.int64(964), np.int64(6139)]"
+Bihar,CN_CODE,float64,1476,773,731,0.5237,731,True,"[np.float64(683291.0), np.float64(719094.0), np.float64(691619.0)]"
+Bihar,PROPOSED_L,float64,1476,1476,544,1.0,544,True,"[np.float64(0.0), np.float64(9.43), np.float64(5.05)]"
+Bihar,WORK_NAME,object,1476,1476,732,0.0,0,True,"['T04- Marbatpur Paikbahab Pmgsy Road To Kusaul Via Deoganwa babhangama Damodarpur', 'T30-SH 17 Sonpur  To  Paghari Adhalar', 'MRL10-Triveniganj Mangal Bazar To Baljora Mal Hanwa']"
+Bihar,IMS_YEAR,int64,1476,1476,4,1.0,4,True,"[np.int64(2023), np.int64(2022), np.int64(2024)]"
+Bihar,IMS_BATCH,int64,1476,1476,2,1.0,2,True,"[np.int64(1), np.int64(2)]"
+Bihar,Proposal_T,object,1476,1476,2,0.0,0,True,"['L', 'P']"
+Uttar Pradesh,MRL_ID,int64,2757,2757,2560,1.0,2560,True,"[np.int64(241693), np.int64(257408), np.int64(257420)]"
+Uttar Pradesh,STATE_ID,int64,2757,2757,1,1.0,1,True,[np.int64(33)]
+Uttar Pradesh,DISTRICT_I,int64,2757,2757,75,1.0,75,True,"[np.int64(326), np.int64(174), np.int64(179)]"
+Uttar Pradesh,LGD_STATE,int64,2757,2757,1,1.0,1,True,[np.int64(9)]
+Uttar Pradesh,LGD_DISTRI,int64,2757,2757,75,1.0,75,True,"[np.int64(159), np.int64(138), np.int64(141)]"
+Uttar Pradesh,BLOCK_ID,int64,2757,2757,750,1.0,750,True,"[np.int64(3249), np.int64(5547), np.int64(4240)]"
+Uttar Pradesh,CN_CODE,float64,2757,2753,2556,0.9985,2556,True,"[np.float64(612710.0), np.float64(642019.0), np.float64(604289.0)]"
+Uttar Pradesh,PROPOSED_L,float64,2757,2757,563,1.0,563,True,"[np.float64(6.35), np.float64(5.0), np.float64(10.0)]"
+Uttar Pradesh,WORK_NAME,object,2757,2757,2549,0.0,0,True,"['MRL03-Mamri-Kasta Road To Sakethoo', 'MRL06-Etah Sidhpura Rd. to Achalpur', 'MRL06-Pilkhana to Hardua via Kurar']"
+Uttar Pradesh,IMS_YEAR,int64,2757,2757,4,1.0,4,True,"[np.int64(2020), np.int64(2021), np.int64(2023)]"
+Uttar Pradesh,IMS_BATCH,int64,2757,2757,2,1.0,2,True,"[np.int64(1), np.int64(2)]"
+Uttar Pradesh,Proposal_T,object,2757,2757,2,0.0,0,True,"['P', 'L']"
+Madhya Pradesh,MRL_ID,int64,4635,4635,1874,1.0,1874,True,"[np.int64(253291), np.int64(254348), np.int64(248446)]"
+Madhya Pradesh,STATE_ID,int64,4635,4635,1,1.0,1,True,[np.int64(20)]
+Madhya Pradesh,DISTRICT_I,int64,4635,4635,55,1.0,55,True,"[np.int64(76), np.int64(489), np.int64(214)]"
+Madhya Pradesh,LGD_STATE,int64,4635,4635,1,1.0,1,True,[np.int64(23)]
+Madhya Pradesh,LGD_DISTRI,int64,4635,4635,55,1.0,55,True,"[np.int64(396), np.int64(428), np.int64(408)]"
+Madhya Pradesh,BLOCK_ID,int64,4635,4635,313,1.0,313,True,"[np.int64(730), np.int64(1253), np.int64(3007)]"
+Madhya Pradesh,CN_CODE,float64,4635,3797,1074,0.8192,1074,True,"[np.float64(527854.0), np.float64(552209.0), np.float64(529450.0)]"
+Madhya Pradesh,PROPOSED_L,float64,4635,4635,656,1.0,656,True,"[np.float64(10.1), np.float64(13.18), np.float64(15.0)]"
+Madhya Pradesh,WORK_NAME,object,4635,4635,1074,0.0,0,True,"['MRL05-SH-23 (Sonkatch) to Pipal Khedi', 'T02-Anjaniya Bhimgad Gangai ryt sarekha tola (Kodia ryt)', 'T02-Chruwa to Junapani']"
+Madhya Pradesh,IMS_YEAR,int64,4635,4635,6,1.0,6,True,"[np.int64(2022), np.int64(2021), np.int64(2020)]"
+Madhya Pradesh,IMS_BATCH,int64,4635,4635,2,1.0,2,True,"[np.int64(1), np.int64(2)]"
+Madhya Pradesh,Proposal_T,object,4635,4635,2,0.0,0,True,"['P', 'L']"

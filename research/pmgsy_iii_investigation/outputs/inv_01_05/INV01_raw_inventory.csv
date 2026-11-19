@@ -1,0 +1,16 @@
+state,part,path,bytes,sha256,features,crs,geom_types
+Bihar,.shp,/content/drive/MyDrive/mplad-dvc-storage/Bihar_PMGSY-III.shp,3809620.0,ae4e8dfc9c77cd230db40abd338a870487d667b9eb456feeeb1929a664481b79,,,
+Bihar,.shx,/content/drive/MyDrive/mplad-dvc-storage/Bihar_PMGSY-III.shx,11908.0,86b9a844027fbe9f4d60c783324d443cc410c954cb2d8f4fb86dfedfe62af5a1,,,
+Bihar,.dbf,/content/drive/MyDrive/mplad-dvc-storage/Bihar_PMGSY-III.dbf,432885.0,88f5503654541f038b718abfc1c6d5b5d405f61cadda99d1326fbac4b474ccb8,,,
+Bihar,.prj,/content/drive/MyDrive/mplad-dvc-storage/Bihar_PMGSY-III.prj,143.0,98aaf3d1c0ecadf1a424a4536de261c3daf4e373697cb86c40c43b989daf52eb,,,
+Bihar,FEATURES,,,,1476.0,EPSG:4326,{'LineString': 1476}
+Uttar Pradesh,.shp,/content/drive/MyDrive/mplad-dvc-storage/UP_PMGSY-III.shp,7643628.0,c857fe5a0eff80bc0e43fc66c79cc05843198da1c55a94b70f734c498e020ac5,,,
+Uttar Pradesh,.shx,/content/drive/MyDrive/mplad-dvc-storage/UP_PMGSY-III.shx,22156.0,03ae5fd69ab9e07f1d8cc856cb58cc4128bd02248038a7fc2e0fb64f827332d5,,,
+Uttar Pradesh,.dbf,/content/drive/MyDrive/mplad-dvc-storage/UP_PMGSY-III.dbf,700695.0,db86dd8e4b253c7a171928478fecdf2762ca16c51da956e0d8e7b66e85cefeab,,,
+Uttar Pradesh,.prj,/content/drive/MyDrive/mplad-dvc-storage/UP_PMGSY-III.prj,143.0,98aaf3d1c0ecadf1a424a4536de261c3daf4e373697cb86c40c43b989daf52eb,,,
+Uttar Pradesh,FEATURES,,,,2757.0,EPSG:4326,{'LineString': 2757}
+Madhya Pradesh,.shp,/content/drive/MyDrive/mplad-dvc-storage/MP_PMGSY-III.shp,4190380.0,75f2414c36ef7d09753fd77bda8a02b8eda33756eb909fa5a889bbc2ac4281ea,,,
+Madhya Pradesh,.shx,/content/drive/MyDrive/mplad-dvc-storage/MP_PMGSY-III.shx,37180.0,a6d83dcee3bc3bb0651dd1f835ac47abf783e3ba3d14842c986b47feddeb7a27,,,
+Madhya Pradesh,.dbf,/content/drive/MyDrive/mplad-dvc-storage/MP_PMGSY-III.dbf,1135992.0,64bd42f17d3cddc7bac8a3179b6ade9fb033c5962485ef755e081116b197d982,,,
+Madhya Pradesh,.prj,/content/drive/MyDrive/mplad-dvc-storage/MP_PMGSY-III.prj,143.0,98aaf3d1c0ecadf1a424a4536de261c3daf4e373697cb86c40c43b989daf52eb,,,
+Madhya Pradesh,FEATURES,,,,4635.0,EPSG:4326,{'LineString': 4635}

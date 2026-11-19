@@ -1,0 +1,157 @@
+{
+    "manifest_version":  "1.0",
+    "generated_utc":  "2026-11-19T03.32.38Z",
+    "milestone":  "PMGSY-III Investigation Baseline (INV-01..06, ADD-01..06)",
+    "source_input_hashes":  {
+                                "PMGSY_Master_Dataset_Combined(1).csv":  "773a799b4ada7a95b33f2d6d0c057e5ff70bb8b861fc489503dc3ad8dc835408",
+                                "pmgsy_stream_b_p_unique.csv":  "1c577758bfae2468a1bee5c6768998bd19ba33d6eb62e824ec0674dead079e6a",
+                                "pmgsy_stream_b_l_unique.csv":  "50bd95061a239b987e77225406528e607d1ff9ab3431d07f28be5c6cd81dbbde",
+                                "shapefile_inventory_ref":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV01_raw_inventory.csv"
+                            },
+    "governance_posture":  {
+                               "INV-06_source_admission":  "BLOCKED (license text and canonical observational-unit contract pending PR-B)",
+                               "R1_modelling_gate":  "CLOSED (descriptive observatory \u0026 UP R-tail investigation authorized; no IF/LOF fitting)"
+                           },
+    "committed_artifacts":  [
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/notebooks/PEIARS_PMGSY_III_investigation.ipynb",
+                                    "bytes":  148556,
+                                    "sha256":  "ac44d7a4e322f04bb05f15b12347a9a9d4d296653e697111773d89066d3c5a7b"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_01_04/ADD01_raw_dbf_schema_audit.csv",
+                                    "bytes":  3817,
+                                    "sha256":  "76d5c6996ba1a7bfaffead1131e11a861c503290d4b3cd442efa33675ee92ffb"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_01_04/ADD02_feature_reconciliation.csv",
+                                    "bytes":  632673,
+                                    "sha256":  "557bec2f2c9797640b1cc562a98803d61bfea9c654088ff9635eb4f6f769870c"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_01_04/ADD03_duplicate_group_ledger.csv",
+                                    "bytes":  125487,
+                                    "sha256":  "dc4e337bfd7b823c65ab9bb8a4ca431f5ec3e3e1470c2c2b66705261a5c6c9bf"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_01_04/ADD04_geometry_feature_audit.csv",
+                                    "bytes":  425,
+                                    "sha256":  "8e6471a9ac7136e8f48d939a2cc58d111025ddbcc8cf147fd17ebfcb23af9eeb"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD01_raw_dbf_schema_audit.csv",
+                                    "bytes":  3817,
+                                    "sha256":  "76d5c6996ba1a7bfaffead1131e11a861c503290d4b3cd442efa33675ee92ffb"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD02_feature_reconciliation.csv",
+                                    "bytes":  632673,
+                                    "sha256":  "557bec2f2c9797640b1cc562a98803d61bfea9c654088ff9635eb4f6f769870c"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD03_duplicate_group_ledger.csv",
+                                    "bytes":  125487,
+                                    "sha256":  "dc4e337bfd7b823c65ab9bb8a4ca431f5ec3e3e1470c2c2b66705261a5c6c9bf"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD04_geometry_feature_audit.csv",
+                                    "bytes":  425,
+                                    "sha256":  "8e6471a9ac7136e8f48d939a2cc58d111025ddbcc8cf147fd17ebfcb23af9eeb"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD05_corr_pearson.csv",
+                                    "bytes":  579,
+                                    "sha256":  "51676f2463d66c4465835c487075786e204f30940e37483d0b9088e17f9db349"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD05_corr_spearman.csv",
+                                    "bytes":  565,
+                                    "sha256":  "2d6fb0a00bb2ee4a5f175fd54a87c4c2ec4be63dcc89ebff82673ef0aaa7229d"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD05_vif.csv",
+                                    "bytes":  110,
+                                    "sha256":  "a48b02e161fb449e3dbea1077ee0c0e0b400ccdee3fc0fbdf28a1cf0b8b3f309"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/ADD06_package_R_distribution.csv",
+                                    "bytes":  308823,
+                                    "sha256":  "1d164e779224df339ef0e4fe363c95cf57716bd07d9d3c44fac462495966c318"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV01_raw_inventory.csv",
+                                    "bytes":  2062,
+                                    "sha256":  "0d1219c07fb4ee4f195dd4ba3c33704cceab6b854337952ba9e9bf414ee49676"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV02_geometry_categories.csv",
+                                    "bytes":  224,
+                                    "sha256":  "46a31c2088d3cc38654db41ac35bfc77a36a3d894175ed4e6d75fce69d60d65a"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV03_cohort_cube.csv",
+                                    "bytes":  3097,
+                                    "sha256":  "88954ba0189ff24607accda4759fca262165654402c509c1f6e512a2d493e2e5"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV03_field_dictionary.csv",
+                                    "bytes":  884,
+                                    "sha256":  "3730d31c09185f78e5ea84124ba9f5f8b7594200159620a1ca477d7a191b7450"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV04_L_by_source.csv",
+                                    "bytes":  130,
+                                    "sha256":  "6c719c4104611e3c7ee03b1b12c062394d4458c0287b9a750feec5be6e51d70f"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV04_P_by_source.csv",
+                                    "bytes":  310,
+                                    "sha256":  "3b3a2ec4ff6591f51616a230ac9441f5f70d39ab004f69ffaf9cd9015a571653"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/addendum_05_06/INV05_feature_eligibility.csv",
+                                    "bytes":  1043,
+                                    "sha256":  "8627e38af93a468b1e35c4d00a250a5b4ea3a60d6f09d2b0d3e8f220205264f1"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV01_raw_inventory.csv",
+                                    "bytes":  2062,
+                                    "sha256":  "0d1219c07fb4ee4f195dd4ba3c33704cceab6b854337952ba9e9bf414ee49676"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV02_geometry_categories.csv",
+                                    "bytes":  224,
+                                    "sha256":  "46a31c2088d3cc38654db41ac35bfc77a36a3d894175ed4e6d75fce69d60d65a"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV03_cohort_cube.csv",
+                                    "bytes":  3097,
+                                    "sha256":  "88954ba0189ff24607accda4759fca262165654402c509c1f6e512a2d493e2e5"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV03_field_dictionary.csv",
+                                    "bytes":  884,
+                                    "sha256":  "3730d31c09185f78e5ea84124ba9f5f8b7594200159620a1ca477d7a191b7450"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV04_L_by_source.csv",
+                                    "bytes":  130,
+                                    "sha256":  "6c719c4104611e3c7ee03b1b12c062394d4458c0287b9a750feec5be6e51d70f"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV04_P_by_source.csv",
+                                    "bytes":  310,
+                                    "sha256":  "3b3a2ec4ff6591f51616a230ac9441f5f70d39ab004f69ffaf9cd9015a571653"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/outputs/inv_01_05/INV05_feature_eligibility.csv",
+                                    "bytes":  1043,
+                                    "sha256":  "8627e38af93a468b1e35c4d00a250a5b4ea3a60d6f09d2b0d3e8f220205264f1"
+                                },
+                                {
+                                    "path":  "research/pmgsy_iii_investigation/PMGSY_III_investigation.md",
+                                    "bytes":  52223,
+                                    "sha256":  "6d46476aa831f991ea632569bbd7d0c342b6872d5e3a52f77c842632ba4a7afd"
+                                }
+                            ]
+}

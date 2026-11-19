@@ -1,0 +1,15 @@
+field,dtype,category,notes
+MRL_ID,string,UNVERIFIED,MRL segment ID; label not key (INV-02)
+STATE_ID,string,IDENTIFIER,State code
+STATE_NAME,string,IDENTIFIER,State name tagged during merge
+DISTRICT_I,string,IDENTIFIER,District code (source-specific)
+LGD_STATE,string,IDENTIFIER,LGD state code
+LGD_DISTRI,string,IDENTIFIER,LGD district code
+BLOCK_ID,string,IDENTIFIER,Block code
+CN_CODE,string,UNVERIFIED,Present only for L rows in master; meaning undocumented
+PROPOSED_L,float,MEASUREMENT,Proposed length; units assumed km UNVERIFIED; L all zero
+WORK_NAME,string,CONTEXT,Proposed work description
+IMS_YEAR,int,TEMPORAL,IMS edition year; L has 2026 row in split
+IMS_BATCH,int,TEMPORAL,IMS batch (1/2/3 depending on cohort)
+PROPOSAL_T,char,CONTEXT,"P=road, L=bridge (prior vocabulary; UNVERIFIED)"
+SOURCE_STATE,string,PROVENANCE,Source group in split files; not identical to STATE_NAME

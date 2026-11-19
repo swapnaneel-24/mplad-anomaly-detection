@@ -1,0 +1,7 @@
+cohort,feature,n_valid,n_unique,median,iqr,pearson_r_vs_PROPOSED_L,spearman_r_vs_PROPOSED_L
+P,_proposed_l_num,7323,1272,8.075,6.17,1.0,1.0
+P,_geom_len_km,7323,7319,4.9681,6.1625,0.0749,0.0355
+P,_n_vertices,7323,590,84.0,158.0,-0.0118,-0.1183
+P,_sinuosity,7094,6776,1.1436,0.2646,-0.0716,-0.1557
+P,_vertex_density_per_km,7096,7095,24.7281,23.23,0.0106,-0.1164
+P,_len_ratio_geom_to_prop,7323,7319,0.6694,0.8997,-0.3592,-0.3489

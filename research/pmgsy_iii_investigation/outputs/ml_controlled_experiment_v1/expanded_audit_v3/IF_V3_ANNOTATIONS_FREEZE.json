@@ -1,0 +1,16 @@
+{
+  "freeze_version": "IF_V3_ANNOTATIONS_FREEZE_V1",
+  "frozen_at_utc": "2026-11-23T09:52:33.398228+00:00",
+  "reviewer_status": "SINGLE_REVIEWER_LIMITATION (provisional admission interpretation)",
+  "hashes": {
+    "IF_V3_BLIND_ANNOTATIONS.csv": "f389e112f954f4586f44ba0df3d5b00a88018f7645293308dad11e5c206a0c5b",
+    "IF_V3_BLIND_REVIEW.csv": "bdf35c5611e9d8463ec09399cbf0ef4efaa8dc266bcd62660c7bec425f800615",
+    "IF_EXPANDED_AUDIT_PROTOCOL_V1.md": "8c702df85f508f676ec8b6d86836ad9ec172598e0b657f9010ad9ea51b8d6b81",
+    "IF_V3_STATISTICAL_ADDENDUM_V1.md": "d240581ace30fce0cc3c4c9d2e5b0d4a6812c1871efdc0ef6be4e23fea0207b7"
+  },
+  "outcome_counts": {
+    "BENIGN_EXPLAINED": 93,
+    "UNRESOLVED": 17,
+    "SUPPORTED_REVIEW_CANDIDATE": 10
+  }
+}

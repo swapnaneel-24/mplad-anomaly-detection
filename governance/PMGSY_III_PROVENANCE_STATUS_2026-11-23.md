@@ -118,3 +118,18 @@ This addendum records the project owner's reported status and an approved next-s
 - Require stable package-to-case identity, source feature/geometry lineage, metric + rule provenance, all queue selection reasons, versioned observations, reviewer decisions and audit trail.
 - Existing Option B v2/topology remain descriptive evidence tracks; IF closure unchanged (`CLOSED_RESEARCH_NOT_ADMITTED`), no IF v4, fraud claims, or production model inference.
 - User reports untracked outputs `blinded_annotation_v1/`, `ml_experiment_protocol_v1.md`, `up_cohort_heterogeneity_report.md`; preserve and classify under archival/reproducibility policy, and do not add without inspecting for restricted keys or sensitive information.
+
+
+## Addendum — 2026-11-23: reconciled remote and six-case P0 topology pilot
+
+**Verified remote artifact:** `81c07d40edcaa8ec260ee0f58bbb6b479f7019ff` on `swapnaneel-24/mplad-anomaly-detection` contains `research/pmgsy_iii_investigation/outputs/peiars_evidence_integration_v1/PEIARS_PMGSY_P0_ADJUDICATION_V1.md`. User reports local Git history including `dd294052f20d9c46ace0457afe369796a8e3f3ad` was merged/pushed; this supersedes the earlier temporary 'missing remote commit' explanation. Earlier addenda remain as chronological records.
+
+- 42-case integrated selection baseline: P0 topology 6, P1 top absolute km discrepancy 25, P2 top absolute relative discrepancy 25, 42 unique cases; 4,361 source P packages.
+- Cohort lineage correction: register initially lacked `cohort_year_batch`; source-linked `ims_year` classifies UP 2020 as 25/42 priority cases (59.5%). **Do not equate year 2020 to `2020_B1` without a source-backed batch ID.**
+- P0 six-case topology pilot committed and pushed: `PEIARS_PMGSY_001` UP MRL 241861 (exact geometry duplicate and 5,687.585 m maximum shared overlap); `002` MP MRL 234789 (23.333 m overlap); `003` MP MRL 252608 (1 invalid segment); `004` MP MRL 231294 (10.261 m overlap and 1 invalid segment); `005` MP MRL 234858 (17.363 m overlap); `006` MP MRL 234868 (2 invalid segments).
+- All six end `REVIEWED / SUPPORTED_REVIEW_CANDIDATE`; none `CONFIRMED_SOURCE_DEFECT`. Evidence supports reproducible geometric flags, not external validation of a defect or allegations about construction quality, funds or fraud.
+- P0 report records 42 original case-creation events + 12 appended transitions = 54 events and replay PASS; these outcomes were read from committed Markdown. The local JSONL and full export are not independently rerun in this governance update.
+- Remaining 36 unique P1/P2 cases `PEIARS_PMGSY_007`–`042` are `QUEUED_AWAITING_SOURCE_ADJUDICATION / UNRESOLVED`; next authorized phase: `PEIARS-PMGSY-42-CASE-SOURCE-REVIEW-V1`.
+- **Preservation:** closed IF v1–v3 research, Option B v2 freeze, historical audit labels, case-creation history and 12 P0 transition events must not be modified. After each 12-case batch append audit events, verify replay, and publish sanitized provenance-linked review summaries. The three pre-existing untracked files/directories remain outside this milestone until explicitly reviewed.
+
+**Disposition:** P0 pilot complete; full 42-case source review open; no confirmed source defects introduced. No IF v4 or production anomaly/fraud scoring.

@@ -75,3 +75,27 @@ This record is an audit trail of project-reported observations and decisions, no
 - Pending artifacts: `IF_AUDIT_PROTOCOL_V1.md`, `IF_ENRICHED_AUDIT_RESULTS_V1.csv`, `IF_AUDIT_COMPARISON_REPORT.md`, `IF_ADMISSION_DECISION_V2.md`.
 
 **Disposition unchanged:** Option B v2 and topology audit are primary descriptive evidence tracks. Isolation Forest remains research-only pending independent evidence validation; no blended scoring.
+
+
+## Addendum — 2026-11-23: v3 IF closure and transition to Option B evidence review
+
+**Basis:** Project-owner reported outcomes and Git commits; local CSV and frozen experiment files were not independently inspected in this update. Historical frozen reports remain unchanged.
+
+### IF v3 and research closure
+- v3: 120 blinded desk-review cases, 60 Tier-0 matched pairs; single reviewer, no external field survey. Outcomes: 93 BENIGN_EXPLAINED, 17 UNRESOLVED, 10 SUPPORTED_REVIEW_CANDIDATE, 0 CONFIRMED_SOURCE_DEFECT, 0 INSUFFICIENT_EVIDENCE.
+- IF arm: 38 benign, 6 supported, 16 unresolved, 0 confirmed; control: 55 benign, 4 supported, 1 unresolved, 0 confirmed. Only 44 complete adjudicable pairs; gate completeness >=48 not met.
+- Primary confirmed-defect difference 0.0; observed paired bootstrap CI [0,0] is **degenerate** with zero observed events and does not prove zero true effect. No demonstrated incremental confirmed defects.
+- Formal IF research disposition: `CLOSED_RESEARCH_NOT_ADMITTED`, reasons `PRIMARY_ENDPOINT_ZERO_CONFIRMED_DEFECTS; COMPLETENESS_GATE_FAILED; INSUFFICIENT_INDEPENDENT_EVIDENCE`. No v4 authorized; no production detector or fraud inference.
+- Project owner reports v3 commit `afdd70b` and closure commit `f72cd81`, including `IF_RESEARCH_CLOSURE_V1.md` and `PEIARS_PMGSY_FINAL_RESEARCH_REPORT.md`. These commit references are reported, not independently reconciled to local artifact contents in this addendum.
+
+### Active PMGSY evidence track
+- `PMGSY_EVIDENCE_REGISTER_V2.csv` reportedly generated locally with 4,361 P-package rows under `research/pmgsy_iii_investigation/outputs/option_b_v2_evidence_review/`; the full CSV remains ignored by `*.csv`.
+- Primary tracks remain **Option B v2** (state-conditional R consistency) and **topology audit**, independent and inspectable.
+- **Next authorized work is review preparation, not confirmed findings:** validate register cardinality, unique source-state/package keys, signed length difference conventions, missingness, arithmetic, topology flags, and agreement with frozen Option B counts.
+- Generate three non-exclusive queues: all 6 topology-evidence packages; top 25 by absolute km difference; top 25 by absolute relative difference. Deduplicate case identities while retaining all queue-membership reasons. Include positive and negative discrepancies.
+- Recompute source geometry for reviewed cases and record `CONFIRMED_SOURCE_DEFECT`, `SUPPORTED_REVIEW_CANDIDATE`, `BENIGN_EXPLAINED`, or `UNRESOLVED` only as evidence warrants. No high-R or topology flag alone proves fraud or a source defect.
+- **Repository policy:** keep the full generated register CSV ignored for now; track deterministic generator, source/output SHA-256 manifest, validation summary, queue definition and a sanitized review summary. Do not alter frozen IF or Option B v2 reports.
+- Planned milestone `PEIARS-PMGSY-EVIDENCE-REVIEW-V1`; execution pending. See `governance/PMGSY_EVIDENCE_REVIEW_PLAN_V1.md`.
+
+### Evidence/availability boundary
+This addendum records the project owner's reported status and an approved next-step plan. It does **not** assert that the local 4,361-row register has been inspected, that priority queues have been generated, or that any new source defects have been confirmed.

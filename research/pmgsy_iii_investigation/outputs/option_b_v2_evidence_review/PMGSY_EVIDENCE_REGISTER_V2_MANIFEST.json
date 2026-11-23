@@ -1,0 +1,50 @@
+{
+  "manifest_version": "PMGSY_EVIDENCE_REGISTER_V2_MANIFEST_V1",
+  "generated_at_utc": "2026-11-23T10:16:36.806845+00:00",
+  "script_path": "run_pmgsy_evidence_register_v2.py",
+  "script_sha256": "8584bf1b6bcbaac5aa0e4c238334287efc1efb3035560e31aa75e4b2cf39787e",
+  "upstream_canonical_dataset": "pmgsy3_3state_v1",
+  "upstream_option_b_policy": "Option B v2 (state-conditional length consistency + topology audit)",
+  "source_hashes": {
+    "packages_p_scored_option_b_v2.csv": "7e2b3141280747db4fb177782274ae5fbc6374a9066bbafc20e5372f475683d4",
+    "segments.parquet": "60f63d3af317dba9bb2aaffd58eadee6ea156bda4ab69f224890432b0915cb54"
+  },
+  "register_artifact": {
+    "path": "research/pmgsy_iii_investigation/outputs/option_b_v2_evidence_review/PMGSY_EVIDENCE_REGISTER_V2.csv",
+    "git_policy": "GITIGNORED_FULL_DATASET",
+    "row_count": 4361,
+    "unique_package_uids": 4361,
+    "sha256": "4b578e6bcf8ece5f6e1f88af1bd07526e69564f6ee30a0a8162bd23d2fbda98f",
+    "columns": [
+      "package_uid",
+      "mrl_id",
+      "source_state_key",
+      "n_segments",
+      "proposed_l_km",
+      "sum_geom_len_km",
+      "work_name",
+      "completeness_tier",
+      "investigation_tier",
+      "priority_reason",
+      "length_diff_km",
+      "length_rel_diff",
+      "in_if_v1_audit",
+      "in_if_v3_audit",
+      "primary_track_disposition",
+      "if_research_disposition",
+      "verification_status",
+      "_abs_diff",
+      "_abs_rel"
+    ]
+  },
+  "rel_diff_definition": {
+    "formula": "(sum_geom_len_km - proposed_l_km) / proposed_l_km (when proposed_l_km > 0)",
+    "sign_convention": "Positive means mapped geometry length exceeds proposed length; negative means shorter than proposed."
+  },
+  "queue_summary": {
+    "p0_topology_count": 6,
+    "p1_top25_abs_diff_count": 25,
+    "p2_top25_abs_rel_count": 25,
+    "deduplicated_union_count": 42
+  }
+}

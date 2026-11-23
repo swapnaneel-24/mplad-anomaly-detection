@@ -99,3 +99,22 @@ This record is an audit trail of project-reported observations and decisions, no
 
 ### Evidence/availability boundary
 This addendum records the project owner's reported status and an approved next-step plan. It does **not** assert that the local 4,361-row register has been inspected, that priority queues have been generated, or that any new source defects have been confirmed.
+
+
+## Addendum — 2026-11-23: Evidence Register V2 validation and PEIARS integration handoff
+
+**Source status:** Values below are project-owner-reported results, not independent inspection of the local register or the reported `dd29405` commit. **Repository reconciliation:** the connected GitHub repository (`swapnaneel-24/mplad-anomaly-detection`) does not resolve short SHA `dd29405`, and the named milestone artifacts could not be found there at the anticipated paths. Confirm actual remote and full commit SHA before asserting cross-repository provenance continuity.
+
+### Reported completed local milestone
+- User reports `dd29405` added `run_pmgsy_evidence_register_v2.py`, `PMGSY_EVIDENCE_REGISTER_V2_MANIFEST.json`, `PMGSY_EVIDENCE_REGISTER_V2_SUMMARY.md`, and `PMGSY_PRIORITY_REVIEW_V1.md`.
+- `PMGSY_EVIDENCE_REGISTER_V2.csv`: 4,361 unique P packages, 0 duplicated `package_uid`, exact UID match to scored baseline, 0 nulls, arithmetic discrepancy 0 for `length_diff_km` and `length_rel_diff = (sum_geom_len_km - proposed_l_km) / proposed_l_km`.
+- Project-reported CSV SHA-256: `4b578e6bcf8ece5f6e1f88af1bd07526e69564f6ee30a0a8162bd23d2fbda98f`. Keep generated CSV ignored, preserve hash in tracked manifest.
+- Queue P0 topology=6; P1 top-|km difference|=25; P2 top-|relative difference|=25; union 42 packages with 14 duplicate queue appearances. States: UP=34, MP=6, Bihar=2. Queue creation is **not equivalent** to case-level adjudication.
+- Cohort grouping appears blank in reported summary. The `UP / 2020_B1 = 0/42` observation is **unverified** until cohort field completeness, join key, type, and grouping logic are checked. Do not claim absence of that cohort or compare it to prior cohort findings before resolution.
+
+### Governance transition and explicit open gates
+- Mark **register/queue generation** complete on user report; mark **source-level 42-case review** OPEN. The earlier evidence-review plan's case-disposition acceptance criterion has not yet been reported met.
+- Next phase: `PEIARS-PMGSY-EVIDENCE-INTEGRATION-V1`, documented in `governance/PEIARS_PMGSY_EVIDENCE_INTEGRATION_V1.md`.
+- Require stable package-to-case identity, source feature/geometry lineage, metric + rule provenance, all queue selection reasons, versioned observations, reviewer decisions and audit trail.
+- Existing Option B v2/topology remain descriptive evidence tracks; IF closure unchanged (`CLOSED_RESEARCH_NOT_ADMITTED`), no IF v4, fraud claims, or production model inference.
+- User reports untracked outputs `blinded_annotation_v1/`, `ml_experiment_protocol_v1.md`, `up_cohort_heterogeneity_report.md`; preserve and classify under archival/reproducibility policy, and do not add without inspecting for restricted keys or sensitive information.

@@ -1,0 +1,15 @@
+# PEIARS ? P0 Topology 6-Case Adjudication Pilot v1
+
+- **Completed At (UTC):** 2026-11-23T10:33:16.124657+00:00
+- **Events Appended:** `12` (`42` original creation events preserved; total log events = `54`).
+- **Event Log Replay Check:** `PASS` (`6/6` pilot cases replay to `REVIEWED` / `SUPPORTED_REVIEW_CANDIDATE`; remaining `36` cases stay `QUEUED_AWAITING_SOURCE_ADJUDICATION` / `UNRESOLVED`).
+- **Defect Claim Rule:** Reproducible topology flags are recorded as `SUPPORTED_REVIEW_CANDIDATE` with alternative explanations, not forced to `CONFIRMED_SOURCE_DEFECT` without external source corroboration.
+
+| case_id          | package_uid                                                      | mrl_id | source_state_key | ims_year | segs_pq | geom_km_pq | topo_detail                                                                                                          | disposition                |
+| ---------------- | ---------------------------------------------------------------- | ------ | ---------------- | -------- | ------- | ---------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| PEIARS_PMGSY_001 | e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7 | 241861 | UTTAR_PRADESH    | 2020     | 2       | 11.3752    | has_exact_geom_dup=True; has_linear_overlap=True; max_shared_overlap_m=5687.585055197188                             | SUPPORTED_REVIEW_CANDIDATE |
+| PEIARS_PMGSY_002 | c51a6696cf89c994fc1455241e40f949ebd0dd29755d309edde29c26e6a4d99a | 234789 | MADHYA_PRADESH   | 2020     | 4       | 9.2047     | has_linear_overlap=True; max_shared_overlap_m=23.33255468971273                                                      | SUPPORTED_REVIEW_CANDIDATE |
+| PEIARS_PMGSY_003 | 511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e | 252608 | MADHYA_PRADESH   | 2022     | 18      | 10.4896    | has_invalid_segment_geom=True; n_invalid_segments=1                                                                  | SUPPORTED_REVIEW_CANDIDATE |
+| PEIARS_PMGSY_004 | e62391909fda6aee78cec34447a4fbd747facf5b5ac9e4ce19910441776ec7bd | 231294 | MADHYA_PRADESH   | 2019     | 11      | 11.1761    | has_linear_overlap=True; max_shared_overlap_m=10.26100244302387; has_invalid_segment_geom=True; n_invalid_segments=1 | SUPPORTED_REVIEW_CANDIDATE |
+| PEIARS_PMGSY_005 | e607c3847858c89cdc79dcdcb8a15906836de7ca5aad8f5fcf64d2200e8aadd0 | 234858 | MADHYA_PRADESH   | 2020     | 5       | 20.5926    | has_linear_overlap=True; max_shared_overlap_m=17.36293238870093                                                      | SUPPORTED_REVIEW_CANDIDATE |
+| PEIARS_PMGSY_006 | dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a | 234868 | MADHYA_PRADESH   | 2020     | 67      | 33.1032    | has_invalid_segment_geom=True; n_invalid_segments=2                                                                  | SUPPORTED_REVIEW_CANDIDATE |

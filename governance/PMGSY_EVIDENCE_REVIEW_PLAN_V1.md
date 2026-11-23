@@ -80,3 +80,14 @@ The connected repository now contains the completed six-case P0 report in commit
 - **Next action:** preserve 54-event baseline, review unique case IDs 007–042 in reproducible batches, append/replay events, produce aggregate 42-case outcomes and evidence-linked decision report. No automatic promotion to confirmed defect.
 
 The reviewed P0 cases fulfill the six-case topology review component of the acceptance criteria. The original requirement for an evidence-linked disposition across every selected package remains open until the other 36 are reviewed.
+
+
+## Completion addendum — 2026-11-23: desk-review stage closed, external validation blocked
+
+The previously open 36-case P1/P2 desk-review phase was completed and published at `c8aa5a1f7569e57c014f266f019aecb774849c31`. A corrective evidence-validity gate separated threshold screening from disposition and preserved the previous 126 events; 36 gate events brought the local reported history to 162 with full replay PASS. Final 42-case counts: 37 `SUPPORTED_REVIEW_CANDIDATE`, 5 `UNRESOLVED`, 0 `CONFIRMED_SOURCE_DEFECT`. The committed manifest has the raw local event-history SHA-256. No independent local rerun occurred during this governance update.
+
+The independent-evidence pilot committed at `314b804ea5fe6a3bdaf11a3949cda44233112d3a` selected 12 cases (6 P0 + 5 unresolved + case 007); 12/12 are `VERIFICATION_BLOCKED` due to absent independent authoritative PMGSY/OMMAS records and all baseline dispositions were retained. **Blocked does not mean corroborated or benign.**
+
+**Plan disposition:** Register/queue validation, 42-case desk-review coverage, and audit-report generation are **COMPLETE**. Independent-source verification is **BLOCKED/PENDING EXTERNAL INPUT**. A later authoritative source can reopen cases through append-only events, with previous dispositions preserved historically.
+
+**No further desk-only reclassification is required for closure.** Shift to `PEIARS-CORE-CASE-MANAGEMENT-V1`: implement import, evidence lineage, hash-chain replay, review UI and verifiable exports without making source-defect, infrastructure, financial-misuse or production-model claims.

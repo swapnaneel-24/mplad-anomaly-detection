@@ -1,0 +1,33 @@
+{
+  "freeze_version": "PEIARS_PMGSY_INTEGRATION_FREEZE_V1",
+  "frozen_at_utc": "2026-11-23T10:29:24.791094+00:00",
+  "milestone": "PEIARS-PMGSY-EVIDENCE-INTEGRATION-V1",
+  "case_count": 42,
+  "queue_counts": {
+    "P0": 6,
+    "P1": 25,
+    "P2": 25,
+    "deduplicated_union": 42
+  },
+  "cohort_lineage": {
+    "restored_field": "ims_year",
+    "separate_batch_column_in_v2": [
+      "ims_batch"
+    ],
+    "batch_2020_b1_verified": false,
+    "up_ims_year_2020_in_42_queue": 25,
+    "up_ims_year_2020_in_4361_v2": 883,
+    "queue_share_note": "25/42 (59.5%) is a priority-queue share, not a population-adjusted defect rate."
+  },
+  "hashes": {
+    "build_peiars_pmgsy_integration_v1.py": "b2114ba3e22e0506492f164e22336e5372133c5e48c676851efed513f48dd222",
+    "PEIARS_PMGSY_INTEGRATION_REPORT_V1.md": "82c824a40993291417d9f3c8e72837fe6e605b4c369286b8278aad855eddadac",
+    "PEIARS_PMGSY_42_CASES.json": "76d7d7820ee667d846651a835aa891f125973ecb94f58ec4487240d1d5c3181d",
+    "PEIARS_PMGSY_42_CASES.csv": "92dd9d54e0acaf1eaa14c91eba6e47d886400a93621dd9adcb6daf9c997127ef",
+    "PEIARS_PMGSY_EVIDENCE_RECORDS.json": "ef539772fd3e571c95e7d642c5573b2e8bfda1f5268bb5055af1132b962e5895",
+    "PEIARS_PMGSY_REVIEW_STATES.csv": "6d305de452a580e3b8986867421c82d76f2b0f49dbbd8b37c6f4e21266cf5180",
+    "PEIARS_PMGSY_DECISION_HISTORY.jsonl": "a43b0a1b0092039377bafe4794162b698c13a99554e327324d936207bd5092aa",
+    "PMGSY_EVIDENCE_REGISTER_V2.csv": "4b578e6bcf8ece5f6e1f88af1bd07526e69564f6ee30a0a8162bd23d2fbda98f",
+    "packages_p_scored_option_b_v2.csv": "7e2b3141280747db4fb177782274ae5fbc6374a9066bbafc20e5372f475683d4"
+  }
+}

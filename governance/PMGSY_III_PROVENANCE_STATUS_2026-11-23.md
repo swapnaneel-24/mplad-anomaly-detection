@@ -133,3 +133,16 @@ This addendum records the project owner's reported status and an approved next-s
 - **Preservation:** closed IF v1–v3 research, Option B v2 freeze, historical audit labels, case-creation history and 12 P0 transition events must not be modified. After each 12-case batch append audit events, verify replay, and publish sanitized provenance-linked review summaries. The three pre-existing untracked files/directories remain outside this milestone until explicitly reviewed.
 
 **Disposition:** P0 pilot complete; full 42-case source review open; no confirmed source defects introduced. No IF v4 or production anomaly/fraud scoring.
+
+
+## Addendum — 2026-11-23: completed 42-case desk review, blocked external corroboration, engineering transition
+
+**Verified connected-repository commits:** `c8aa5a1f7569e57c014f266f019aecb774849c31` (desk review summaries, gate reconciliation, manifest) and `314b804ea5fe6a3bdaf11a3949cda44233112d3a` (desk closure plus 12-case corroboration pilot artifacts). Preserve previous entries as chronological evidence, not the latest status.
+
+- **Desk-review final:** 42 cases; 37 supported candidates, 5 unresolved (all UP: `030`, `034`, `037`, `040`, `042`), 0 confirmed source defects. The corrected screening-versus-disposition boundary is retained; zero proposed length means `UNDEFINED_ZERO_DENOMINATOR`, never an artificial relative-discrepancy trigger.
+- **Event history:** user-generated 42 initial + 12 P0 + 72 P1/P2 + 36 corrective gate events = 162. Committed replay report records PASS and manifest hashes the gitignored local JSONL. Frozen desk baseline event head: `9caa9735fab13e88a47848a12532653bc4216548aa69cf80e4648fc5d646d5de` (as recorded in corroboration report); neither raw JSONL nor source data independently rerun in this update.
+- **Independent corroboration:** 12/12 cases `VERIFICATION_BLOCKED` and `independent_of_canonical_gis=False`, due to absent independent PMGSY/OMMAS sanction/alignment documentation within local snapshot. Dispositions remain seven supported (six P0 plus case 007) and five unresolved; zero confirmed defects. These are unverified cases, **not** 12 disproved irregularities.
+- **Source-quality boundary:** mapped-versus-proposed km and observed topology flags are reproducible GIS observations; no claim of field road quality, fraud, expenditure irregularity or source defect is established without appropriate independent evidence.
+- **Project decision:** PMGSY desk-review research cycle closed with documented evidence limitation; IF remains `CLOSED_RESEARCH_NOT_ADMITTED`. External source verification may be reopened later if independent evidence is obtained. **Engineering track now active:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, see `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Implement local-first case management, independent provenance replay and verifiable case exports using frozen data; no new unsupervised model experiment.
+
+**Retention policy:** keep full source/register/case/evidence/JSONL raw exports ignored as appropriate, but retain manifest and reproducible scripts in repository. Do not modify frozen desk baseline or reassign prior dispositions in place.

@@ -1,0 +1,266 @@
+{
+  "sample_version": "PEIARS_PMGSY_CORROBORATION_SAMPLE_V1",
+  "created_at_utc": "2026-11-23T10:58:24.339250+00:00",
+  "baseline_commit": "c8aa5a1",
+  "sample_size": 12,
+  "composition": {
+    "P0_topology": 6,
+    "UNRESOLVED_P1P2": 5,
+    "high_discrepancy_P1P2": 1
+  },
+  "cases": [
+    {
+      "rank": 1,
+      "case_id": "PEIARS_PMGSY_001",
+      "package_uid": "e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7",
+      "mrl_id": "241861",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 2,
+        "proposed_l_km": 5.85,
+        "sum_geom_len_km": 11.375170110394375,
+        "length_diff_km": 5.5252,
+        "length_rel_diff": 0.9445
+      }
+    },
+    {
+      "rank": 2,
+      "case_id": "PEIARS_PMGSY_002",
+      "package_uid": "c51a6696cf89c994fc1455241e40f949ebd0dd29755d309edde29c26e6a4d99a",
+      "mrl_id": "234789",
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 4,
+        "proposed_l_km": 9.375,
+        "sum_geom_len_km": 9.204696964940451,
+        "length_diff_km": -0.1703,
+        "length_rel_diff": -0.0182
+      }
+    },
+    {
+      "rank": 3,
+      "case_id": "PEIARS_PMGSY_003",
+      "package_uid": "511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e",
+      "mrl_id": "252608",
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": "2022",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 18,
+        "proposed_l_km": 10.7,
+        "sum_geom_len_km": 10.489628839368562,
+        "length_diff_km": -0.2104,
+        "length_rel_diff": -0.0197
+      }
+    },
+    {
+      "rank": 4,
+      "case_id": "PEIARS_PMGSY_004",
+      "package_uid": "e62391909fda6aee78cec34447a4fbd747facf5b5ac9e4ce19910441776ec7bd",
+      "mrl_id": "231294",
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": "2019",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 11,
+        "proposed_l_km": 11.4,
+        "sum_geom_len_km": 11.17612358798468,
+        "length_diff_km": -0.2239,
+        "length_rel_diff": -0.0196
+      }
+    },
+    {
+      "rank": 5,
+      "case_id": "PEIARS_PMGSY_005",
+      "package_uid": "e607c3847858c89cdc79dcdcb8a15906836de7ca5aad8f5fcf64d2200e8aadd0",
+      "mrl_id": "234858",
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 5,
+        "proposed_l_km": 21.0,
+        "sum_geom_len_km": 20.592626329158783,
+        "length_diff_km": -0.4074,
+        "length_rel_diff": -0.0194
+      }
+    },
+    {
+      "rank": 6,
+      "case_id": "PEIARS_PMGSY_006",
+      "package_uid": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+      "mrl_id": "234868",
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "P0_TOPOLOGY_6",
+      "queues_qualified": [
+        "P0_TOPOLOGY_FLAG"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Verify canonical topology flag (exact duplicate, linear overlap, or invalid segment geometry) against authoritative source/convention.",
+      "measurements_snapshot": {
+        "n_segments": 67,
+        "proposed_l_km": 33.755,
+        "sum_geom_len_km": 33.10324601527847,
+        "length_diff_km": -0.6518,
+        "length_rel_diff": -0.0193
+      }
+    },
+    {
+      "rank": 7,
+      "case_id": "PEIARS_PMGSY_030",
+      "package_uid": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+      "mrl_id": "241026",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "UNRESOLVED_P1P2_5",
+      "queues_qualified": [
+        "P1_ABS_LEN_DIFF_TOP25(#24)"
+      ],
+      "baseline_disposition": "UNRESOLVED",
+      "selection_rationale": "Investigate why desk evidence remained UNRESOLVED due to missing external alignment/source context.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 24.72,
+        "sum_geom_len_km": 32.61652073074062,
+        "length_diff_km": 7.8965,
+        "length_rel_diff": 0.3194
+      }
+    },
+    {
+      "rank": 8,
+      "case_id": "PEIARS_PMGSY_034",
+      "package_uid": "c9efb1c3fb05d7acac672bf376004c1c39b24cd55a96afba0e8019199d8b55ec",
+      "mrl_id": "258614",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2021",
+      "sample_group": "UNRESOLVED_P1P2_5",
+      "queues_qualified": [
+        "P2_ABS_REL_DIFF_TOP25(#15)"
+      ],
+      "baseline_disposition": "UNRESOLVED",
+      "selection_rationale": "Investigate why desk evidence remained UNRESOLVED due to missing external alignment/source context.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 4.7,
+        "sum_geom_len_km": 9.45155218484812,
+        "length_diff_km": 4.7516,
+        "length_rel_diff": 1.011
+      }
+    },
+    {
+      "rank": 9,
+      "case_id": "PEIARS_PMGSY_037",
+      "package_uid": "be62378e919d9d3f3a394e94b128d8f687569df1334154f6363bad8b2b7f6482",
+      "mrl_id": "241659",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "UNRESOLVED_P1P2_5",
+      "queues_qualified": [
+        "P2_ABS_REL_DIFF_TOP25(#18)"
+      ],
+      "baseline_disposition": "UNRESOLVED",
+      "selection_rationale": "Investigate why desk evidence remained UNRESOLVED due to missing external alignment/source context.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 5.0,
+        "sum_geom_len_km": 0.1580103842283745,
+        "length_diff_km": -4.842,
+        "length_rel_diff": -0.9684
+      }
+    },
+    {
+      "rank": 10,
+      "case_id": "PEIARS_PMGSY_040",
+      "package_uid": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+      "mrl_id": "242491",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2021",
+      "sample_group": "UNRESOLVED_P1P2_5",
+      "queues_qualified": [
+        "P2_ABS_REL_DIFF_TOP25(#21)"
+      ],
+      "baseline_disposition": "UNRESOLVED",
+      "selection_rationale": "Investigate why desk evidence remained UNRESOLVED due to missing external alignment/source context.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 5.2,
+        "sum_geom_len_km": 0.225555325509683,
+        "length_diff_km": -4.9744,
+        "length_rel_diff": -0.9566
+      }
+    },
+    {
+      "rank": 11,
+      "case_id": "PEIARS_PMGSY_042",
+      "package_uid": "1f6bb37db61459307424439c2d25ff2e02ee024aebea9a8cdb5c8845757ed2b5",
+      "mrl_id": "240646",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2021",
+      "sample_group": "UNRESOLVED_P1P2_5",
+      "queues_qualified": [
+        "P2_ABS_REL_DIFF_TOP25(#24)"
+      ],
+      "baseline_disposition": "UNRESOLVED",
+      "selection_rationale": "Investigate why desk evidence remained UNRESOLVED due to missing external alignment/source context.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 5.0,
+        "sum_geom_len_km": 0.2668048971572518,
+        "length_diff_km": -4.7332,
+        "length_rel_diff": -0.9466
+      }
+    },
+    {
+      "rank": 12,
+      "case_id": "PEIARS_PMGSY_007",
+      "package_uid": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+      "mrl_id": "240900",
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": "2020",
+      "sample_group": "HIGH_DISCREPANCY_P1P2_1",
+      "queues_qualified": [
+        "P1_ABS_LEN_DIFF_TOP25(#1)",
+        "P2_ABS_REL_DIFF_TOP25(#3)"
+      ],
+      "baseline_disposition": "SUPPORTED_REVIEW_CANDIDATE",
+      "selection_rationale": "Test independent corroboration workflow on a prominent signed length discrepancy (PEIARS_PMGSY_007); prioritization only, not a defect claim.",
+      "measurements_snapshot": {
+        "n_segments": 1,
+        "proposed_l_km": 9.75,
+        "sum_geom_len_km": 31.69498442754215,
+        "length_diff_km": 21.945,
+        "length_rel_diff": 2.2508
+      }
+    }
+  ]
+}

@@ -72,3 +72,6 @@ research/pmgsy_iii_investigation/outputs/peiars_evidence_integration_v1/PEIARS_P
 research/pmgsy_iii_investigation/outputs/peiars_evidence_integration_v1/PEIARS_PMGSY_EVIDENCE_RECORDS.json
 research/pmgsy_iii_investigation/outputs/peiars_evidence_integration_v1/PEIARS_PMGSY_REVIEW_STATES.csv
 research/pmgsy_iii_investigation/outputs/peiars_evidence_integration_v1/PEIARS_PMGSY_DECISION_HISTORY.jsonl
+
+peiars_app/data/
+

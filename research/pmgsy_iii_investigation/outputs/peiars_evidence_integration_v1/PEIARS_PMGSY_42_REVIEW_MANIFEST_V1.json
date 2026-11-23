@@ -1,0 +1,25 @@
+{
+  "manifest_version": "PEIARS_PMGSY_42_REVIEW_MANIFEST_V1_GATE_VALIDATED",
+  "recorded_at_utc": "2026-11-23T10:52:21.455078+00:00",
+  "milestone": "PEIARS-PMGSY-42-CASE-SOURCE-REVIEW-V1",
+  "validity_gate": "PEIARS-PMGSY-P1P2-EVIDENCE-VALIDITY-GATE-V1",
+  "cases_reviewed_total": 42,
+  "confirmed_source_defects_claimed": 0,
+  "disposition_counts": {
+    "SUPPORTED_REVIEW_CANDIDATE": 37,
+    "UNRESOLVED": 5
+  },
+  "event_log_prior_entries_preserved": 126,
+  "event_log_appended_gate_entries": 36,
+  "event_log_total_entries": 162,
+  "hashes": {
+    "PEIARS_PMGSY_P1P2_ADJUDICATION_V1.md": "9107fc92ae76c24b5b09ff64c2a68c446f6a50ed63e18e6fa3030e185cacb318",
+    "PEIARS_PMGSY_42_CASE_DISPOSITION_SUMMARY_V1.md": "7df9a8bc4fa78de0041c2c2afe21e257367cb42f7c9f04ed1793b611075c151f",
+    "PEIARS_PMGSY_EVENT_REPLAY_VALIDATION_V1.md": "8105f8679b429be19fd33241a0459d844af7811cbb11764b2ac2905a97f9ffe9",
+    "PEIARS_PMGSY_42_CASES.json": "d1bd3d29b59eedfd456c9c9697729bdaaac4b012c26d433a44f21e3e991d3c19",
+    "PEIARS_PMGSY_42_CASES.csv": "175c70f93c8b817b9f5b18a3fa999d2902d5a3281b2bd3eb0ead5ffe4ab4beba",
+    "PEIARS_PMGSY_EVIDENCE_RECORDS.json": "35327bf53df5f2439de8ab594d9dca1baba5e16cbe5af73bff7ebddaf2866340",
+    "PEIARS_PMGSY_REVIEW_STATES.csv": "86fe0499a27f8eaaa9be22dc89374163f431214591be6212fb88ec11ecade3fc",
+    "PEIARS_PMGSY_DECISION_HISTORY.jsonl": "08c69f5927d99d15aa45c55eeef4d065431752c1e8bf4ae1e02e267289f5f5cc"
+  }
+}

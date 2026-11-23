@@ -1,0 +1,37 @@
+{
+  "protocol_version": "IF_EXPANDED_AUDIT_PROTOCOL_V1",
+  "created_at_utc": "2026-11-23T09:45:48.083684+00:00",
+  "dataset": "pmgsy3_3state_v1",
+  "model_config": {
+    "features": [
+      "n_segments",
+      "mean_seg_len_km",
+      "mean_sinuosity",
+      "vertices_per_km",
+      "seg_len_concentration"
+    ],
+    "stratification": "source_state_key",
+    "scaler": "RobustScaler",
+    "n_estimators": 200,
+    "contamination": 0.05,
+    "model_seed": 42,
+    "refitted_during_sampling": false
+  },
+  "sampling_design": {
+    "sampling_seed": 20261123,
+    "matching_level": "TIER_0_EXACT (source_state_key x cohort_year_batch x seg_bucket x len_band)",
+    "target_pairs": 60,
+    "total_items": 120,
+    "excluded_v1_audit_packages": 60,
+    "eligible_population": 4301,
+    "eligible_if_top5": 189,
+    "eligible_if_top5_with_tier0_match": 123,
+    "tier0_coverage_ratio": 0.6508,
+    "max_disjoint_tier0_pairs": 97
+  },
+  "prerequisite_hashes": {
+    "IF_EXPANDED_AUDIT_PROTOCOL_V1.md": "8c702df85f508f676ec8b6d86836ad9ec172598e0b657f9010ad9ea51b8d6b81",
+    "IF_10_CASE_VALIDITY_DECISION_V1.md": "478b2bf46e43a9bd9ade5430da0915c5ffd153bd9bb4ddc5ff07bffe5a6c1360",
+    "IF_ENRICHED_AUDIT_RESULTS_V1.csv": "b72002085fb344011b473b6afa685e74dcd08e0a6d93980de49bb84011398e9b"
+  }
+}

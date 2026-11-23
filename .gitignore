@@ -63,3 +63,5 @@ inspection.txt
 
 # Ad-hoc review artifacts (not part of the shipped tree)
 PR11_SOURCE_FOR_REVIEW.md
+research/pmgsy_iii_investigation/outputs/ml_controlled_experiment_v1/diagnostics/if_enriched_audit_unblinded_key_DO_NOT_PEEK.csv
+research/pmgsy_iii_investigation/outputs/ml_controlled_experiment_v1/expanded_audit_v3/IF_V3_UNBLINDED_KEY_RESTRICTED.csv

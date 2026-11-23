@@ -1,0 +1,24 @@
+{
+  "manifest_version": "IF_V1_AUDIT_PROVENANCE_V1",
+  "recorded_at_utc": "2026-11-23T09:16:13.557677+00:00",
+  "artifacts": {
+    "IF_ENRICHED_AUDIT_RESULTS_V1.csv": {
+      "path": "research/pmgsy_iii_investigation/outputs/ml_controlled_experiment_v1/IF_ENRICHED_AUDIT_RESULTS_V1.csv",
+      "sha256": "b72002085fb344011b473b6afa685e74dcd08e0a6d93980de49bb84011398e9b",
+      "bytes": 29410,
+      "access_policy": "IMMUTABLE_VERSIONED_PUBLIC_RESEARCH"
+    },
+    "if_enriched_audit_blind_review.csv": {
+      "path": "research/pmgsy_iii_investigation/outputs/ml_controlled_experiment_v1/diagnostics/if_enriched_audit_blind_review.csv",
+      "sha256": "b72002085fb344011b473b6afa685e74dcd08e0a6d93980de49bb84011398e9b",
+      "bytes": 29410,
+      "access_policy": "VERSIONED_WORKING_BLIND_SHEET"
+    },
+    "if_enriched_audit_unblinded_key_DO_NOT_PEEK.csv": {
+      "restricted_archive_ref": "local_restricted://diagnostics/if_enriched_audit_unblinded_key_DO_NOT_PEEK.csv",
+      "sha256": "eae1a3d82d4059ef96a13e3a01d03cf1f244a6a5e252b4376fe141dfac060c8c",
+      "bytes": 7741,
+      "access_policy": "RESTRICTED_ARCHIVE_DO_NOT_PUBLISH_TO_MAIN"
+    }
+  }
+}

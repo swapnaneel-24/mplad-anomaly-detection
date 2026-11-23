@@ -66,3 +66,17 @@ No IF v4, LOF replacement, weighted IF/R score, threshold retuning, model admiss
 - **OPEN:** Phase 3 source-level case adjudication. Queue inclusion is not a verified defect or a completed review.
 - **OPEN:** Integration acceptance tests, case audit trail and Phase 4 outcome report. See `PEIARS_PMGSY_EVIDENCE_INTEGRATION_V1.md`.
 - **Data policy:** Continue ignoring the complete generated CSV; version scripts, manifests and sanitized aggregate reports. Do not indiscriminately track old untracked annotation/research artifacts without reviewing their contents and restricted-key exposure.
+
+
+## Status addendum — 2026-11-23: six P0 cases reviewed
+
+The connected repository now contains the completed six-case P0 report in commit `81c07d4` (pushed to `origin/main` per project owner). The original planning text above remains an immutable statement of prior intent.
+
+- **Register and queues:** 4,361 P packages; P0 6, P1 25, P2 25, union 42. Local 42-case integration export and P0 workflow are reported completed.
+- **P0 decisions:** 6/6 reviewed as `SUPPORTED_REVIEW_CANDIDATE`, with 0 `CONFIRMED_SOURCE_DEFECT`. Recorded observations comprise exact duplicate geometry, overlaps and/or invalid segments in the six named P0 packages. They remain candidates absent authoritative corroboration.
+- **Event provenance:** committed P0 report records 12 transition events appended to 42 creation events (total 54), with replay PASS. This status reflects review of the committed report rather than direct execution of local JSONL replay.
+- **Remaining gate:** all 36 non-P0 unique cases are queued/unresolved; source-level P1/P2 adjudication is **NOT COMPLETE**.
+- **Cohort amendment:** `cohort_year_batch` missing from register caused blank grouping; join to canonical `ims_year` yields 25/42 UP 2020, but no inference about batch unless source batch is separately verified.
+- **Next action:** preserve 54-event baseline, review unique case IDs 007–042 in reproducible batches, append/replay events, produce aggregate 42-case outcomes and evidence-linked decision report. No automatic promotion to confirmed defect.
+
+The reviewed P0 cases fulfill the six-case topology review component of the acceptance criteria. The original requirement for an evidence-linked disposition across every selected package remains open until the other 36 are reviewed.

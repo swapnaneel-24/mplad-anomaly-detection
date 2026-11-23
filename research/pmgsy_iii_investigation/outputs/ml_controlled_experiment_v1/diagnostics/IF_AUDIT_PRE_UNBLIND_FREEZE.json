@@ -1,0 +1,18 @@
+{
+  "protocol_version": "IF_AUDIT_PROTOCOL_V1",
+  "frozen_at_utc": "2026-11-23T05:54:13.091552+00:00",
+  "files": {
+    "IF_AUDIT_PROTOCOL_V1.md": {
+      "sha256": "4567c0b96ffc3e04a88f65e056e1defb390041a1435bab3c4adb7b5e40774f58",
+      "bytes": 1270
+    },
+    "if_enriched_audit_blind_review.csv": {
+      "sha256": "bb48f0fc97aa40544b8b1b815b4a336d120ce0aadd397ecd82d0254538473cb8",
+      "bytes": 15104
+    },
+    "if_enriched_audit_unblinded_key_DO_NOT_PEEK.csv": {
+      "sha256": "eae1a3d82d4059ef96a13e3a01d03cf1f244a6a5e252b4376fe141dfac060c8c",
+      "bytes": 7741
+    }
+  }
+}

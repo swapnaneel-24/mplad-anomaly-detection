@@ -53,3 +53,16 @@ Keep the complete generated `PMGSY_EVIDENCE_REGISTER_V2.csv` ignored unless sepa
 
 ## Explicit non-goals
 No IF v4, LOF replacement, weighted IF/R score, threshold retuning, model admission or production detector deployment. This milestone advances evidence review and provenance integration only.
+
+
+## Status addendum — register validation versus case adjudication (2026-11-23)
+
+**Reported partial completion:** The project owner reports commit `dd29405` containing generator, manifest, validation summary, and P0/P1/P2 priority report. The connected repository does not resolve that SHA; synchronize the authoritative remote and full commit ID before closing repository provenance checks.
+
+- Reported integrity: 4,361 P records, unique `package_uid`, zero nulls and exact recomputed signed/relative discrepancy arithmetic; CSV SHA-256 `4b578e6bcf8ece5f6e1f88af1bd07526e69564f6ee30a0a8162bd23d2fbda98f`.
+- Reported queue creation: 6 P0, 25 P1, 25 P2, 42 unique package identities, all selection reasons retained; review distributions UP 34, MP 6, Bihar 2.
+- **Closed on report:** Phase 1 arithmetic and identity checks, Phase 2 queue generation (pending independent source file/manifest read).
+- **OPEN:** Cohort provenance check because the summary displays blank cohort grouping; independently recompute UP `2020_B1` membership after confirming nonmissing source fields and joins.
+- **OPEN:** Phase 3 source-level case adjudication. Queue inclusion is not a verified defect or a completed review.
+- **OPEN:** Integration acceptance tests, case audit trail and Phase 4 outcome report. See `PEIARS_PMGSY_EVIDENCE_INTEGRATION_V1.md`.
+- **Data policy:** Continue ignoring the complete generated CSV; version scripts, manifests and sanitized aggregate reports. Do not indiscriminately track old untracked annotation/research artifacts without reviewing their contents and restricted-key exposure.

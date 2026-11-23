@@ -70,3 +70,16 @@ Keep full 4,361-row generated CSV ignored; store its SHA-256 and deterministic g
 7. If independent source corroboration remains absent, record that limitation plainly. **Do not classify a discrepancy as confirmed merely to finish the milestone.**
 
 **Next authorized milestone:** `PEIARS-PMGSY-42-CASE-SOURCE-REVIEW-V1`. Implementation/execution pending; successful P0 pilot does not close the entire 42-case adjudication gate.
+
+
+## Closure and engineering handoff — 2026-11-23 (supersedes prior pending stages)
+
+**Verified GitHub milestone:** `c8aa5a1f7569e57c014f266f019aecb774849c31` freezes the 42-case desk-review disposition/manifest (37 `SUPPORTED_REVIEW_CANDIDATE`, 5 `UNRESOLVED`, 0 confirmed defects) and reports 162 append-only events with replay PASS. The raw ignored event log was not independently replayed here.
+
+**Verified GitHub follow-up:** `314b804ea5fe6a3bdaf11a3949cda44233112d3a` adds desk-review closure, external-evidence protocol/register, frozen 12-case selection, corroboration report and manifest. Pilot groups: 6 P0 topology, 5 unresolved (`030`, `034`, `037`, `040`, `042`) and 1 large discrepancy (`007`). All 12 have `verification_status=VERIFICATION_BLOCKED` and `independent_of_canonical_gis=False` because the local snapshot has no independent PMGSY/OMMAS sanction/alignment evidence. Their prior case dispositions remain unchanged, with 0 independently confirmed defects. This is an **evidence-access blocker**, not proof of benignity or a failed positive verification test.
+
+**Disposition:** `PEIARS-PMGSY-EVIDENCE-INTEGRATION-V1` data export, 42-case desk review and audit-history design are research-stage complete. External corroboration is blocked; no new desk-only claim escalation is authorized. Continue development of the software application with evidence limitation visible in every case.
+
+**Next milestone:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, governed by `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Local-first, read-only import from frozen PMGSY snapshot, provenance chain verification, workflow event append, case details, explicit reviewer decisions and signed/hashed report exports. Preserve original baselines, scripts and events; separate verification status from disposition. Stop further ML research and avoid any automatic positive-label promotion.
+
+**Next implementation gate:** Import 42 cases, independently replay and hash-verify all 162 frozen events, show 37/5/0 dispositions and 12 blocked external-source verification statuses, append a test event only in a separate development event stream, then export a provenance-verifiable case dossier. Do not rewrite the frozen JSONL.

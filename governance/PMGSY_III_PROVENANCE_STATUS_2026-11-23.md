@@ -47,3 +47,31 @@
 
 ## Provenance limitations
 This record is an audit trail of project-reported observations and decisions, not a substitute for raw artifacts, independent verification, or formal model admission. Preserve immutable snapshots, scripts, configuration, hashes, reviewer annotations, and the link from each candidate to source geometry.
+
+
+## Addendum — 2026-11-23: Cohort robustness, segmentation validity, blinded audit protocol
+
+**Evidence basis:** User-reported outputs from `step1_cohort_robustness.py`, `step2_segmentation_validity.py`, and `step3_prepare_blind_60_audit.py`. Local reports and audit rows were not independently inspected in this GitHub update.
+
+### Cohort robustness and permutation results
+- Full-population, within-state Cramer's V for IF top-5% membership vs year/batch: Bihar 0.1273 (37/731; permutation null mean 0.0687, p=0.0399); MP 0.1112 (54/1,074; null mean 0.0552, p=0.0200); UP 0.0915 (128/2,556; null mean 0.0360, p=0.0100). Mean observed V 0.1100.
+- About 30% of expected contingency cells are below 5 in each state. Effect sizes are mild but permutation results indicate residual cohort association under the tested null; **do not claim cohort independence or an unconditional confounding-gate pass**.
+- Reference population sensitivity remains material: within-cohort 223 vs state-stratified 219 selected, overlap 168, Jaccard 0.6131.
+
+### Segmentation validity diagnostic
+- One segment: 47/3,553 selected (1.32%); selected vs controls median sinuosity 3.254 vs 1.232, vertices/km 39.69 vs 24.39.
+- Two segments: 95/302 selected (31.46%); median concentration 0.715 vs 0.892, vertices/km 27.27 vs 17.24.
+- Three to five segments: 48/302 selected (15.89%); median concentration 0.847 vs 0.580.
+- Six or more segments: 29/204 selected (14.22%); median concentration 0.223 vs 0.402.
+- Strong dependence on segmentation is established as a **candidate-selection mechanism**, not as proof of useful anomalies. Two-segment selection rate is roughly 24 times single-segment selection rate; determine whether this represents actionable geometry/source defects or legitimate GIS segmentation.
+
+### New blinded 60-case audit
+- Reported artifacts: `IF_COHORT_ROBUSTNESS_REPORT.md`, `IF_SEGMENTATION_VALIDITY_REPORT.md`, `if_enriched_audit_blind_review.csv`, `if_enriched_audit_unblinded_key_DO_NOT_PEEK.csv`.
+- Blinded identifiers `IFAUD_001`–`IFAUD_060`; 30 IF-selected and 30 matched non-IF controls; worksheet hides `audit_group`, IF score and top-5% membership.
+- **Approved next action:** freeze a written rubric, review manually against source evidence, optionally use independent reviewers, freeze annotations and hashes, *then* unblind. Deterministic scripts may validate schema/completeness and calculate outcomes, but **must not assign positive labels from IF scores, R cutoffs, or topology flags**.
+- Recommended exclusive outcomes: `VERIFIED_ACTIONABLE_IRREGULARITY`, `VERIFIED_BENIGN_STRUCTURE`, `SOURCE_PROCESSING_ARTIFACT`, `UNRESOLVED`, `INSUFFICIENT_EVIDENCE`. Capture evidence domain, source reference, alternative explanation, confidence and actionability. A source-processing artifact counts as actionable only when independently verified and genuinely warrants correction or investigation.
+- **Proposed (not yet adopted or frozen) research-pilot admission criteria:** all 60 accounted for and blinding intact; >=24 adjudicable per arm; IF actionable yield at least 20 percentage points higher than matched controls, with positive lower confidence bound for yield difference using pair-aware analysis if matching is pairwise; independently supported incremental findings beyond Option B; segmentation validity, cohort robustness, and complete provenance. These numerical thresholds are planning proposals and must be formally frozen **before** key unblinding; small samples may yield an inconclusive result.
+- A positive audit can justify **expanded research pilot only**, never production deployment or fraud inference.
+- Pending artifacts: `IF_AUDIT_PROTOCOL_V1.md`, `IF_ENRICHED_AUDIT_RESULTS_V1.csv`, `IF_AUDIT_COMPARISON_REPORT.md`, `IF_ADMISSION_DECISION_V2.md`.
+
+**Disposition unchanged:** Option B v2 and topology audit are primary descriptive evidence tracks. Isolation Forest remains research-only pending independent evidence validation; no blended scoring.

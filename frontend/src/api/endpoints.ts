@@ -49,6 +49,11 @@ import type {
   WorkbenchSnapshotDetail,
   WorkbenchSnapshotListResponse,
   DatasetKind,
+  WorkbenchInvestigationListResponse,
+  InvestigationDetail,
+  InvestigationHistoryResponse,
+  AppendInvestigationNoteRequest,
+  AppendInvestigationNoteResponse,
 } from "@/api/contracts";
 import { CSRF_HEADER } from "@/api/contracts";
 import {
@@ -470,6 +475,57 @@ export function getWorkbenchPmgsyPackage(
   return request<WorkbenchPackageDetail>(
     `/workbench/pmgsy/packages/${encodeURIComponent(caseId)}`,
     {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function listWorkbenchInvestigations(
+  signal?: AbortSignal,
+): Promise<WorkbenchInvestigationListResponse> {
+  return request<WorkbenchInvestigationListResponse>("/workbench/investigations", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getWorkbenchInvestigation(
+  caseId: string,
+  signal?: AbortSignal,
+): Promise<InvestigationDetail> {
+  return request<InvestigationDetail>(
+    `/workbench/investigations/${encodeURIComponent(caseId)}`,
+    {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function getWorkbenchInvestigationHistory(
+  caseId: string,
+  signal?: AbortSignal,
+): Promise<InvestigationHistoryResponse> {
+  return request<InvestigationHistoryResponse>(
+    `/workbench/investigations/${encodeURIComponent(caseId)}/history`,
+    {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function appendWorkbenchInvestigationNote(
+  caseId: string,
+  body: AppendInvestigationNoteRequest,
+  signal?: AbortSignal,
+): Promise<AppendInvestigationNoteResponse> {
+  return request<AppendInvestigationNoteResponse>(
+    `/workbench/investigations/${encodeURIComponent(caseId)}/notes`,
+    {
+      method: "POST",
+      body: body,
       signal,
       timeoutMs: DEFAULT_TIMEOUT_MS,
     },

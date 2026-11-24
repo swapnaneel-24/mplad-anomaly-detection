@@ -916,3 +916,129 @@ export interface WorkbenchPackageDetail {
     evidence_record_present: boolean;
   };
 }
+
+export interface InvestigationSummary {
+  case_id: string;
+  package_uid: string;
+  mrl_id: string;
+  state: string;
+  ims_year: string;
+  queues: string[];
+  screening_summary: string;
+  disposition: string;
+  verification_status: string;
+  case_status: string;
+  app_event_count: number;
+}
+
+export interface WorkbenchInvestigationListResponse {
+  investigations: InvestigationSummary[];
+  count: number;
+}
+
+export interface InvestigationDetail {
+  identity: {
+    case_id: string;
+    package_uid: string;
+    mrl_id: string;
+    state: string;
+    ims_year: string;
+  };
+  selection: {
+    queues: string[];
+    screening_reasons: string[];
+    selection_ranks: Record<string, unknown> | null;
+  };
+  measurements: {
+    proposed_l_km: number | null;
+    sum_geom_len_km: number | null;
+    signed_diff_km: number | null;
+    relative_diff: number | string | null;
+    relative_diff_status: string;
+  };
+  topology: {
+    exact_geometry_duplicate: boolean;
+    linear_overlap: boolean;
+    invalid_geometry: boolean;
+    segment_count: number | null;
+  };
+  review: {
+    baseline_case_status: string;
+    baseline_disposition: string;
+    current_app_review_state: string;
+    app_event_count: number;
+  };
+  verification: {
+    verification_status: string;
+    independent_of_canonical_gis: boolean;
+    blocker_reason: string | null;
+  };
+  provenance: {
+    snapshot_id: string;
+    case_id: string;
+    package_uid: string;
+    frozen_baseline_event_count: number;
+    app_event_count: number;
+    frozen_head_hash: string;
+    app_head_hash: string;
+    manifest_reference: string;
+    verified_manifest_hash: string | null;
+  };
+}
+
+export type InvestigationStreamType = "FROZEN_BASELINE" | "APPENDED_APP_EVENT";
+
+export interface InvestigationHistoryEvent {
+  event_id: string;
+  event_type: string;
+  timestamp_utc: string | null;
+  actor: string | null;
+  previous_state: string | null;
+  new_state: string | null;
+  disposition: string | null;
+  evidence_refs: string[];
+  rationale: string | null;
+  previous_event_hash: string | null;
+  event_hash: string | null;
+  stream_type: InvestigationStreamType;
+}
+
+export interface InvestigationHistoryResponse {
+  case_id: string;
+  package_uid: string;
+  integrity_note: string;
+  writes_allowed: boolean;
+  integrity_error: string | null;
+  baseline: {
+    immutable: boolean;
+    event_count: number;
+    head_hash: string;
+    replay_valid: boolean;
+    replay_error: string | null;
+    case_event_count: number;
+    events: InvestigationHistoryEvent[];
+  };
+  app_stream: {
+    immutable_append_only: boolean;
+    parent_baseline_head: string;
+    event_count: number;
+    current_head: string;
+    replay_valid: boolean;
+    replay_error: string | null;
+    events: InvestigationHistoryEvent[];
+  };
+}
+
+export interface AppendInvestigationNoteRequest {
+  note: string;
+  reviewer_id?: string | null;
+  requested_disposition?: string | null;
+  expected_app_head_hash?: string | null;
+  expected_app_event_count?: number | null;
+}
+
+export interface AppendInvestigationNoteResponse {
+  case_id: string;
+  event: InvestigationHistoryEvent;
+  app_stream: InvestigationHistoryResponse["app_stream"];
+}

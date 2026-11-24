@@ -50,6 +50,7 @@ import {
 } from "@/pages/case-model";
 import { setDocumentTitle } from "@/utils/title";
 import "@/pages/InvestigationsPage.css";
+import { PmgsyInvestigationsWorkbench } from "@/pages/PmgsyInvestigationsWorkbench";
 
 type SelectionKind = "record" | "case" | null;
 
@@ -1178,6 +1179,7 @@ function CaseHistoryView({ history }: { history: CaseHistoryResponse | null }): 
     );
   }
   return (
+<>
     <div className="inv__history">
       <h3 className="section-h4">Event history ({history.total})</h3>
       {history.items.length === 0 ? (
@@ -1208,5 +1210,7 @@ function CaseHistoryView({ history }: { history: CaseHistoryResponse | null }): 
         </ol>
       )}
     </div>
+      <PmgsyInvestigationsWorkbench />
+    </>
   );
 }

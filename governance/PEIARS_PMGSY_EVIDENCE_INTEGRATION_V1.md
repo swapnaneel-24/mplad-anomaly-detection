@@ -83,3 +83,8 @@ Keep full 4,361-row generated CSV ignored; store its SHA-256 and deterministic g
 **Next milestone:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, governed by `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Local-first, read-only import from frozen PMGSY snapshot, provenance chain verification, workflow event append, case details, explicit reviewer decisions and signed/hashed report exports. Preserve original baselines, scripts and events; separate verification status from disposition. Stop further ML research and avoid any automatic positive-label promotion.
 
 **Next implementation gate:** Import 42 cases, independently replay and hash-verify all 162 frozen events, show 37/5/0 dispositions and 12 blocked external-source verification statuses, append a test event only in a separate development event stream, then export a provenance-verifiable case dossier. Do not rewrite the frozen JSONL.
+
+
+## Research-method addendum — 2026-11-24
+
+The later `PEIARS-PMGSY-LOF-FEASIBILITY-V1` experiment is verified at research commit `fc03519af02309732943ad238562c7c485d8a820`. It does **not** reopen or modify this evidence-integration milestone. LOF closure is `LOF_FEASIBILITY_COMPLETED_RESEARCH_ONLY_NOT_ADMITTED`: structural feasibility passed with limitations; evidence validity did not meet admission requirements. The 42-case evidence outcomes remain 37 `SUPPORTED_REVIEW_CANDIDATE`, 5 `UNRESOLVED`, 0 `CONFIRMED_SOURCE_DEFECT`, with the independent-evidence pilot still blocked. LOF scores must not be used to retroactively reprioritize or relabel these cases.

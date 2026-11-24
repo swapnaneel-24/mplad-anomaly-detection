@@ -107,3 +107,46 @@ The React + FastAPI workbench is now the presentation/API track. `peiars_app` re
 **Milestone status:** `PEIARS-CORE-CASE-MANAGEMENT-V1` is partially implemented and materially advanced, but the final gate remains `PEIARS_CORE_V1_ENGINEERING_PASS` only after the remaining investigation workflow, complete event-history UX, dossier/export verification and end-to-end/negative validation requirements are satisfied.
 
 **Next UI milestone:** Prompt C, scoped to the evidence-backed investigation workflow and provenance/event-history presentation. Do not begin new anomaly-model research as part of this handoff.
+
+
+## Engineering status addendum — 2026-11-24: Prompt C investigation workflow completed
+
+**Verified feature-branch implementation:** `feat/react-workbench-02-data` at `206ad6efee52b637d90bfdaf129b51a5b76ff548` (`feat(workbench): implement prompt C investigation workflow and event history`).
+
+Prompt C establishes the React/FastAPI `04 Investigations` workflow over the frozen 42-case PMGSY baseline while preserving the immutable 162-event history and writing reviewer activity only to the separate application event stream.
+
+### Delivered
+- Investigation read APIs:
+  - `GET /api/v1/workbench/investigations`
+  - `GET /api/v1/workbench/investigations/{case_id}`
+  - `GET /api/v1/workbench/investigations/{case_id}/history`
+- Append-only reviewer-note API:
+  - `POST /api/v1/workbench/investigations/{case_id}/notes`
+- React investigation workbench with case filtering, grouped evidence/verification/provenance detail, and explicit event-history presentation.
+- History contract separates `FROZEN_BASELINE` from `APPENDED_APP_EVENT`; the frozen stream remains immutable and the application stream remains append-only.
+- New writes are rejected on provenance-chain failure, stale head/count, unknown cases, empty notes, or unsupported disposition requests.
+- `CONFIRMED_SOURCE_DEFECT` promotion remains unavailable without independently verified evidence.
+
+### Verified invariant state
+- 42 cases.
+- 37 `SUPPORTED_REVIEW_CANDIDATE`.
+- 5 `UNRESOLVED`.
+- 0 `CONFIRMED_SOURCE_DEFECT`.
+- 12 `VERIFICATION_BLOCKED`.
+- 162 frozen baseline events.
+- Frozen head `9caa9735fab13e88a47848a12532653bc4216548aa69cf80e4648fc5d646d5de`.
+- `UNDEFINED_ZERO_DENOMINATOR` preserved for zero proposed length.
+
+### Validation reported at Prompt C completion
+- Targeted backend suite: 59 passed.
+- Frontend `npm run build`: passed.
+- Reviewer-note append demonstrated against the application stream.
+- Frozen baseline byte/hash state unchanged by app writes.
+- Unsupported confirmed-defect promotion rejected.
+- Corrupted chain state rejects/disables writes.
+- No research artifact changed.
+
+### Milestone interpretation
+Prompt C satisfies the principal case-list, case-detail, reviewer-note, event-history and frozen/app-stream separation requirements of the core specification. It does **not** by itself grant `PEIARS_CORE_V1_ENGINEERING_PASS`; dossier/export verification, complete end-to-end validation, remaining negative-path coverage and release-readiness evidence still need to be completed and recorded.
+
+**Next milestone:** Prompt D should focus on reproducible dossier/export verification, end-to-end validation, negative tests, and release-readiness reporting. The planned PMGSY IF-versus-LOF analytical comparison/visualization track remains a separate `03 Analysis`/`06 Research` milestone and must not be mixed into investigation disposition logic.

@@ -69,3 +69,41 @@ Core case-management behavior is unchanged:
 - If exposed in the UI, place LOF under Research/experimental context with the frozen configuration and limitations visible; do not present it as an admitted detector.
 - Frozen comparison candidates are `full_5feat__k35` and `ablation_no_seg_conc__k35`; they are not production defaults.
 - Continue the workbench/core implementation from the existing engineering baseline; no LOF integration is required to satisfy `PEIARS_CORE_V1_ENGINEERING_PASS`.
+
+
+## Engineering status addendum — 2026-11-24: Prompt B completed on React/FastAPI workbench
+
+**Verified feature-branch implementation:** `feat/react-workbench-02-data` at `09d16df35e7f6ea9ea6623ea88f9f668dd8a4013` (`feat(workbench): implement prompt B read-only PMGSY data path and inspector`).
+
+Prompt B completes the truthful read-only `02 Data` path and contextual metadata/provenance inspector without changing the frozen PMGSY evidence baseline.
+
+### Delivered
+- Read-only workbench API routes:
+  - `GET /api/v1/workbench/snapshots`
+  - `GET /api/v1/workbench/snapshots/{snapshot_id}`
+  - `GET /api/v1/workbench/pmgsy/packages`
+  - `GET /api/v1/workbench/pmgsy/packages/{case_id}`
+- Typed backend/frontend contracts for snapshot summaries/details and PMGSY package summaries/details.
+- React `02 Data` now loads the real 42 case-linked PMGSY package records rather than hard-coded presentation placeholders.
+- Package detail is loaded on selection and separates identity, scope, measurements, screening, topology, review, verification and provenance.
+- Local PMGSY snapshot remains distinct from the admitted `/api/v1/sources` registry.
+- `VERIFICATION_BLOCKED` remains separate from disposition; zero proposed length remains `UNDEFINED_ZERO_DENOMINATOR`.
+- No reviewer mutation, IF/LOF score, model output or composite score is exposed through `02 Data`.
+
+### Verified state
+- 42 case-linked records, explicitly scoped as a selected subset of 4,361 scored P packages.
+- 37 `SUPPORTED_REVIEW_CANDIDATE`, 5 `UNRESOLVED`, 0 `CONFIRMED_SOURCE_DEFECT`.
+- 12 `VERIFICATION_BLOCKED`.
+- Frozen research/source artifacts unchanged.
+
+### Validation reported at Prompt B completion
+- Backend targeted suite: 55 passed.
+- Frontend `npm run build`: passed.
+- UTF-8 BOM removed from touched source files.
+
+### Architecture status
+The React + FastAPI workbench is now the presentation/API track. `peiars_app` remains the local/core provenance and reference implementation; Prompt B does not require maintaining a second feature-equivalent Streamlit UI.
+
+**Milestone status:** `PEIARS-CORE-CASE-MANAGEMENT-V1` is partially implemented and materially advanced, but the final gate remains `PEIARS_CORE_V1_ENGINEERING_PASS` only after the remaining investigation workflow, complete event-history UX, dossier/export verification and end-to-end/negative validation requirements are satisfied.
+
+**Next UI milestone:** Prompt C, scoped to the evidence-backed investigation workflow and provenance/event-history presentation. Do not begin new anomaly-model research as part of this handoff.

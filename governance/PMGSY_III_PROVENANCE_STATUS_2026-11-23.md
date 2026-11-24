@@ -146,3 +146,32 @@ This addendum records the project owner's reported status and an approved next-s
 - **Project decision:** PMGSY desk-review research cycle closed with documented evidence limitation; IF remains `CLOSED_RESEARCH_NOT_ADMITTED`. External source verification may be reopened later if independent evidence is obtained. **Engineering track now active:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, see `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Implement local-first case management, independent provenance replay and verifiable case exports using frozen data; no new unsupervised model experiment.
 
 **Retention policy:** keep full source/register/case/evidence/JSONL raw exports ignored as appropriate, but retain manifest and reproducible scripts in repository. Do not modify frozen desk baseline or reassign prior dispositions in place.
+
+---
+
+## Addendum (2026-11-24): Formal Closure of `PEIARS-PMGSY-LOF-FEASIBILITY-V1`
+
+- **Decision ID:** `PEIARS-LOF-FEASIBILITY-V1-CLOSURE`
+- **Disposition:** `LOF_FEASIBILITY_COMPLETED_RESEARCH_ONLY_NOT_ADMITTED`
+- **Gate Verdicts:** Gate 1 (`Structural Feasibility`) = `PASS_WITH_LIMITATIONS`; Gate 2 (`Evidence Validity`) = `NOT_MET`
+- **Research Branch & Prior Commit:** `research/pmgsy-lof-feasibility-v1` (prior commit `fc03519` on `4,361` scored `P` road packages in `pmgsy3_3state_v1`)
+- **Frozen Artifacts & Manifest:** `research/pmgsy_iii_investigation/outputs/lof_feasibility_v1/` (including `LOF_FEASIBILITY_V1_REPORT.md`, `LOF_FEASIBILITY_V1_CLOSURE_MANIFEST.json`, `lof_feasibility_v1_scores.parquet`, `lof_feasibility_v1_neighbors.json`, `lof_feasibility_v1_summary.json`, `phase1_audit.json`, `phase3_diagnostics.json`, and `phase4_42case_descriptive.json`).
+- **Preserved Research Comparison Candidates Only:** `full_5feat__k35` and `ablation_no_seg_conc__k35` (frozen research comparators only; not production models or default ranking algorithms). Existing Isolation Forest outputs remain a historical benchmark only.
+
+### Recorded Findings & Methodological Caveats
+1. **Neighborhood stability:** Ranking stability is moderate for `k=20?50`, whereas `k=10` is comparatively unstable.
+2. **Low overlap with Option B v2:** State-stratified LOF has low selection overlap with Option B v2 descriptive flags; low overlap is not proof of independent investigative value.
+3. **Two-segment spike:** Selection rate elevation on two-segment packages remains significant in the full five-feature set (`full_5feat`), and no independent defect detection or segmentation independence is claimed.
+4. **Ablation trade-off:** Removing segmentation-related features (`ablation_no_seg_conc`) reduces the two-segment spike but materially alters which cases are selected.
+5. **Zero-IQR scaling limitation:** `RobustScaler` behavior when `IQR = 0` on `n_segments` (where `81.47%` of scored `P` packages equal `1`) is a methodological limitation.
+6. **Non-random 42-case register:** The existing 42-case register (`PEIARS_PMGSY_42_CASES.csv`, 37 supported / 5 unresolved) is a biased historical review sample and cannot establish unbiased precision, recall, verified detection yield, or external validity.
+7. **No confirmed independent source defects:** Independent source defect corroboration remains unestablished; the existing 37 supported / 5 unresolved / 0 confirmed evidence baseline is unchanged.
+
+### Mandatory Governance Guardrails
+- Isolation Forest (`IF`) remains `CLOSED_RESEARCH_NOT_ADMITTED`.
+- LOF is a separate, completed research experiment and is **not** admitted as an operational anomaly detector.
+- No LOF score may automatically change case dispositions or reprioritize operational queues.
+- No `LOF + IF + Option B` composite score is authorized.
+- No new neighborhood or feature tuning is authorized under `v1`.
+- Any future evidence-validity work requires a new protocol and independent source evidence.
+- Workbench UI/evidence work on `feat/react-workbench-02-data` must preserve separation between screening flags, evidence-backed case dispositions, external verification statuses, and exploratory ML research (such as an optional frozen `06 Research` view).

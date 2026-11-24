@@ -1,0 +1,86 @@
+{
+  "manifest_id": "PEIARS-LOF-FEASIBILITY-V1-CLOSURE-MANIFEST",
+  "decision_id": "PEIARS-LOF-FEASIBILITY-V1-CLOSURE",
+  "disposition": "LOF_FEASIBILITY_COMPLETED_RESEARCH_ONLY_NOT_ADMITTED",
+  "gate_1": "PASS_WITH_LIMITATIONS",
+  "gate_2": "NOT_MET",
+  "dataset_version": "pmgsy3_3state_v1",
+  "research_branch": "research/pmgsy-lof-feasibility-v1",
+  "research_commit_prior": "fc03519",
+  "feature_specifications": {
+    "full_5feat": [
+      "n_segments",
+      "mean_seg_len_km",
+      "mean_sinuosity",
+      "vertices_per_km",
+      "seg_len_concentration"
+    ],
+    "ablation_no_seg_conc": [
+      "mean_seg_len_km",
+      "mean_sinuosity",
+      "vertices_per_km"
+    ],
+    "derived_formulas": {
+      "vertices_per_km": "total_vertices / sum_geom_len_km if sum_geom_len_km > 0 else 0.0",
+      "seg_len_concentration": "max_seg_len_km / sum_geom_len_km if sum_geom_len_km > 0 else 0.0",
+      "mean_sinuosity_imputation": "within-state median prior to numeric coercion/fill 0.0"
+    }
+  },
+  "preprocessing_configuration": {
+    "population_filter": "proposal_type == 'P' & proposed_l_km > 0 & length_ratio_r notna (4,361 rows)",
+    "stratification": "source_state_key (UTTAR_PRADESH, MADHYA_PRADESH, BIHAR)",
+    "scaler": "sklearn.preprocessing.RobustScaler (IQR=0 falls back to 1.0 in scikit-learn)",
+    "algorithm": "sklearn.neighbors.LocalOutlierFactor(metric='minkowski', p=2, novelty=False)"
+  },
+  "neighborhood_grid": [
+    10,
+    20,
+    35,
+    50
+  ],
+  "preserved_comparison_candidates": [
+    "full_5feat__k35",
+    "ablation_no_seg_conc__k35"
+  ],
+  "verification_checks": {
+    "p_scored_rows_4361": true,
+    "arms_match": true,
+    "neighbor_grid_matches": true,
+    "phase4_42_cases_descriptive": true
+  },
+  "source_artifacts_sha256": {
+    "packages.parquet": "c0b9d792e4918a3914fa0f137a2a7302009143ef1e13275ea641f61849f920bd",
+    "segments.parquet": "60f63d3af317dba9bb2aaffd58eadee6ea156bda4ab69f224890432b0915cb54",
+    "FREEZE_MANIFEST_OPTION_B_V2.json": "cdcf5b549f4585b647684cf48bb19c1756cff2367f6d4ae930cc0e77e543f16e"
+  },
+  "frozen_lof_artifacts_sha256": {
+    "LOF_FEASIBILITY_V1_REPORT.md": {
+      "bytes": 3533,
+      "sha256": "2af6c9498c5d97e20aa83e1a7c67901d4371523939586a4fbce73c37bdfc624a"
+    },
+    "phase1_audit.json": {
+      "bytes": 9169,
+      "sha256": "70741d8abc2236701cf9225409ae0e0f36401fcaaff840e710063cc11e5c95b7"
+    },
+    "lof_feasibility_v1_scores.parquet": {
+      "bytes": 1053750,
+      "sha256": "f93d262a3477866277e6813bc3252e27f9b5012e77b00058fc0cfc246741e03e"
+    },
+    "lof_feasibility_v1_neighbors.json": {
+      "bytes": 5395480,
+      "sha256": "b4fcc277c277c4f8a8b7089f7c34ba7d4a470f366ff88c1b30735d8ca12241c9"
+    },
+    "lof_feasibility_v1_summary.json": {
+      "bytes": 2941,
+      "sha256": "aaead4146f087a99381e2dff73b56e84bb688713a956846755958101df78c309"
+    },
+    "phase3_diagnostics.json": {
+      "bytes": 5710,
+      "sha256": "7145dbd5bdd37326b0643133b8708d201208713be3ff1bdf91b2a47f76069a3c"
+    },
+    "phase4_42case_descriptive.json": {
+      "bytes": 31347,
+      "sha256": "4c585a00acf23a67ecdf1381e6fb267f72f27b674af8a8de63a370d0c8289e66"
+    }
+  }
+}

@@ -165,3 +165,19 @@ This addendum records the project owner's reported status and an approved next-s
 **Stop rule:** no further v1 neighborhood tuning, feature search, fitting to the 42-case labels, production anomaly ranking, fraud inference, or LOF+IF+Option-B composite score is authorized. Freeze `full_5feat__k35` and `ablation_no_seg_conc__k35` only as possible future research comparators. Any future human-in-the-loop comparison requires a new prospectively frozen protocol and genuinely independent evidence. IF remains `CLOSED_RESEARCH_NOT_ADMITTED`.
 
 **Engineering direction:** return to the PEIARS workbench/core product track. LOF may be displayed in `06 Research` as a frozen exploratory result, clearly separated from evidence-backed case disposition and verification status.
+
+
+## Addendum — 2026-11-24: React/FastAPI Prompt B data-workbench completion
+
+**Verified workbench commit:** `09d16df35e7f6ea9ea6623ea88f9f668dd8a4013` on `feat/react-workbench-02-data`.
+
+- The `02 Data` workbench now exposes the frozen local PMGSY snapshot and all 42 case-linked package records through explicit read-only workbench routes, while preserving the separate admitted-source semantics of `/api/v1/sources`.
+- The previous React-only illustrative PMGSY package/snapshot constants were removed; the selected-record inspector now reads typed backend data and loads package detail on selection.
+- Current displayed evidence state remains exactly 37 supported review candidates, 5 unresolved, 0 confirmed source defects, with 12 verification-blocked cases.
+- Relative length remains undefined when proposed length is zero; `UNDEFINED_ZERO_DENOMINATOR` is preserved.
+- Screening, disposition, verification and provenance remain distinct concepts. No review decision is mutated from `02 Data`.
+- IF and LOF remain research-only closures and are not exposed as operational PMGSY case scores. No composite scoring was introduced.
+- Targeted backend tests report 55 passing tests and the frontend TypeScript/Vite build passes.
+- Frozen PMGSY source/research artifacts were not modified by this implementation.
+
+**Engineering interpretation:** this is a presentation/data-access milestone, not a new evidentiary finding. The authoritative 42-case evidence outcomes and external-corroboration limitation are unchanged.

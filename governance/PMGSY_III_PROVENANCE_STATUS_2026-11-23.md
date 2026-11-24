@@ -146,3 +146,22 @@ This addendum records the project owner's reported status and an approved next-s
 - **Project decision:** PMGSY desk-review research cycle closed with documented evidence limitation; IF remains `CLOSED_RESEARCH_NOT_ADMITTED`. External source verification may be reopened later if independent evidence is obtained. **Engineering track now active:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, see `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Implement local-first case management, independent provenance replay and verifiable case exports using frozen data; no new unsupervised model experiment.
 
 **Retention policy:** keep full source/register/case/evidence/JSONL raw exports ignored as appropriate, but retain manifest and reproducible scripts in repository. Do not modify frozen desk baseline or reassign prior dispositions in place.
+
+
+## Addendum — 2026-11-24: LOF feasibility v1 closed as research-only
+
+**Verified research branch:** `research/pmgsy-lof-feasibility-v1` at `fc03519af02309732943ad238562c7c485d8a820` contains the seven frozen `PEIARS-PMGSY-LOF-FEASIBILITY-V1` artifacts under `research/pmgsy_iii_investigation/outputs/lof_feasibility_v1/`. This addendum records the experiment without modifying the frozen PMGSY desk-review baseline, Option B v2, IF v1–v3, or case dispositions.
+
+- **Population/configuration:** 4,361 scored P packages (UP 2,556; MP 1,074; Bihar 731), state-stratified RobustScaler + LocalOutlierFactor, `novelty=False`, Euclidean `p=2`, `k={10,20,35,50}`. Arms: five structural features and a three-feature ablation dropping `n_segments` and `seg_len_concentration`. The committed report states no label tuning.
+- **Data criticality:** `n_segments==1` for 3,553/4,361 (81.47%), IQR=0 and skew≈9.05. This makes RobustScaler's zero-IQR treatment and discrete segment-count jumps an explicit methodological limitation, not a resolved preprocessing detail.
+- **Stability:** full five-feature top-5% Jaccard = 0.7951 for k20↔k35 and 0.7805 for k35↔k50; three-feature ablation k35↔k50 = 0.8798. k10 is materially less stable (full k10↔k50 = 0.4361; ablation = 0.4129).
+- **Segmentation sensitivity:** full-vs-ablation top-5% Jaccard is 0.5643–0.5927. At k35, full-feature selection rate is 13.91% for two-segment packages vs 4.19% for one-segment packages; the ablation removes that spike. Therefore LOF is **not** treated as segmentation-independent.
+- **Option B comparison:** top-5% LOF overlap with 1,135 Option B v2 non-baseline flags has Jaccard 0.0529–0.0603. This is evidence of low selection overlap only; it does not establish useful orthogonality or defect-detection validity.
+- **42-case cross-check:** all 42 historical review cases matched the P population. Full-feature LOF top-5% contains 11–13 of them depending on k; the committed report correctly treats this as descriptive alignment because the register is queue-selected and non-random, not an unbiased validation sample.
+- **Evidence boundary:** independent source-defect corroboration remains unavailable; LOF has no verified precision/recall or operational defect yield. It must not change the 37 supported / 5 unresolved / 0 confirmed desk-review dispositions.
+
+**Two-gate closure:** Gate 1 `PASS_WITH_LIMITATIONS` (structural feasibility retained as a research result); Gate 2 `NOT_MET` (evidence validity / operational admission). Formal disposition: `LOF_FEASIBILITY_COMPLETED_RESEARCH_ONLY_NOT_ADMITTED`.
+
+**Stop rule:** no further v1 neighborhood tuning, feature search, fitting to the 42-case labels, production anomaly ranking, fraud inference, or LOF+IF+Option-B composite score is authorized. Freeze `full_5feat__k35` and `ablation_no_seg_conc__k35` only as possible future research comparators. Any future human-in-the-loop comparison requires a new prospectively frozen protocol and genuinely independent evidence. IF remains `CLOSED_RESEARCH_NOT_ADMITTED`.
+
+**Engineering direction:** return to the PEIARS workbench/core product track. LOF may be displayed in `06 Research` as a frozen exploratory result, clearly separated from evidence-backed case disposition and verification status.

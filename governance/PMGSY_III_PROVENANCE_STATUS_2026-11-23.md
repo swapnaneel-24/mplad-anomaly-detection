@@ -181,3 +181,19 @@ This addendum records the project owner's reported status and an approved next-s
 - Frozen PMGSY source/research artifacts were not modified by this implementation.
 
 **Engineering interpretation:** this is a presentation/data-access milestone, not a new evidentiary finding. The authoritative 42-case evidence outcomes and external-corroboration limitation are unchanged.
+
+
+## Addendum — 2026-11-24: Prompt C investigation/provenance workflow completion
+
+**Verified workbench commit:** `206ad6efee52b637d90bfdaf129b51a5b76ff548` on `feat/react-workbench-02-data`.
+
+- `04 Investigations` now exposes all 42 PMGSY cases through typed React/FastAPI contracts and keeps screening reasons, disposition, verification status and provenance as separate concepts.
+- The history API presents the global frozen 162-event baseline and separate case-scoped application stream explicitly; frozen head remains `9caa9735fab13e88a47848a12532653bc4216548aa69cf80e4648fc5d646d5de`.
+- Reviewer notes append only to the application event stream. Frozen history is not rewritten.
+- Writes fail closed for stale app-stream state, chain-integrity failure, unknown cases and invalid note/disposition requests.
+- Promotion to `CONFIRMED_SOURCE_DEFECT` is rejected because independently verified corroboration is not present.
+- The evidence state remains unchanged: 37 supported review candidates, 5 unresolved, 0 confirmed source defects, 12 verification-blocked.
+- Targeted backend tests report 59 passing tests; frontend TypeScript/Vite build passes.
+- IF and LOF remain research-only and are excluded from investigation filtering, scoring and adjudication.
+
+**Engineering interpretation:** Prompt C advances auditable case-management capability but introduces no new source-level finding. Hash-chain continuity validates recorded history integrity under the implemented scheme; it does not establish factual correctness of the underlying evidence.

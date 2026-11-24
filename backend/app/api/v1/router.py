@@ -14,6 +14,7 @@ from app.api.v1 import (
     phase5b,
     research,
     sources,
+    workbench,
     synthetic,
 )
 
@@ -21,6 +22,7 @@ api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(meta.router)
 api_router.include_router(sources.router)
+api_router.include_router(workbench.router)
 api_router.include_router(synthetic.router)
 api_router.include_router(cases.router)
 api_router.include_router(auth.router)

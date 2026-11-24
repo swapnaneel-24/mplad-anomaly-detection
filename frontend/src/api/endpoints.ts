@@ -44,6 +44,10 @@ import type {
   SyntheticRecordListResponse,
   TransitionStatusRequest,
   UserResponse,
+  WorkbenchPackageDetail,
+  WorkbenchPackageListResponse,
+  WorkbenchSnapshotDetail,
+  WorkbenchSnapshotListResponse,
   DatasetKind,
 } from "@/api/contracts";
 import { CSRF_HEADER } from "@/api/contracts";
@@ -424,4 +428,50 @@ export function getPhase5BTraceability(signal?: AbortSignal): Promise<Traceabili
 /** URL builder for a canonical figure PNG (usable directly as <img src=...>). */
 export function phase5bFigureImageUrl(figureNo: number): string {
   return `${API_BASE}/research/phase5b/figures/${figureNo}/image`;
+}
+
+// --- Read-Only Workbench Snapshots & PMGSY Packages (Prompt B) --------
+
+export function listWorkbenchSnapshots(
+  signal?: AbortSignal,
+): Promise<WorkbenchSnapshotListResponse> {
+  return request<WorkbenchSnapshotListResponse>("/workbench/snapshots", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getWorkbenchSnapshot(
+  snapshotId: string,
+  signal?: AbortSignal,
+): Promise<WorkbenchSnapshotDetail> {
+  return request<WorkbenchSnapshotDetail>(
+    `/workbench/snapshots/${encodeURIComponent(snapshotId)}`,
+    {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function listWorkbenchPmgsyPackages(
+  signal?: AbortSignal,
+): Promise<WorkbenchPackageListResponse> {
+  return request<WorkbenchPackageListResponse>("/workbench/pmgsy/packages", {
+    signal,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+  });
+}
+
+export function getWorkbenchPmgsyPackage(
+  caseId: string,
+  signal?: AbortSignal,
+): Promise<WorkbenchPackageDetail> {
+  return request<WorkbenchPackageDetail>(
+    `/workbench/pmgsy/packages/${encodeURIComponent(caseId)}`,
+    {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
 }

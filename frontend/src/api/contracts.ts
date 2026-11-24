@@ -823,3 +823,96 @@ export interface TraceabilityResponse {
   research_questions: Array<ResearchQuestionEntry>;
   source_identity: Record<string, unknown>;
 };
+
+// --- Read-Only Workbench Snapshots & PMGSY Package Records (Prompt B) ---
+
+export interface WorkbenchSnapshotDetail {
+  snapshot_id: string;
+  label: string;
+  dataset_version: string;
+  record_scope: string;
+  registration_status: string;
+  case_linked_count: number;
+  disposition_counts: Record<string, number>;
+  verification_status_counts: Record<string, number>;
+  baseline_event_count: number;
+  notes: string;
+  manifest_reference: string;
+  manifest_sha256: string | null;
+  read_only_seam: boolean;
+  is_admitted_source_registry: boolean;
+  complete_4361_population: boolean;
+}
+
+export interface WorkbenchSnapshotListResponse {
+  snapshots: WorkbenchSnapshotDetail[];
+  count: number;
+}
+
+export interface WorkbenchPackageSummary {
+  case_id: string;
+  package_uid: string;
+  mrl_id: string;
+  state: string;
+  ims_year: string;
+  queues: string[];
+  observation_summary: string;
+  disposition: string;
+  verification_status: string;
+}
+
+export interface WorkbenchPackageListResponse {
+  packages: WorkbenchPackageSummary[];
+  count: number;
+}
+
+export interface WorkbenchPackageDetail {
+  case_id: string;
+  identity: {
+    case_id: string;
+    package_uid: string;
+    mrl_id: string;
+    state: string;
+    ims_year: string;
+  };
+  scope: {
+    snapshot_id: string;
+    record_scope: string;
+    source_registration_status: string;
+    complete_4361_population: boolean;
+  };
+  measurements: {
+    proposed_l_km: number | null;
+    sum_geom_len_km: number | null;
+    length_diff_km: number | null;
+    length_rel_diff: number | string | null;
+    length_rel_diff_status: string;
+  };
+  screening: {
+    queues: string[];
+    screening_reasons: string[];
+  };
+  topology: {
+    exact_geometry_duplicate: boolean | string;
+    linear_overlap: boolean | string;
+    invalid_geometry: boolean | string;
+    segment_count: number | null;
+    details: Record<string, unknown>;
+  };
+  review: {
+    disposition: string;
+    review_status: string;
+  };
+  verification: {
+    verification_status: string;
+    independent_of_canonical_gis: boolean | string;
+    blocker_reason: string;
+  };
+  provenance: {
+    baseline_event_count_for_case: number;
+    frozen_baseline_head: string;
+    manifest_reference: string;
+    verified_manifest_hash: string | null;
+    evidence_record_present: boolean;
+  };
+}

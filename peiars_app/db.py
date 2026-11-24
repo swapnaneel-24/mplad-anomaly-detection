@@ -1,10 +1,13 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import hashlib
 import json
 import sqlite3
 from pathlib import Path
-import pandas as pd
+try:
+    import pandas as pd  # type: ignore[import-not-found]
+except ModuleNotFoundError:  # pragma: no cover
+    pd = None  # type: ignore[assignment]
 
 
 def sha256_file(path: Path) -> str:
@@ -44,11 +47,11 @@ def compute_signed_length_metrics(meas: dict) -> dict:
     prop_raw = meas.get("proposed_l_km")
     geom_raw = meas.get("sum_geom_len_km")
     try:
-        prop = float(prop_raw) if prop_raw is not None and pd.notna(prop_raw) else None
+        prop = float(prop_raw) if prop_raw is not None and (pd.notna(prop_raw) if pd is not None else not (isinstance(prop_raw, float) and prop_raw != prop_raw)) else None
     except (TypeError, ValueError):
         prop = None
     try:
-        geom = float(geom_raw) if geom_raw is not None and pd.notna(geom_raw) else None
+        geom = float(geom_raw) if geom_raw is not None and (pd.notna(geom_raw) if pd is not None else not (isinstance(geom_raw, float) and geom_raw != geom_raw)) else None
     except (TypeError, ValueError):
         geom = None
 

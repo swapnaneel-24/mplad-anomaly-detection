@@ -1,8 +1,14 @@
-﻿// Data Observatory — Dataset Examination Workspace (Prompt A structural redesign).
+// Data Observatory ? Dataset Examination Workspace (Prompt B).
 // Wide primary workspace by default; contextual right inspector only when a row is selected.
 
 import { useEffect, useMemo, useState } from "react";
-import { listSources } from "@/api/endpoints";
+import {
+  getWorkbenchPmgsyPackage,
+  getWorkbenchSnapshot,
+  listSources,
+  listWorkbenchPmgsyPackages,
+  listWorkbenchSnapshots,
+} from "@/api/endpoints";
 import { ApiError } from "@/api/client";
 import type {
   AnalysisStatus,
@@ -10,6 +16,9 @@ import type {
   IntegrityStatus,
   SourceListResponse,
   SourceSummary,
+  WorkbenchPackageDetail,
+  WorkbenchPackageSummary,
+  WorkbenchSnapshotDetail,
 } from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
@@ -17,46 +26,6 @@ import { EmptyState } from "@/components/EmptyState";
 import "@/pages/DataPage.css";
 
 type DataSubview = "sources" | "snapshots" | "package_records";
-
-interface SnapshotDescriptor {
-  snapshot_id: string;
-  label: string;
-  registration_status: string;
-  record_scope: string;
-  notes: string;
-}
-
-interface PackageRecordDescriptor {
-  record_id: string;
-  package_uid: string;
-  mrl_id: string;
-  state: string;
-  ims_year: string;
-  record_scope: string;
-  link_status: string;
-}
-
-const LOCAL_SNAPSHOTS: SnapshotDescriptor[] = [
-  {
-    snapshot_id: "pmgsy3_3state_v1_curated_42",
-    label: "Local research snapshot (PMGSY-III curated 42-case import)",
-    registration_status: "Not established in global /api/v1/sources registry",
-    record_scope: "42 selected case-linked packages (not all 4,361 P packages)",
-    notes: "Local research snapshot only; separate from the server-side source registry.",
-  },
-];
-
-const CURATED_CASE_LINKED_PACKAGES: PackageRecordDescriptor[] = [
-  {
-    record_id: "PEIARS_PMGSY_001",
-    package_uid: "pmgsy3_up_241861",
-    mrl_id: "241861",
-    state: "UTTAR_PRADESH",
-    ims_year: "2020",
-    record_scope: "42 selected case-linked packages (subset of 4,361 P packages)",
-    link_status: "Case-linked in local research baseline",
-  },
-];
 
 const DATASET_KINDS: DatasetKind[] = [
   "ulb_benchmark",
@@ -79,8 +48,18 @@ const ANALYSIS_STATUSES: AnalysisStatus[] = [
   "unavailable",
 ];
 
+function formatNum(val: number | string | null | undefined, digits = 4): string {
+  if (val === null || val === undefined || val === "") return "UNAVAILABLE";
+  if (typeof val === "string") return val;
+  if (Number.isNaN(val)) return "UNAVAILABLE";
+  return val.toFixed(digits);
+}
+
 export function DataPage(): JSX.Element {
   const [sourceResp, setSourceResp] = useState<SourceListResponse | null>(null);
+  const [snapshots, setSnapshots] = useState<WorkbenchSnapshotDetail[]>([]);
+  const [packages, setPackages] = useState<WorkbenchPackageSummary[]>([]);
+
   const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -95,14 +74,33 @@ export function DataPage(): JSX.Element {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [inspectorOpen, setInspectorOpen] = useState(false);
 
+  const [snapshotDetail, setSnapshotDetail] = useState<WorkbenchSnapshotDetail | null>(null);
+  const [snapshotDetailLoading, setSnapshotDetailLoading] = useState(false);
+
+  const [packageDetail, setPackageDetail] = useState<WorkbenchPackageDetail | null>(null);
+  const [packageDetailLoading, setPackageDetailLoading] = useState(false);
+  const [packageDetailError, setPackageDetailError] = useState<string | null>(null);
+
+  const [measurementsOpen, setMeasurementsOpen] = useState(true);
+  const [provenanceOpen, setProvenanceOpen] = useState(false);
+  const [rawJsonOpen, setRawJsonOpen] = useState(false);
+
   useEffect(() => {
     const controller = new AbortController();
     (async () => {
       setLoading(true);
       setError(null);
       try {
-        const result = await listSources({ signal: controller.signal });
-        setSourceResp(result);
+        if (subview === "sources") {
+          const result = await listSources({ signal: controller.signal });
+          setSourceResp(result);
+        } else if (subview === "snapshots") {
+          const result = await listWorkbenchSnapshots(controller.signal);
+          setSnapshots(result.snapshots);
+        } else {
+          const result = await listWorkbenchPmgsyPackages(controller.signal);
+          setPackages(result.packages);
+        }
       } catch (err) {
         if (err instanceof ApiError && err.aborted) return;
         setError(err instanceof ApiError ? err : null);
@@ -111,7 +109,7 @@ export function DataPage(): JSX.Element {
       }
     })();
     return () => controller.abort();
-  }, []);
+  }, [subview]);
 
   const sources: SourceSummary[] = useMemo(
     () => sourceResp?.sources ?? [],
@@ -136,34 +134,90 @@ export function DataPage(): JSX.Element {
 
   const filteredSnapshots = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return LOCAL_SNAPSHOTS.filter((sn) => {
+    return snapshots.filter((sn) => {
       if (!q) return true;
       return (
         sn.snapshot_id.toLowerCase().includes(q) ||
         sn.label.toLowerCase().includes(q) ||
-        sn.record_scope.toLowerCase().includes(q)
+        sn.record_scope.toLowerCase().includes(q) ||
+        sn.dataset_version.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [snapshots, searchQuery]);
 
   const filteredPackages = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return CURATED_CASE_LINKED_PACKAGES.filter((pkg) => {
+    return packages.filter((pkg) => {
       if (!q) return true;
       return (
-        pkg.record_id.toLowerCase().includes(q) ||
+        pkg.case_id.toLowerCase().includes(q) ||
         pkg.package_uid.toLowerCase().includes(q) ||
         pkg.mrl_id.toLowerCase().includes(q) ||
         pkg.state.toLowerCase().includes(q) ||
-        pkg.ims_year.toLowerCase().includes(q)
+        pkg.ims_year.toLowerCase().includes(q) ||
+        pkg.disposition.toLowerCase().includes(q) ||
+        pkg.verification_status.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [packages, searchQuery]);
+
+  useEffect(() => {
+    if (!inspectorOpen || !selectedId) {
+      setSnapshotDetail(null);
+      setPackageDetail(null);
+      setPackageDetailError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    if (subview === "snapshots") {
+      setSnapshotDetailLoading(true);
+      const cached = snapshots.find((s) => s.snapshot_id === selectedId) ?? null;
+      setSnapshotDetail(cached);
+      getWorkbenchSnapshot(selectedId, controller.signal)
+        .then((detail) => {
+          if (!controller.signal.aborted) setSnapshotDetail(detail);
+        })
+        .catch((err) => {
+          if (err instanceof ApiError && err.aborted) return;
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setSnapshotDetailLoading(false);
+        });
+    } else if (subview === "package_records") {
+      setPackageDetailLoading(true);
+      setPackageDetailError(null);
+      setPackageDetail(null);
+      setProvenanceOpen(false);
+      setRawJsonOpen(false);
+      getWorkbenchPmgsyPackage(selectedId, controller.signal)
+        .then((detail) => {
+          if (!controller.signal.aborted) {
+            setPackageDetail(detail);
+          }
+        })
+        .catch((err) => {
+          if (err instanceof ApiError && err.aborted) return;
+          if (!controller.signal.aborted) {
+            setPackageDetailError(
+              err instanceof ApiError ? err.message : "Failed to load package detail.",
+            );
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setPackageDetailLoading(false);
+        });
+    }
+    return () => controller.abort();
+  }, [inspectorOpen, selectedId, subview, snapshots]);
 
   const handleSubviewChange = (next: DataSubview) => {
     setSubview(next);
     setSelectedId(null);
     setInspectorOpen(false);
+    setSnapshotDetail(null);
+    setPackageDetail(null);
+    setPackageDetailError(null);
     setKindFilter("all");
     setIntegrityFilter("all");
     setAnalysisFilter("all");
@@ -186,20 +240,26 @@ export function DataPage(): JSX.Element {
   };
 
   const selectedSource =
-    subview === "sources"
-      ? filteredSources.find((s) => s.source_id === selectedId) ?? null
+    subview === "sources" && selectedId
+      ? sources.find((s) => s.source_id === selectedId) ?? null
       : null;
-  const selectedSnapshot =
-    subview === "snapshots"
-      ? filteredSnapshots.find((sn) => sn.snapshot_id === selectedId) ?? null
+
+  const selectedSnapshotSummary =
+    subview === "snapshots" && selectedId
+      ? snapshots.find((sn) => sn.snapshot_id === selectedId) ?? null
       : null;
-  const selectedPackage =
-    subview === "package_records"
-      ? filteredPackages.find((pkg) => pkg.record_id === selectedId) ?? null
+
+  const selectedPackageSummary =
+    subview === "package_records" && selectedId
+      ? packages.find((pkg) => pkg.case_id === selectedId) ?? null
       : null;
 
   const hasSelection = Boolean(
-    inspectorOpen && (selectedSource || selectedSnapshot || selectedPackage),
+    inspectorOpen &&
+      selectedId &&
+      ((subview === "sources" && selectedSource) ||
+        (subview === "snapshots" && (snapshotDetail || selectedSnapshotSummary)) ||
+        (subview === "package_records" && selectedPackageSummary)),
   );
 
   const visibleCount =
@@ -213,8 +273,8 @@ export function DataPage(): JSX.Element {
     subview === "sources"
       ? sources.length
       : subview === "snapshots"
-        ? LOCAL_SNAPSHOTS.length
-        : CURATED_CASE_LINKED_PACKAGES.length;
+        ? snapshots.length
+        : packages.length;
 
   return (
     <div className="data-page workspace-composition">
@@ -269,18 +329,17 @@ export function DataPage(): JSX.Element {
               onClick={() => setAboutRegistryOpen(false)}
               aria-label="Close registry notes"
             >
-              ×
+              ?
             </button>
           </div>
           <div className="panel__body data-page__help-body">
             <p>
               Registered sources come from <code>/api/v1/sources</code> using opaque slugs and do
-              not scan the filesystem or turn a synthetic demonstration source into PMGSY.
+              not scan the filesystem or turn a local snapshot into an admitted source.
             </p>
             <p>
-              Local research snapshots and curated case-linked package sets (such as the 42-case
-              research baseline) are distinct entities from the global source registry and do not
-              represent all 4,361 P packages.
+              The 42 case-linked PMGSY package records are a selected subset of the 4,361 scored P
+              packages and are distinct from 03 Analysis, 04 Investigations, and 06 Research.
             </p>
           </div>
         </div>
@@ -296,8 +355,8 @@ export function DataPage(): JSX.Element {
             subview === "sources"
               ? "Search source ID, dataset kind, integrity, or analysis..."
               : subview === "snapshots"
-                ? "Search snapshot ID or scope..."
-                : "Search case ID, package UID, MRL ID, state, or year..."
+                ? "Search snapshot ID, dataset version, or scope..."
+                : "Search case ID, package UID, MRL ID, state, year, or status..."
           }
           aria-label="Search records"
         />
@@ -388,17 +447,17 @@ export function DataPage(): JSX.Element {
                 ? "Registered sources (/api/v1/sources)"
                 : subview === "snapshots"
                   ? "Local research snapshots"
-                  : "Curated case-linked package records"}
+                  : "Case-linked PMGSY package records (42-case subset)"}
             </span>
             <span className="panel__title mono">{visibleCount} shown</span>
           </div>
 
           <div className="panel__body panel__body--flush">
-            {subview === "sources" && loading && !sourceResp ? (
+            {loading ? (
               <div className="data-page__state-pad">
-                <Loading label="Loading sources…" />
+                <Loading label="Loading workbench records?" />
               </div>
-            ) : subview === "sources" && error ? (
+            ) : error ? (
               <div className="data-page__state-pad">
                 <ErrorPanel error={error} onRetry={() => window.location.reload()} />
               </div>
@@ -447,15 +506,15 @@ export function DataPage(): JSX.Element {
                 <thead>
                   <tr>
                     <th scope="col">Snapshot ID</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Label</th>
                     <th scope="col">Record scope</th>
-                    <th scope="col">Registry linkage</th>
+                    <th scope="col">Registry status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSnapshots.length > 0 ? (
                     filteredSnapshots.map((sn) => {
-                      const active = hasSelection && selectedSnapshot?.snapshot_id === sn.snapshot_id;
+                      const active = hasSelection && selectedId === sn.snapshot_id;
                       return (
                         <tr
                           key={sn.snapshot_id}
@@ -465,7 +524,11 @@ export function DataPage(): JSX.Element {
                           <td className="mono">{sn.snapshot_id}</td>
                           <td>{sn.label}</td>
                           <td>{sn.record_scope}</td>
-                          <td>{sn.registration_status}</td>
+                          <td>
+                            <span className="badge badge--integrity mono">
+                              {sn.registration_status}
+                            </span>
+                          </td>
                         </tr>
                       );
                     })
@@ -482,34 +545,46 @@ export function DataPage(): JSX.Element {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th scope="col">Case Ref</th>
+                    <th scope="col">Case ID</th>
                     <th scope="col">Package UID</th>
                     <th scope="col">MRL ID</th>
                     <th scope="col">State</th>
                     <th scope="col">IMS Year</th>
+                    <th scope="col">Disposition</th>
+                    <th scope="col">Verification</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPackages.length > 0 ? (
                     filteredPackages.map((pkg) => {
-                      const active = hasSelection && selectedPackage?.record_id === pkg.record_id;
+                      const active = hasSelection && selectedId === pkg.case_id;
                       return (
                         <tr
-                          key={pkg.record_id}
+                          key={pkg.case_id}
                           className={active ? "is-selected" : undefined}
-                          onClick={() => handleSelectRow(pkg.record_id)}
+                          onClick={() => handleSelectRow(pkg.case_id)}
                         >
-                          <td className="mono">{pkg.record_id}</td>
+                          <td className="mono">{pkg.case_id}</td>
                           <td className="mono">{pkg.package_uid}</td>
                           <td className="mono">{pkg.mrl_id}</td>
                           <td className="mono">{pkg.state}</td>
                           <td className="mono">{pkg.ims_year}</td>
+                          <td>
+                            <span className="badge badge--disposition mono">
+                              {pkg.disposition}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="badge badge--verification mono">
+                              {pkg.verification_status}
+                            </span>
+                          </td>
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan={5}>
+                      <td colSpan={7}>
                         <EmptyState>No case-linked package records match the current search.</EmptyState>
                       </td>
                     </tr>
@@ -522,7 +597,7 @@ export function DataPage(): JSX.Element {
 
         {hasSelection && (
           <aside className="data-page__inspector panel" aria-label="Selected item inspector">
-            <div className="panel__header">
+            <div className="panel__header inspector__header">
               <span className="panel__title">Inspector</span>
               <button
                 type="button"
@@ -530,49 +605,311 @@ export function DataPage(): JSX.Element {
                 onClick={handleCloseInspector}
                 aria-label="Close inspector"
               >
-                ×
+                ?
               </button>
             </div>
-            <div className="panel__body data-page__inspector-body">
-              {selectedSource && (
-                <dl className="data-page__dl">
-                  <dt>Source ID</dt>
-                  <dd className="mono">{selectedSource.source_id}</dd>
-                  <dt>Dataset kind</dt>
-                  <dd className="mono">{selectedSource.dataset_kind}</dd>
-                  <dt>Integrity</dt>
-                  <dd className="mono">{selectedSource.integrity_status}</dd>
-                  <dt>Analysis</dt>
-                  <dd className="mono">{selectedSource.analysis_status}</dd>
-                </dl>
+
+            <div className="panel__body data-page__inspector-body inspector__body">
+              {subview === "sources" && selectedSource && (
+                <section className="inspector__section" aria-label="Source metadata">
+                  <div className="inspector__identity">
+                    <div className="inspector__title mono">{selectedSource.source_id}</div>
+                    <div className="inspector__subtitle">
+                      Admitted source registry record (/api/v1/sources)
+                    </div>
+                  </div>
+                  <dl className="data-page__dl">
+                    <dt>Source ID</dt>
+                    <dd className="mono">{selectedSource.source_id}</dd>
+                    <dt>Dataset kind</dt>
+                    <dd className="mono">{selectedSource.dataset_kind}</dd>
+                    <dt>Integrity</dt>
+                    <dd>
+                      <span className="badge badge--integrity mono">
+                        {selectedSource.integrity_status}
+                      </span>
+                    </dd>
+                    <dt>Analysis</dt>
+                    <dd className="mono">{selectedSource.analysis_status}</dd>
+                    <dt>Additional provenance</dt>
+                    <dd>Unavailable from SourceSummary registry contract.</dd>
+                  </dl>
+                </section>
               )}
-              {selectedSnapshot && (
-                <dl className="data-page__dl">
-                  <dt>Snapshot ID</dt>
-                  <dd className="mono">{selectedSnapshot.snapshot_id}</dd>
-                  <dt>Scope</dt>
-                  <dd>{selectedSnapshot.record_scope}</dd>
-                  <dt>Registry status</dt>
-                  <dd>{selectedSnapshot.registration_status}</dd>
-                  <dt>Notes</dt>
-                  <dd>{selectedSnapshot.notes}</dd>
-                </dl>
+
+              {subview === "snapshots" && (snapshotDetail || selectedSnapshotSummary) && (
+                <section className="inspector__section" aria-label="Snapshot metadata">
+                  {(() => {
+                    const snap = snapshotDetail ?? selectedSnapshotSummary!;
+                    return (
+                      <>
+                        <div className="inspector__identity">
+                          <div className="inspector__title mono">{snap.snapshot_id}</div>
+                          <div className="inspector__subtitle">{snap.label}</div>
+                        </div>
+
+                        <div className="inspector__status-pair">
+                          <div className="inspector__status-cell">
+                            <span className="inspector__meta-label">Registry linkage</span>
+                            <span className="badge badge--integrity mono">
+                              {snap.registration_status}
+                            </span>
+                          </div>
+                          <div className="inspector__status-cell">
+                            <span className="inspector__meta-label">Dataset version</span>
+                            <span className="badge badge--screening mono">
+                              {snap.dataset_version}
+                            </span>
+                          </div>
+                        </div>
+
+                        <dl className="data-page__dl">
+                          <dt>Record scope</dt>
+                          <dd>{snap.record_scope}</dd>
+                          <dt>Population note</dt>
+                          <dd>
+                            Contains {snap.case_linked_count} case-linked records; not all 4,361
+                            scored P packages and not an admitted /api/v1/sources registry source.
+                          </dd>
+                          <dt>Case-linked count</dt>
+                          <dd className="mono">{snap.case_linked_count}</dd>
+                          <dt>Baseline events</dt>
+                          <dd className="mono">{snap.baseline_event_count}</dd>
+                          <dt>Disposition counts</dt>
+                          <dd className="mono">
+                            {Object.entries(snap.disposition_counts ?? {})
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(" ? ") || "Unavailable"}
+                          </dd>
+                          <dt>Verification counts</dt>
+                          <dd className="mono">
+                            {Object.entries(snap.verification_status_counts ?? {})
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(" ? ") || "Unavailable"}
+                          </dd>
+                          <dt>Manifest reference</dt>
+                          <dd className="mono">{snap.manifest_reference || "Unavailable"}</dd>
+                          <dt>Manifest hash</dt>
+                          <dd className="mono">{snap.manifest_sha256 || "Unavailable"}</dd>
+                          <dt>Notes</dt>
+                          <dd>{snap.notes}</dd>
+                        </dl>
+                        {snapshotDetailLoading && (
+                          <div className="inspector__muted mono">Refreshing snapshot details?</div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </section>
               )}
-              {selectedPackage && (
-                <dl className="data-page__dl">
-                  <dt>Case Ref</dt>
-                  <dd className="mono">{selectedPackage.record_id}</dd>
-                  <dt>Package UID</dt>
-                  <dd className="mono">{selectedPackage.package_uid}</dd>
-                  <dt>MRL ID</dt>
-                  <dd className="mono">{selectedPackage.mrl_id}</dd>
-                  <dt>State / Year</dt>
-                  <dd className="mono">
-                    {selectedPackage.state} · {selectedPackage.ims_year}
-                  </dd>
-                  <dt>Scope</dt>
-                  <dd>{selectedPackage.record_scope}</dd>
-                </dl>
+
+              {subview === "package_records" && selectedPackageSummary && (
+                <>
+                  {/* Level 1 ? Immediate context */}
+                  <section className="inspector__section inspector__identity" aria-label="Record identity">
+                    <div className="inspector__title mono">{selectedPackageSummary.case_id}</div>
+                    <dl className="data-page__dl">
+                      <dt>MRL ID</dt>
+                      <dd className="mono">
+                        {packageDetail?.identity.mrl_id || selectedPackageSummary.mrl_id || "UNAVAILABLE"}
+                      </dd>
+                      <dt>State</dt>
+                      <dd className="mono">
+                        {packageDetail?.identity.state || selectedPackageSummary.state || "UNAVAILABLE"}
+                      </dd>
+                      <dt>IMS Year</dt>
+                      <dd className="mono">
+                        {packageDetail?.identity.ims_year || selectedPackageSummary.ims_year || "UNAVAILABLE"}
+                      </dd>
+                    </dl>
+
+                    <div className="inspector__observation">
+                      <span className="inspector__meta-label">Observation</span>
+                      <p className="inspector__observation-text">
+                        {selectedPackageSummary.observation_summary}
+                      </p>
+                    </div>
+
+                    <div className="inspector__status-pair">
+                      <div className="inspector__status-cell">
+                        <span className="inspector__meta-label">Disposition</span>
+                        <span className="badge badge--disposition mono">
+                          {packageDetail?.review.disposition || selectedPackageSummary.disposition}
+                        </span>
+                      </div>
+                      <div className="inspector__status-cell">
+                        <span className="inspector__meta-label">Verification</span>
+                        <span className="badge badge--verification mono">
+                          {packageDetail?.verification.verification_status ||
+                            selectedPackageSummary.verification_status}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="inspector__nav-link-row">
+                      <a
+                        className="inspector__nav-link"
+                        href={`#investigations?case=${encodeURIComponent(selectedPackageSummary.case_id)}`}
+                        data-case-id={selectedPackageSummary.case_id}
+                      >
+                        Open related investigation ?
+                      </a>
+                    </div>
+                  </section>
+
+                  {packageDetailLoading && (
+                    <div className="inspector__muted mono">Loading record detail &amp; provenance?</div>
+                  )}
+                  {packageDetailError && (
+                    <div className="inspector__error">{packageDetailError}</div>
+                  )}
+
+                  {/* Level 2 ? Evidence & Measurements */}
+                  {packageDetail && (
+                    <section className="inspector__section" aria-label="Evidence and measurements">
+                      <button
+                        type="button"
+                        className="inspector__disclosure-btn"
+                        aria-expanded={measurementsOpen}
+                        onClick={() => setMeasurementsOpen((prev) => !prev)}
+                      >
+                        <span>Evidence &amp; Measurements</span>
+                        <span className="mono">{measurementsOpen ? "?" : "+"}</span>
+                      </button>
+
+                      {measurementsOpen && (
+                        <dl className="data-page__dl inspector__group-body">
+                          <dt>Proposed length</dt>
+                          <dd className="mono">
+                            {formatNum(packageDetail.measurements.proposed_l_km)} km
+                          </dd>
+                          <dt>Mapped geometry length</dt>
+                          <dd className="mono">
+                            {formatNum(packageDetail.measurements.sum_geom_len_km)} km
+                          </dd>
+                          <dt>Signed diff (geom ? proposed)</dt>
+                          <dd className="mono">
+                            {formatNum(packageDetail.measurements.length_diff_km)} km
+                          </dd>
+                          <dt>Relative length diff</dt>
+                          <dd className="mono">
+                            {packageDetail.measurements.length_rel_diff_status ===
+                            "UNDEFINED_ZERO_DENOMINATOR"
+                              ? "UNDEFINED_ZERO_DENOMINATOR"
+                              : formatNum(packageDetail.measurements.length_rel_diff)}
+                          </dd>
+                          <dt>Segment count</dt>
+                          <dd className="mono">
+                            {packageDetail.topology.segment_count !== null &&
+                            packageDetail.topology.segment_count !== undefined
+                              ? String(packageDetail.topology.segment_count)
+                              : "UNAVAILABLE"}
+                          </dd>
+                          <dt>Exact geometry duplicate</dt>
+                          <dd className="mono">
+                            {String(packageDetail.topology.exact_geometry_duplicate)}
+                          </dd>
+                          <dt>Linear overlap</dt>
+                          <dd className="mono">
+                            {String(packageDetail.topology.linear_overlap)}
+                          </dd>
+                          <dt>Invalid geometry</dt>
+                          <dd className="mono">
+                            {String(packageDetail.topology.invalid_geometry)}
+                          </dd>
+                          <dt>Queues</dt>
+                          <dd className="mono">
+                            {packageDetail.screening.queues.length > 0
+                              ? packageDetail.screening.queues.join(", ")
+                              : "None listed"}
+                          </dd>
+                          <dt>Screening reasons</dt>
+                          <dd>
+                            {packageDetail.screening.screening_reasons.length > 0
+                              ? packageDetail.screening.screening_reasons.join("; ")
+                              : "None recorded"}
+                          </dd>
+                          <dt>Review status</dt>
+                          <dd className="mono">{packageDetail.review.review_status}</dd>
+                          <dt>Independent of canonical GIS</dt>
+                          <dd className="mono">
+                            {String(packageDetail.verification.independent_of_canonical_gis)}
+                          </dd>
+                          <dt>Verification blocker</dt>
+                          <dd>
+                            {packageDetail.verification.blocker_reason || "None recorded"}
+                          </dd>
+                        </dl>
+                      )}
+                    </section>
+                  )}
+
+                  {/* Level 3 ? Technical Provenance (collapsed by default) */}
+                  {packageDetail && (
+                    <section className="inspector__section" aria-label="Technical provenance">
+                      <button
+                        type="button"
+                        className="inspector__disclosure-btn"
+                        aria-expanded={provenanceOpen}
+                        onClick={() => setProvenanceOpen((prev) => !prev)}
+                      >
+                        <span>Technical Provenance</span>
+                        <span className="mono">{provenanceOpen ? "?" : "+"}</span>
+                      </button>
+
+                      {provenanceOpen && (
+                        <div className="inspector__group-body">
+                          <dl className="data-page__dl">
+                            <dt>Package UID</dt>
+                            <dd className="mono">{packageDetail.identity.package_uid}</dd>
+                            <dt>Case ID</dt>
+                            <dd className="mono">{packageDetail.identity.case_id}</dd>
+                            <dt>Snapshot ID</dt>
+                            <dd className="mono">{packageDetail.scope.snapshot_id}</dd>
+                            <dt>Record scope</dt>
+                            <dd>{packageDetail.scope.record_scope}</dd>
+                            <dt>Registry status</dt>
+                            <dd className="mono">
+                              {packageDetail.scope.source_registration_status}
+                            </dd>
+                            <dt>Baseline events (case)</dt>
+                            <dd className="mono">
+                              {packageDetail.provenance.baseline_event_count_for_case}
+                            </dd>
+                            <dt>Frozen baseline head</dt>
+                            <dd className="mono">
+                              {packageDetail.provenance.frozen_baseline_head}
+                            </dd>
+                            <dt>Manifest reference</dt>
+                            <dd className="mono">
+                              {packageDetail.provenance.manifest_reference}
+                            </dd>
+                            <dt>Verified manifest hash</dt>
+                            <dd className="mono">
+                              {packageDetail.provenance.verified_manifest_hash || "UNAVAILABLE"}
+                            </dd>
+                          </dl>
+
+                          <div className="inspector__raw-disclosure">
+                            <button
+                              type="button"
+                              className="btn btn--secondary btn--compact"
+                              aria-expanded={rawJsonOpen}
+                              onClick={() => setRawJsonOpen((prev) => !prev)}
+                            >
+                              {rawJsonOpen ? "Hide structured detail JSON" : "Show structured detail JSON"}
+                            </button>
+                            {rawJsonOpen && (
+                              <pre className="inspector__json mono">
+                                {JSON.stringify(packageDetail, null, 2)}
+                              </pre>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </section>
+                  )}
+                </>
               )}
             </div>
           </aside>

@@ -1,4 +1,4 @@
-﻿"""PR-10 â€” Phase 5A uncertainty/agreement/review-policy evidence tests.
+"""PR-10 â€” Phase 5A uncertainty/agreement/review-policy evidence tests.
 
 Covers the mandatory fixture-only CI scenarios from the PR-10 brief
 (section 9.A), using deterministic synthetic fixtures stored only under

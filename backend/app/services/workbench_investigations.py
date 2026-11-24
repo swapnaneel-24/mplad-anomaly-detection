@@ -598,8 +598,20 @@ def get_workbench_investigation_detail(repo_root: Path, case_id: str) -> Investi
                 proposed_l_km=metrics["proposed_l_km"],
                 sum_geom_len_km=metrics["sum_geom_len_km"],
                 signed_diff_km=metrics["length_diff_km"],
-                relative_diff=metrics["length_rel_diff"],
-                relative_diff_status=metrics["length_rel_diff_status"],
+                relative_diff=(
+                    "UNDEFINED_ZERO_DENOMINATOR"
+                    if metrics.get("proposed_l_km") == 0
+                    else metrics.get("length_rel_diff")
+                ),
+                relative_diff_status=(
+                    "UNDEFINED_ZERO_DENOMINATOR"
+                    if metrics.get("proposed_l_km") == 0
+                    else (
+                        str(metrics["length_rel_diff"])
+                        if isinstance(metrics.get("length_rel_diff"), str)
+                        else ("COMPUTED" if isinstance(metrics.get("length_rel_diff"), (int, float)) else "UNAVAILABLE")
+                    )
+                ),
             ),
             topology=InvestigationTopology(
                 exact_geometry_duplicate=bool(topo_raw.get("exact_geometry_duplicate", False)),

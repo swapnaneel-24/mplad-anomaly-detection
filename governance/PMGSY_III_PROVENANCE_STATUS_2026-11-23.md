@@ -146,3 +146,6 @@ This addendum records the project owner's reported status and an approved next-s
 - **Project decision:** PMGSY desk-review research cycle closed with documented evidence limitation; IF remains `CLOSED_RESEARCH_NOT_ADMITTED`. External source verification may be reopened later if independent evidence is obtained. **Engineering track now active:** `PEIARS-CORE-CASE-MANAGEMENT-V1`, see `governance/PEIARS_CORE_CASE_MANAGEMENT_V1.md`. Implement local-first case management, independent provenance replay and verifiable case exports using frozen data; no new unsupervised model experiment.
 
 **Retention policy:** keep full source/register/case/evidence/JSONL raw exports ignored as appropriate, but retain manifest and reproducible scripts in repository. Do not modify frozen desk baseline or reassign prior dispositions in place.
+
+## Prompt D Provenance Addendum (2026-11-24)
+- Verified frozen 162-event baseline immutability and isolated append-only app event stream across end-to-end and negative integrity tests.

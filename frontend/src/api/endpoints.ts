@@ -54,6 +54,9 @@ import type {
   InvestigationHistoryResponse,
   AppendInvestigationNoteRequest,
   AppendInvestigationNoteResponse,
+  ExportCaseDossierResponse,
+  VerifyCaseDossierRequest,
+  VerifyCaseDossierResponse,
 } from "@/api/contracts";
 import { CSRF_HEADER } from "@/api/contracts";
 import {
@@ -525,7 +528,36 @@ export function appendWorkbenchInvestigationNote(
     `/workbench/investigations/${encodeURIComponent(caseId)}/notes`,
     {
       method: "POST",
-      body: body,
+      json: body,
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function exportWorkbenchInvestigationDossier(
+  caseId: string,
+  signal?: AbortSignal,
+): Promise<ExportCaseDossierResponse> {
+  return request<ExportCaseDossierResponse>(
+    `/workbench/investigations/${encodeURIComponent(caseId)}/dossier`,
+    {
+      signal,
+      timeoutMs: DEFAULT_TIMEOUT_MS,
+    },
+  );
+}
+
+export function verifyWorkbenchInvestigationDossier(
+  caseId: string,
+  body: VerifyCaseDossierRequest,
+  signal?: AbortSignal,
+): Promise<VerifyCaseDossierResponse> {
+  return request<VerifyCaseDossierResponse>(
+    `/workbench/investigations/${encodeURIComponent(caseId)}/dossier/verify`,
+    {
+      method: "POST",
+      json: body,
       signal,
       timeoutMs: DEFAULT_TIMEOUT_MS,
     },

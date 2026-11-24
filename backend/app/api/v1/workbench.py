@@ -235,3 +235,88 @@ async def post_investigation_note(
             code=ErrorCode.SERVICE_NOT_READY,
             details={"integrity_code": exc.code, "reason": str(exc), **exc.details},
         ) from exc
+
+from app.services.workbench_dossier import (
+    ExportCaseDossierResponse,
+    VerifyCaseDossierRequest,
+    VerifyCaseDossierResponse,
+    build_and_export_case_dossier,
+    verify_case_dossier,
+)
+
+
+@router.get(
+    "/investigations/{case_id}/dossier",
+    response_model=ExportCaseDossierResponse,
+    responses={
+        404: {"model": ErrorEnvelope, "description": "Investigation case not found."},
+        503: {"model": ErrorEnvelope, "description": "Provenance or event chain integrity failure."},
+    },
+    summary="Export structured case dossier with provenance and manifest hashes",
+)
+async def get_investigation_dossier(case_id: str, request: Request) -> ExportCaseDossierResponse:
+    repo_root = _resolve_repo_root(request)
+    try:
+        return build_and_export_case_dossier(repo_root, case_id, write_sidecar_files=False)
+    except WorkbenchLookupError as exc:
+        raise ApiError(
+            status_code=404,
+            code=ErrorCode.NOT_FOUND,
+            details={"case_id": case_id},
+        ) from exc
+    except InvestigationIntegrityError as exc:
+        raise ApiError(
+            status_code=503,
+            code=ErrorCode.SERVICE_NOT_READY,
+            details={"integrity_code": exc.code, "reason": str(exc), **exc.details},
+        ) from exc
+
+
+@router.post(
+    "/investigations/{case_id}/dossier/export",
+    response_model=ExportCaseDossierResponse,
+    responses={
+        404: {"model": ErrorEnvelope, "description": "Investigation case not found."},
+        503: {"model": ErrorEnvelope, "description": "Provenance or event chain integrity failure."},
+    },
+    summary="Generate case dossier payload and manifest",
+)
+async def post_investigation_dossier_export(case_id: str, request: Request) -> ExportCaseDossierResponse:
+    repo_root = _resolve_repo_root(request)
+    try:
+        return build_and_export_case_dossier(repo_root, case_id, write_sidecar_files=False)
+    except WorkbenchLookupError as exc:
+        raise ApiError(
+            status_code=404,
+            code=ErrorCode.NOT_FOUND,
+            details={"case_id": case_id},
+        ) from exc
+    except InvestigationIntegrityError as exc:
+        raise ApiError(
+            status_code=503,
+            code=ErrorCode.SERVICE_NOT_READY,
+            details={"integrity_code": exc.code, "reason": str(exc), **exc.details},
+        ) from exc
+
+
+@router.post(
+    "/investigations/{case_id}/dossier/verify",
+    response_model=VerifyCaseDossierResponse,
+    responses={
+        404: {"model": ErrorEnvelope, "description": "Investigation case not found."},
+    },
+    summary="Verify a case dossier against current case, stream, and manifest state",
+)
+async def post_investigation_dossier_verify(
+    case_id: str,
+    payload: VerifyCaseDossierRequest,
+    request: Request,
+) -> VerifyCaseDossierResponse:
+    repo_root = _resolve_repo_root(request)
+    if payload.dossier.identity.get("case_id") and payload.dossier.identity.get("case_id") != case_id:
+        raise ApiError(
+            status_code=404,
+            code=ErrorCode.NOT_FOUND,
+            details={"case_id": case_id},
+        )
+    return verify_case_dossier(repo_root, payload)

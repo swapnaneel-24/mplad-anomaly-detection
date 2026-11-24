@@ -6,12 +6,16 @@ import {
   getWorkbenchInvestigation,
   getWorkbenchInvestigationHistory,
   listWorkbenchInvestigations,
+  exportWorkbenchInvestigationDossier,
+  verifyWorkbenchInvestigationDossier,
 } from "@/api/endpoints";
 import type {
   InvestigationDetail,
   InvestigationHistoryEvent,
   InvestigationHistoryResponse,
   InvestigationSummary,
+  ExportCaseDossierResponse,
+  VerifyCaseDossierResponse,
 } from "@/api/contracts";
 import { Loading } from "@/components/Loading";
 import { ErrorPanel } from "@/components/ErrorPanel";
@@ -68,6 +72,10 @@ export function PmgsyInvestigationsWorkbench(): JSX.Element {
   const [writeNotice, setWriteNotice] = useState<string | null>(null);
   const [showFullHashes, setShowFullHashes] = useState<boolean>(false);
   const [showRawSummary, setShowRawSummary] = useState<boolean>(false);
+  const [exportedDossier, setExportedDossier] = useState<ExportCaseDossierResponse | null>(null);
+  const [dossierVerification, setDossierVerification] = useState<VerifyCaseDossierResponse | null>(null);
+  const [dossierBusy, setDossierBusy] = useState<boolean>(false);
+  const [dossierStatusMessage, setDossierStatusMessage] = useState<string | null>(null);
 
   const loadList = useCallback(async (signal?: AbortSignal) => {
     setLoadingList(true);
@@ -233,6 +241,62 @@ export function PmgsyInvestigationsWorkbench(): JSX.Element {
 
   const handleOpenInDataPage = (caseId: string): void => {
     navigate(`/data?case_id=${encodeURIComponent(caseId)}`);
+  };
+
+  const handleExportDossier = async (caseId: string): Promise<void> => {
+    if (!caseId || writesBlockedByIntegrity) {
+      return;
+    }
+    setDossierBusy(true);
+    setDossierStatusMessage(null);
+    setDossierVerification(null);
+    try {
+      const exported = await exportWorkbenchInvestigationDossier(caseId);
+      setExportedDossier(exported);
+      const blob = new Blob([JSON.stringify(exported.dossier, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = exported.json_filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setDossierStatusMessage(`Exported ${exported.json_filename} and manifest ${exported.manifest_filename}.`);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setDossierStatusMessage(`${err.code} (${err.status}): ${err.message}`);
+      } else {
+        setDossierStatusMessage("Unable to export case dossier.");
+      }
+    } finally {
+      setDossierBusy(false);
+    }
+  };
+
+  const handleVerifyDossier = async (): Promise<void> => {
+    if (!exportedDossier) {
+      return;
+    }
+    setDossierBusy(true);
+    try {
+      const result = await verifyWorkbenchInvestigationDossier(exportedDossier.case_id, {
+        dossier: exportedDossier.dossier,
+        manifest: exportedDossier.manifest,
+        markdown_content: exportedDossier.markdown_content,
+      });
+      setDossierVerification(result);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setDossierStatusMessage(`${err.code} (${err.status}): ${err.message}`);
+      } else {
+        setDossierStatusMessage("Unable to verify exported dossier.");
+      }
+    } finally {
+      setDossierBusy(false);
+    }
   };
 
   const handleAppendNote = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -441,14 +505,46 @@ export function PmgsyInvestigationsWorkbench(): JSX.Element {
                     Package UID: {detail.identity.package_uid} ? State: {detail.identity.state} ? IMS Year: {detail.identity.ims_year}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="pmgsy-btn"
-                  onClick={() => handleOpenInDataPage(detail.identity.case_id)}
-                >
-                  Open source/package record ?
-                </button>
+                <div className="pmgsy-action-row">
+                  <button
+                    type="button"
+                    className="pmgsy-btn pmgsy-btn-secondary"
+                    disabled={dossierBusy || writesBlockedByIntegrity}
+                    onClick={() => void handleExportDossier(detail.identity.case_id)}
+                  >
+                    {dossierBusy ? "Working..." : "Export dossier"}
+                  </button>
+                  {exportedDossier && exportedDossier.case_id === detail.identity.case_id && (
+                    <button
+                      type="button"
+                      className="pmgsy-btn pmgsy-btn-secondary"
+                      disabled={dossierBusy}
+                      onClick={() => void handleVerifyDossier()}
+                    >
+                      Verify dossier
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="pmgsy-btn"
+                    onClick={() => handleOpenInDataPage(detail.identity.case_id)}
+                  >
+                    Open source/package record ?
+                  </button>
+                </div>
               </div>
+
+              {(dossierStatusMessage || dossierVerification) && (
+                <div className="pmgsy-subpanel">
+                  {dossierStatusMessage && <div className="pmgsy-inv-row-meta">{dossierStatusMessage}</div>}
+                  {dossierVerification && (
+                    <div className="pmgsy-inv-row-meta">
+                      Dossier verification: <strong>{dossierVerification.valid ? "PASS" : "FAIL"}</strong>
+                      {dossierVerification.errors.length > 0 && ` ? ${dossierVerification.errors.join("; ")}`}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="pmgsy-inv-columns">
                 <div className="pmgsy-subpanel">

@@ -57,3 +57,7 @@ Track application code, tests, schema/migrations, sanitized public docs, provena
 - Evidence source acquisition/connectors for PMGSY/OMMAS if authorized and accessible, with explicit independence and licensing checks.
 - Reviewer assignment, two-reviewer adjudication, access control and redaction.
 - More data streams only after case/event/evidence abstractions pass the local PMGSY demonstration.
+
+## Prompt D Engineering Addendum (2026-11-24)
+- Added case dossier export (JSON/Markdown/manifest) and independent dossier verification.
+- Gate decision: `PEIARS_CORE_V1_ENGINEERING_PASS`.

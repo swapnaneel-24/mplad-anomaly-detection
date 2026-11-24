@@ -1042,3 +1042,57 @@ export interface AppendInvestigationNoteResponse {
   event: InvestigationHistoryEvent;
   app_stream: InvestigationHistoryResponse["app_stream"];
 }
+
+export interface DossierManifestFileEntry {
+  filename: string;
+  sha256: string;
+}
+
+export interface DossierManifest {
+  schema_version: string;
+  case_id: string;
+  generated_at_utc: string;
+  files: DossierManifestFileEntry[];
+  frozen_baseline_head: string;
+  app_stream_head: string;
+  snapshot_id: string;
+}
+
+export interface CaseDossierPayload {
+  export_schema_version: string;
+  generated_at_utc: string;
+  identity: Record<string, unknown>;
+  snapshot: Record<string, unknown>;
+  screening: Record<string, unknown>;
+  measurements: Record<string, unknown>;
+  topology: Record<string, unknown>;
+  review: Record<string, unknown>;
+  verification: Record<string, unknown>;
+  event_history: Record<string, unknown>;
+  provenance: Record<string, unknown>;
+  limitations: string[];
+}
+
+export interface ExportCaseDossierResponse {
+  case_id: string;
+  json_filename: string;
+  markdown_filename: string;
+  manifest_filename: string;
+  dossier: CaseDossierPayload;
+  markdown_content: string;
+  manifest: DossierManifest;
+}
+
+export interface VerifyCaseDossierRequest {
+  dossier: CaseDossierPayload;
+  manifest?: DossierManifest | null;
+  json_content_sha256?: string | null;
+  markdown_content?: string | null;
+}
+
+export interface VerifyCaseDossierResponse {
+  case_id: string;
+  valid: boolean;
+  checks: Record<string, boolean>;
+  errors: string[];
+}

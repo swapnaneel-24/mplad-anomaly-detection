@@ -1,0 +1,242 @@
+{
+  "full_5feat__k20": {
+    "seg_bucket_rates": {
+      "1_seg": {
+        "count": 3553,
+        "sum": 150,
+        "rate_pct": 4.22
+      },
+      "2_seg": {
+        "count": 302,
+        "sum": 41,
+        "rate_pct": 13.58
+      },
+      "3_to_5_seg": {
+        "count": 302,
+        "sum": 12,
+        "rate_pct": 3.97
+      },
+      "6plus_seg": {
+        "count": 204,
+        "sum": 16,
+        "rate_pct": 7.84
+      }
+    },
+    "top_8_cohorts_among_selected": [
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 57
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 46
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 30
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B2",
+        "selected_count": 23
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B2",
+        "selected_count": 14
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B1",
+        "selected_count": 14
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 12
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 7
+      }
+    ],
+    "topology_flag_hits": {
+      "has_exact_geom_dup": {
+        "total_true": 1,
+        "in_lof_top5": 1
+      },
+      "has_linear_overlap": {
+        "total_true": 4,
+        "in_lof_top5": 1
+      },
+      "has_conflicting_proposed_l": {
+        "total_true": 0,
+        "in_lof_top5": 0
+      }
+    }
+  },
+  "full_5feat__k35": {
+    "seg_bucket_rates": {
+      "1_seg": {
+        "count": 3553,
+        "sum": 149,
+        "rate_pct": 4.19
+      },
+      "2_seg": {
+        "count": 302,
+        "sum": 42,
+        "rate_pct": 13.91
+      },
+      "3_to_5_seg": {
+        "count": 302,
+        "sum": 9,
+        "rate_pct": 2.98
+      },
+      "6plus_seg": {
+        "count": 204,
+        "sum": 19,
+        "rate_pct": 9.31
+      }
+    },
+    "top_8_cohorts_among_selected": [
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 58
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 40
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 26
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B2",
+        "selected_count": 26
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B1",
+        "selected_count": 16
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 14
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B2",
+        "selected_count": 13
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2022_B1",
+        "selected_count": 7
+      }
+    ],
+    "topology_flag_hits": {
+      "has_exact_geom_dup": {
+        "total_true": 1,
+        "in_lof_top5": 1
+      },
+      "has_linear_overlap": {
+        "total_true": 4,
+        "in_lof_top5": 1
+      },
+      "has_conflicting_proposed_l": {
+        "total_true": 0,
+        "in_lof_top5": 0
+      }
+    }
+  },
+  "ablation_no_seg_conc__k35": {
+    "seg_bucket_rates": {
+      "1_seg": {
+        "count": 3553,
+        "sum": 196,
+        "rate_pct": 5.52
+      },
+      "2_seg": {
+        "count": 302,
+        "sum": 11,
+        "rate_pct": 3.64
+      },
+      "3_to_5_seg": {
+        "count": 302,
+        "sum": 8,
+        "rate_pct": 2.65
+      },
+      "6plus_seg": {
+        "count": 204,
+        "sum": 4,
+        "rate_pct": 1.96
+      }
+    },
+    "top_8_cohorts_among_selected": [
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 56
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 44
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 27
+      },
+      {
+        "source_state_key": "UTTAR_PRADESH",
+        "cohort_year_batch": "2021_B2",
+        "selected_count": 23
+      },
+      {
+        "source_state_key": "MADHYA_PRADESH",
+        "cohort_year_batch": "2021_B1",
+        "selected_count": 17
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B1",
+        "selected_count": 14
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2022_B2",
+        "selected_count": 13
+      },
+      {
+        "source_state_key": "BIHAR",
+        "cohort_year_batch": "2020_B1",
+        "selected_count": 10
+      }
+    ],
+    "topology_flag_hits": {
+      "has_exact_geom_dup": {
+        "total_true": 1,
+        "in_lof_top5": 0
+      },
+      "has_linear_overlap": {
+        "total_true": 4,
+        "in_lof_top5": 0
+      },
+      "has_conflicting_proposed_l": {
+        "total_true": 0,
+        "in_lof_top5": 0
+      }
+    }
+  }
+}

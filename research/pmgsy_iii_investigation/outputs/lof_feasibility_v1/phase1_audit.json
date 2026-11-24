@@ -1,0 +1,403 @@
+{
+  "total_packages_parquet_rows": 5867,
+  "p_scored_rows": 4361,
+  "feature_audit": [
+    {
+      "feature": "n_segments",
+      "present_in_packages_parquet": true,
+      "dtype": "int64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 27,
+      "top_value": "1",
+      "top_share_pct": 81.47,
+      "min": 1.0,
+      "p01": 1.0,
+      "median_p50": 1.0,
+      "p75": 1.0,
+      "p99": 11.0,
+      "max": 67.0,
+      "iqr": 0.0,
+      "skew": 9.053231529096955
+    },
+    {
+      "feature": "mean_seg_len_km",
+      "present_in_packages_parquet": true,
+      "dtype": "float64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 4361,
+      "top_value": "8.172086380196639",
+      "top_share_pct": 0.02,
+      "min": 0.15801038422837452,
+      "p01": 0.6366372021193756,
+      "median_p50": 6.0388104236971305,
+      "p75": 8.238708794666882,
+      "p99": 20.375298744680954,
+      "max": 39.51376922784732,
+      "iqr": 3.335330359293118,
+      "skew": 1.7219849642237863
+    },
+    {
+      "feature": "mean_sinuosity",
+      "present_in_packages_parquet": true,
+      "dtype": "float64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 4358,
+      "top_value": "1.0",
+      "top_share_pct": 0.09,
+      "min": 1.0,
+      "p01": 1.006414859761219,
+      "median_p50": 1.2060159154875245,
+      "p75": 1.3814167798962607,
+      "p99": 3.4964868725750535,
+      "max": 16.648350699226338,
+      "iqr": 0.2759155545170071,
+      "skew": 10.823799918448747
+    },
+    {
+      "feature": "vertices_per_km",
+      "present_in_packages_parquet": false
+    },
+    {
+      "feature": "seg_len_concentration",
+      "present_in_packages_parquet": false
+    },
+    {
+      "feature": "total_vertices",
+      "present_in_packages_parquet": true,
+      "dtype": "int64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 640,
+      "top_value": "96",
+      "top_share_pct": 0.62,
+      "min": 2.0,
+      "p01": 17.0,
+      "median_p50": 166.0,
+      "p75": 257.0,
+      "p99": 784.0,
+      "max": 26743.0,
+      "iqr": 154.0,
+      "skew": 40.47785375868886
+    },
+    {
+      "feature": "max_seg_len_km",
+      "present_in_packages_parquet": true,
+      "dtype": "float64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 4361,
+      "top_value": "8.172086380196639",
+      "top_share_pct": 0.02,
+      "min": 0.15801038422837452,
+      "p01": 1.1243508192356726,
+      "median_p50": 6.424161950245786,
+      "p75": 8.673876117090089,
+      "p99": 21.237945550934604,
+      "max": 39.51376922784732,
+      "iqr": 3.4853325889160134,
+      "skew": 1.9929718423654401
+    },
+    {
+      "feature": "n_distinct_geom",
+      "present_in_packages_parquet": true,
+      "dtype": "int64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 27,
+      "top_value": "1",
+      "top_share_pct": 81.5,
+      "min": 1.0,
+      "p01": 1.0,
+      "median_p50": 1.0,
+      "p75": 1.0,
+      "p99": 11.0,
+      "max": 67.0,
+      "iqr": 0.0,
+      "skew": 9.053316145542652
+    },
+    {
+      "feature": "sum_geom_len_km",
+      "present_in_packages_parquet": true,
+      "dtype": "float64",
+      "missing_count": 0,
+      "missing_pct": 0.0,
+      "unique_non_null": 4361,
+      "top_value": "8.172086380196639",
+      "top_share_pct": 0.02,
+      "min": 0.15801038422837452,
+      "p01": 1.215421015214029,
+      "median_p50": 6.899271044708342,
+      "p75": 9.640997197217482,
+      "p99": 26.4479370964604,
+      "max": 44.28351413962352,
+      "iqr": 4.171615888729862,
+      "skew": 2.3452206628481833
+    }
+  ],
+  "group_audit": {
+    "source_state_key": {
+      "num_groups": 3,
+      "min_size": 731,
+      "median_size": 1074.0,
+      "max_size": 2556,
+      "eligible_groups_gt_k": {
+        "10": 3,
+        "20": 3,
+        "35": 3,
+        "50": 3
+      },
+      "smallest_groups": {
+        "UTTAR_PRADESH": 2556,
+        "MADHYA_PRADESH": 1074,
+        "BIHAR": 731
+      }
+    },
+    "ims_year": {
+      "num_groups": 6,
+      "min_size": 7,
+      "median_size": 363.0,
+      "max_size": 2108,
+      "eligible_groups_gt_k": {
+        "10": 5,
+        "20": 5,
+        "35": 5,
+        "50": 5
+      },
+      "smallest_groups": {
+        "2021": 2108,
+        "2020": 1425,
+        "2022": 618,
+        "2019": 108,
+        "2023": 95,
+        "2024": 7
+      }
+    },
+    "ims_batch": {
+      "num_groups": 2,
+      "min_size": 807,
+      "median_size": 2180.5,
+      "max_size": 3554,
+      "eligible_groups_gt_k": {
+        "10": 2,
+        "20": 2,
+        "35": 2,
+        "50": 2
+      },
+      "smallest_groups": {
+        "1": 3554,
+        "2": 807
+      }
+    },
+    "lgd_distri": {
+      "num_groups": 168,
+      "min_size": 1,
+      "median_size": 22.0,
+      "max_size": 81,
+      "eligible_groups_gt_k": {
+        "10": 143,
+        "20": 89,
+        "35": 35,
+        "50": 18
+      },
+      "smallest_groups": {
+        "222": 5,
+        "199": 5,
+        "144": 4,
+        "194": 4,
+        "785": 4,
+        "207": 3,
+        "198": 3,
+        "210": 2,
+        "204": 1,
+        "219": 1
+      }
+    }
+  },
+  "n_segments_distribution": {
+    "1": 3553,
+    "2": 302,
+    "3": 136,
+    "4": 90,
+    "5": 76,
+    "6": 44,
+    "7": 34,
+    "8": 23,
+    "9": 27,
+    "10": 17,
+    "11": 19,
+    "12": 9,
+    "13": 5,
+    "14": 4,
+    "15": 5,
+    "16": 2,
+    "17": 3,
+    "18": 3,
+    "20": 1,
+    "21": 1,
+    "23": 1,
+    "24": 1,
+    "26": 1,
+    "28": 1,
+    "29": 1,
+    "31": 1,
+    "67": 1
+  },
+  "top_15_state_year_batch_cohorts": [
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2021,
+      "ims_batch": 1,
+      "n_packages": 1057
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2020,
+      "ims_batch": 1,
+      "n_packages": 883
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2021,
+      "ims_batch": 2,
+      "n_packages": 550
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2021,
+      "ims_batch": 1,
+      "n_packages": 497
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2020,
+      "ims_batch": 1,
+      "n_packages": 377
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2022,
+      "ims_batch": 1,
+      "n_packages": 277
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2022,
+      "ims_batch": 2,
+      "n_packages": 253
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2020,
+      "ims_batch": 1,
+      "n_packages": 165
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2019,
+      "ims_batch": 1,
+      "n_packages": 108
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2022,
+      "ims_batch": 1,
+      "n_packages": 88
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2023,
+      "ims_batch": 1,
+      "n_packages": 63
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2023,
+      "ims_batch": 1,
+      "n_packages": 32
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2024,
+      "ims_batch": 1,
+      "n_packages": 4
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2021,
+      "ims_batch": 2,
+      "n_packages": 4
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2024,
+      "ims_batch": 1,
+      "n_packages": 3
+    }
+  ],
+  "bottom_10_state_year_batch_cohorts": [
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2022,
+      "ims_batch": 1,
+      "n_packages": 277
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2022,
+      "ims_batch": 2,
+      "n_packages": 253
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2020,
+      "ims_batch": 1,
+      "n_packages": 165
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2019,
+      "ims_batch": 1,
+      "n_packages": 108
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2022,
+      "ims_batch": 1,
+      "n_packages": 88
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2023,
+      "ims_batch": 1,
+      "n_packages": 63
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2023,
+      "ims_batch": 1,
+      "n_packages": 32
+    },
+    {
+      "source_state_key": "BIHAR",
+      "ims_year": 2024,
+      "ims_batch": 1,
+      "n_packages": 4
+    },
+    {
+      "source_state_key": "MADHYA_PRADESH",
+      "ims_year": 2021,
+      "ims_batch": 2,
+      "n_packages": 4
+    },
+    {
+      "source_state_key": "UTTAR_PRADESH",
+      "ims_year": 2024,
+      "ims_batch": 1,
+      "n_packages": 3
+    }
+  ],
+  "total_state_year_batch_cohorts": 15
+}

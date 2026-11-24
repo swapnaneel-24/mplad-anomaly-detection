@@ -1,0 +1,729 @@
+{
+  "register_file": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\research\\pmgsy_iii_investigation\\outputs\\peiars_evidence_integration_v1\\PEIARS_PMGSY_42_CASES.csv",
+  "register_row_count": 42,
+  "matched_to_4361_p_packages": 42,
+  "unmatched_uids": [],
+  "label_column_detected": "adjudication_outcome",
+  "label_counts": {
+    "SUPPORTED_REVIEW_CANDIDATE": 37,
+    "UNRESOLVED": 5
+  },
+  "lof_top5_hits_in_register": {
+    "full_5feat__k10": {
+      "in_lof_top5_count": 11,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_001",
+          "package_uid_reg": "e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_003",
+          "package_uid_reg": "511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_033",
+          "package_uid_reg": "54408804c8cc819e6e1f3a89a37e4eccda2e23e821afc8df5a0e4ce5d42a2180",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        }
+      ]
+    },
+    "full_5feat__k20": {
+      "in_lof_top5_count": 13,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_001",
+          "package_uid_reg": "e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_003",
+          "package_uid_reg": "511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        }
+      ]
+    },
+    "full_5feat__k35": {
+      "in_lof_top5_count": 13,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_001",
+          "package_uid_reg": "e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_003",
+          "package_uid_reg": "511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_008",
+          "package_uid_reg": "40d05cc2e28a556a0c62c98eca09519361bb7c1083a289cbceaf4d4e03ce8089",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        }
+      ]
+    },
+    "full_5feat__k50": {
+      "in_lof_top5_count": 13,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_001",
+          "package_uid_reg": "e31b223d5ca6a4b98d6b5c283a38aacf7b9e790d8389043aadb5dbf224b3d2e7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_003",
+          "package_uid_reg": "511cdf8334dda4d14bce2dc2733df13ca0e450eab07145a69fd5cac878e85d0e",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_008",
+          "package_uid_reg": "40d05cc2e28a556a0c62c98eca09519361bb7c1083a289cbceaf4d4e03ce8089",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        }
+      ]
+    },
+    "ablation_no_seg_conc__k10": {
+      "in_lof_top5_count": 10,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_033",
+          "package_uid_reg": "54408804c8cc819e6e1f3a89a37e4eccda2e23e821afc8df5a0e4ce5d42a2180",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_042",
+          "package_uid_reg": "1f6bb37db61459307424439c2d25ff2e02ee024aebea9a8cdb5c8845757ed2b5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        }
+      ]
+    },
+    "ablation_no_seg_conc__k20": {
+      "in_lof_top5_count": 13,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_008",
+          "package_uid_reg": "40d05cc2e28a556a0c62c98eca09519361bb7c1083a289cbceaf4d4e03ce8089",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_042",
+          "package_uid_reg": "1f6bb37db61459307424439c2d25ff2e02ee024aebea9a8cdb5c8845757ed2b5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        }
+      ]
+    },
+    "ablation_no_seg_conc__k35": {
+      "in_lof_top5_count": 15,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_008",
+          "package_uid_reg": "40d05cc2e28a556a0c62c98eca09519361bb7c1083a289cbceaf4d4e03ce8089",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_014",
+          "package_uid_reg": "4c3400503936dead91946235483dbd679fd25f355c244080c7bd635cdd74b924",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_031",
+          "package_uid_reg": "335bdd7821f9e8edf9a56a66b87cdc5f85b6ca8733c573eace9c1165ac16795f",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_042",
+          "package_uid_reg": "1f6bb37db61459307424439c2d25ff2e02ee024aebea9a8cdb5c8845757ed2b5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        }
+      ]
+    },
+    "ablation_no_seg_conc__k50": {
+      "in_lof_top5_count": 15,
+      "matched_cases": [
+        {
+          "case_id": "PEIARS_PMGSY_006",
+          "package_uid_reg": "dfcd8d0269e16f5454ccbda3470970d71cd4f673b30dc0846b83d685ec3dca5a",
+          "source_state_key_reg": "MADHYA_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_007",
+          "package_uid_reg": "82453cef0ae4c7b5043afbd062af978d927796108661b1b8c8dbe75002038211",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_008",
+          "package_uid_reg": "40d05cc2e28a556a0c62c98eca09519361bb7c1083a289cbceaf4d4e03ce8089",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_009",
+          "package_uid_reg": "823b075f2154418c0dced1730ded0dc44d86e70e17d95dd2b1a5d52f22a47662",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_011",
+          "package_uid_reg": "9415c6a82bfbdf57505202a424ebf7f21791bf26d724e59d8bebeda710e7b222",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_012",
+          "package_uid_reg": "082dfc973db7a6b248ec2cb00f038024fcf36e40898a8ab81b154d73d5586488",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_014",
+          "package_uid_reg": "4c3400503936dead91946235483dbd679fd25f355c244080c7bd635cdd74b924",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_018",
+          "package_uid_reg": "d3f8d17ef2816c53fb7c02f791717323ae2d85dacb7191b4e9b8915bfdbfdd19",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_030",
+          "package_uid_reg": "50593a689b3227a0ad9423a3235486f4e28a8c1f48bb0ab87aa7740967736aca",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_031",
+          "package_uid_reg": "335bdd7821f9e8edf9a56a66b87cdc5f85b6ca8733c573eace9c1165ac16795f",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_036",
+          "package_uid_reg": "e639164417305bff5f23d4ccd9238a6c12bebd49432ce24fa67f8bf0a0d19740",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_038",
+          "package_uid_reg": "b26ca9f842383a327b19c6f6cef109612848eaabcc3328903141da546be7a6d5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_040",
+          "package_uid_reg": "a21d739d25908f7256ede80382ed7585fc92cc76ad1481a137ddb7944e1577ce",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_041",
+          "package_uid_reg": "565c781da14f96d8dd357c6a77c296b8c1de1e32cda2d896f6b5a0b04fa6b5b7",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "SUPPORTED_REVIEW_CANDIDATE"
+        },
+        {
+          "case_id": "PEIARS_PMGSY_042",
+          "package_uid_reg": "1f6bb37db61459307424439c2d25ff2e02ee024aebea9a8cdb5c8845757ed2b5",
+          "source_state_key_reg": "UTTAR_PRADESH",
+          "adjudication_outcome": "UNRESOLVED"
+        }
+      ]
+    }
+  },
+  "rank_pct_summary_on_register": {
+    "full_5feat__k10_rank_pct": {
+      "median": 0.8440741347308658,
+      "p75": 0.9503257002112997,
+      "max": 1.0
+    },
+    "full_5feat__k20_rank_pct": {
+      "median": 0.8834115805946792,
+      "p75": 0.9594092331768388,
+      "max": 1.0
+    },
+    "full_5feat__k35_rank_pct": {
+      "median": 0.8540688575899844,
+      "p75": 0.9636150234741784,
+      "max": 1.0
+    },
+    "full_5feat__k50_rank_pct": {
+      "median": 0.8507433489827856,
+      "p75": 0.9652777777777778,
+      "max": 1.0
+    },
+    "ablation_no_seg_conc__k10_rank_pct": {
+      "median": 0.8794992175273866,
+      "p75": 0.9492946067604644,
+      "max": 0.9933489827856025
+    },
+    "ablation_no_seg_conc__k20_rank_pct": {
+      "median": 0.8884976525821596,
+      "p75": 0.9680164319248826,
+      "max": 0.9949139280125195
+    },
+    "ablation_no_seg_conc__k35_rank_pct": {
+      "median": 0.8693270735524257,
+      "p75": 0.973689358372457,
+      "max": 0.9945226917057903
+    },
+    "ablation_no_seg_conc__k50_rank_pct": {
+      "median": 0.8681839641199149,
+      "p75": 0.9720266040688577,
+      "max": 0.9945226917057903
+    }
+  },
+  "by_review_outcome": {
+    "SUPPORTED_REVIEW_CANDIDATE": {
+      "n_cases": 37,
+      "matched_p_packages": 37,
+      "full_5feat_k20_top5": 11,
+      "full_5feat_k35_top5": 11,
+      "ablation_no_seg_conc_k35_top5": 12
+    },
+    "UNRESOLVED": {
+      "n_cases": 5,
+      "matched_p_packages": 5,
+      "full_5feat_k20_top5": 2,
+      "full_5feat_k35_top5": 2,
+      "ablation_no_seg_conc_k35_top5": 3
+    }
+  }
+}

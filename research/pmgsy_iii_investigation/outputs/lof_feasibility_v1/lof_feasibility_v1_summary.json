@@ -1,0 +1,102 @@
+{
+  "experiment_id": "PEIARS-PMGSY-LOF-FEASIBILITY-V1",
+  "p_packages_evaluated": 4361,
+  "arms": {
+    "full_5feat": [
+      "n_segments",
+      "mean_seg_len_km",
+      "mean_sinuosity",
+      "vertices_per_km",
+      "seg_len_concentration"
+    ],
+    "ablation_no_seg_conc": [
+      "mean_seg_len_km",
+      "mean_sinuosity",
+      "vertices_per_km"
+    ]
+  },
+  "neighbor_grid": [
+    10,
+    20,
+    35,
+    50
+  ],
+  "within_arm_top5_jaccard": {
+    "full_5feat": {
+      "k10_vs_k20": 0.5532,
+      "k10_vs_k35": 0.4649,
+      "k10_vs_k50": 0.4361,
+      "k20_vs_k35": 0.7951,
+      "k20_vs_k50": 0.6654,
+      "k35_vs_k50": 0.7805
+    },
+    "ablation_no_seg_conc": {
+      "k10_vs_k20": 0.5315,
+      "k10_vs_k35": 0.4408,
+      "k10_vs_k50": 0.4129,
+      "k20_vs_k35": 0.759,
+      "k20_vs_k50": 0.6911,
+      "k35_vs_k50": 0.8798
+    }
+  },
+  "full_vs_ablation_top5_jaccard_by_k": {
+    "k10": 0.5643,
+    "k20": 0.5927,
+    "k35": 0.5927,
+    "k50": 0.5699
+  },
+  "top5_overlap_with_option_b_v2_non_baseline": {
+    "full_5feat__k10": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 77,
+      "jaccard_vs_opt_b_non_baseline": 0.0603
+    },
+    "full_5feat__k20": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 73,
+      "jaccard_vs_opt_b_non_baseline": 0.057
+    },
+    "full_5feat__k35": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 69,
+      "jaccard_vs_opt_b_non_baseline": 0.0537
+    },
+    "full_5feat__k50": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 68,
+      "jaccard_vs_opt_b_non_baseline": 0.0529
+    },
+    "ablation_no_seg_conc__k10": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 76,
+      "jaccard_vs_opt_b_non_baseline": 0.0595
+    },
+    "ablation_no_seg_conc__k20": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 77,
+      "jaccard_vs_opt_b_non_baseline": 0.0603
+    },
+    "ablation_no_seg_conc__k35": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 76,
+      "jaccard_vs_opt_b_non_baseline": 0.0595
+    },
+    "ablation_no_seg_conc__k50": {
+      "top5_count": 219,
+      "opt_b_non_baseline_count": 1135,
+      "intersection_count": 72,
+      "jaccard_vs_opt_b_non_baseline": 0.0562
+    }
+  },
+  "artifacts": {
+    "scores_parquet": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\research\\pmgsy_iii_investigation\\outputs\\lof_feasibility_v1\\lof_feasibility_v1_scores.parquet",
+    "neighbors_json": "C:\\Users\\53542\\Desktop\\mplad-anomaly-detection\\research\\pmgsy_iii_investigation\\outputs\\lof_feasibility_v1\\lof_feasibility_v1_neighbors.json"
+  }
+}

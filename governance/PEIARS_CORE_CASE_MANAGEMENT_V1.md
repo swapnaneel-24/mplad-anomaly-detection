@@ -57,3 +57,15 @@ Track application code, tests, schema/migrations, sanitized public docs, provena
 - Evidence source acquisition/connectors for PMGSY/OMMAS if authorized and accessible, with explicit independence and licensing checks.
 - Reviewer assignment, two-reviewer adjudication, access control and redaction.
 - More data streams only after case/event/evidence abstractions pass the local PMGSY demonstration.
+
+
+## Research-model boundary addendum — 2026-11-24
+
+A separate LOF feasibility experiment is now verified on branch `research/pmgsy-lof-feasibility-v1` at `fc03519af02309732943ad238562c7c485d8a820`. Governance disposition: `LOF_FEASIBILITY_COMPLETED_RESEARCH_ONLY_NOT_ADMITTED` (structural feasibility `PASS_WITH_LIMITATIONS`; evidence validity `NOT_MET`).
+
+Core case-management behavior is unchanged:
+- LOF scores/ranks are **research metadata only** and cannot automatically create a case, change disposition, change verification status, or alter Option B/topology evidence.
+- Do not create a composite LOF/IF/Option-B score.
+- If exposed in the UI, place LOF under Research/experimental context with the frozen configuration and limitations visible; do not present it as an admitted detector.
+- Frozen comparison candidates are `full_5feat__k35` and `ablation_no_seg_conc__k35`; they are not production defaults.
+- Continue the workbench/core implementation from the existing engineering baseline; no LOF integration is required to satisfy `PEIARS_CORE_V1_ENGINEERING_PASS`.

@@ -56,3 +56,8 @@ Research-model outputs must not silently alter investigation state.
 Prompt B is closed. The next implementation step is Prompt C. Prompt C should focus on investigation workflow and provenance/event-history presentation using the already separated frozen baseline and app-level event streams.
 
 Do not start new anomaly-model tuning as part of this transition.
+
+
+## Supersession note — 2026-11-24
+
+Prompt C is now complete at `206ad6efee52b637d90bfdaf129b51a5b76ff548`. This document remains the Prompt B closure record; its former “next step: Prompt C” handoff is now historical. The active next milestone is Prompt D, with Prompt C completion recorded separately in `governance/PEIARS_WORKBENCH_04_INVESTIGATIONS_PROMPT_C_COMPLETION.md`.

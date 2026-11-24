@@ -39,6 +39,93 @@ def get_paths(repo_root: Path) -> dict[str, Path]:
     }
 
 
+def compute_signed_length_metrics(meas: dict) -> dict:
+    """Compute signed length difference and safe relative difference (no zero-denominator division)."""
+    prop_raw = meas.get("proposed_l_km")
+    geom_raw = meas.get("sum_geom_len_km")
+    try:
+        prop = float(prop_raw) if prop_raw is not None and pd.notna(prop_raw) else None
+    except (TypeError, ValueError):
+        prop = None
+    try:
+        geom = float(geom_raw) if geom_raw is not None and pd.notna(geom_raw) else None
+    except (TypeError, ValueError):
+        geom = None
+
+    if prop is not None and geom is not None:
+        diff_km = round(geom - prop, 4)
+        if prop == 0.0:
+            rel_display = "UNDEFINED_ZERO_DENOMINATOR"
+            rel_numeric = None
+        else:
+            rel_numeric = round(diff_km / prop, 4)
+            rel_display = f"{rel_numeric:+.4f}"
+    else:
+        diff_km = None
+        rel_numeric = None
+        rel_display = "UNAVAILABLE"
+
+    return {
+        "proposed_l_km": prop,
+        "sum_geom_len_km": geom,
+        "length_diff_km": diff_km,
+        "length_rel_diff": rel_numeric,
+        "length_rel_diff_display": rel_display,
+    }
+
+
+def summarize_observation(ev_rec: dict, metrics: dict, verification_status: str) -> str:
+    topo = ev_rec.get("topology", {}) if isinstance(ev_rec, dict) else {}
+    flags = []
+    if topo.get("has_exact_geom_dup"):
+        flags.append("exact geometry duplicate")
+    if topo.get("has_linear_overlap"):
+        flags.append("linear overlap")
+    if topo.get("has_invalid_segment_geom"):
+        flags.append("invalid segment geometry")
+    if metrics.get("length_rel_diff_display") == "UNDEFINED_ZERO_DENOMINATOR":
+        flags.append("zero proposed length (undefined rel. diff)")
+    elif metrics.get("length_diff_km") is not None and abs(metrics["length_diff_km"]) >= 5.0:
+        flags.append(f"signed length gap ({metrics['length_diff_km']:+.2f} km)")
+    if not flags:
+        flags.append(f"verification: {verification_status.lower()}")
+    return "; ".join(flags)
+
+
+def get_sources_registry_rows() -> list[dict]:
+    """Truthful registered-source rows; does not fabricate PMGSY registry entries or fake records."""
+    return [
+        {
+            "source_id": "synthetic-demonstration",
+            "dataset_kind": "mplads_administration",
+            "registration_scope": "registered_demo_source",
+            "availability": "demonstration_only",
+            "integrity_status": "unavailable",
+            "analysis_status": "restricted",
+            "notes": "Synthetic demonstration source only; not linked to PMGSY local research snapshot.",
+        }
+    ]
+
+
+def get_snapshots_registry_rows(repo_root: Path) -> list[dict]:
+    """Truthful snapshot entries distinguishing local research snapshot from global source registry."""
+    p = get_paths(repo_root)
+    exists = p["cases_json"].exists() and p["hist_162_jsonl"].exists()
+    man_hash = sha256_file(p["man_42_json"])[:16] + "..." if p["man_42_json"].exists() else "unavailable"
+    return [
+        {
+            "snapshot_id": "pmgsy3_3state_v1_curated_42",
+            "snapshot_type": "Local research snapshot",
+            "registry_linkage": "Global source-registry registration not established",
+            "records_scope": "42 selected case-linked packages (not all 4,361 P packages)",
+            "provenance_baseline": "162 frozen events (37 SUPPORTED_REVIEW_CANDIDATE, 5 UNRESOLVED, 0 CONFIRMED_SOURCE_DEFECT)",
+            "external_corroboration": "12/12 VERIFICATION_BLOCKED (missing local PMGSY/OMMAS records)",
+            "manifest_sha256_prefix": man_hash,
+            "status": "loaded_local" if exists else "missing",
+        }
+    ]
+
+
 def init_and_import_sqlite(repo_root: Path | None = None) -> dict:
     root = repo_root or Path.cwd()
     p = get_paths(root)
